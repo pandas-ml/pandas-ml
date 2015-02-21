@@ -24,6 +24,19 @@ class TestModelFrame(tm.TestCase):
         self.assertTrue(isinstance(test_df, expd.ModelFrame))
         self.assertTrue(isinstance(train_df.iloc[:, 2:3], expd.ModelFrame))
 
+    def test_frame_slice(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        expected = ['.target'] + iris.feature_names
+        self.assertEqual(df.columns.tolist(), expected)
+
+        s = df['.target']
+        self.assertTrue(isinstance(s, expd.ModelSeries))
+
+        s = df[['.target']]
+        self.assertTrue(isinstance(s, expd.ModelFrame))
+
 
 if __name__ == '__main__':
     import nose

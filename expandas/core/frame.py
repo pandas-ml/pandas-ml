@@ -3,16 +3,25 @@
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
+from expandas.core.generic import ModelGeneric
+from expandas.core.series import ModelSeries
 from expandas.skaccessors import (ClusterMethods,
                                   CrossValidationMethods,
-                                  MetricsMethods,
-                                  PreprocessingMethods)
+                                  MetricsMethods)
 
-class ModelFrame(pd.DataFrame):
+
+class ModelFrame(ModelGeneric, pd.DataFrame):
 
     _internal_names = (pd.core.generic.NDFrame._internal_names +
-                       ['target_name', 'estimators'])
+                       ['target_name', 'estimators', 'predict'])
     _internal_names_set = set(_internal_names)
+
+    @property
+    def _constructor(self):
+        return ModelFrame
+
+    _constructor_sliced = ModelSeries
+
 
     def __init__(self, data, target=None, target_name=None,
                  *args, **kwargs):
@@ -52,11 +61,7 @@ class ModelFrame(pd.DataFrame):
         # estimator histories
         self.estimators = []
 
-        super(ModelFrame, self).__init__(df, *args, **kwargs)
-
-    @property
-    def _constructor(self):
-        return ModelFrame
+        pd.DataFrame.__init__(self, df, *args, **kwargs)
 
     @property
     def data_columns(self):
@@ -151,6 +156,3 @@ class ModelFrame(pd.DataFrame):
     def metrics(self):
         return MetricsMethods(self)
 
-    @cache_readonly
-    def preprocessing(self):
-        return PreprocessingMethods(self)

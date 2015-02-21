@@ -3,4 +3,5 @@
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from expandas.core import ModelFrame
+
+from expandas.core import ModelFrame, ModelSeries
