@@ -1,0 +1,14 @@
+language: python
+python:
+  - "2.7"
+  - "3.3" 
+  - "3.4"
+          
+install: 
+  - "pip install -r requirements_test.txt"
+
+script: nosetests
+
+after_success:
+  - coveralls
+
