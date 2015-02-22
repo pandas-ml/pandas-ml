@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from expandas.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class ClusterMethods(AccessorMethods):
@@ -51,6 +51,7 @@ class ClusterMethods(AccessorMethods):
     def biclusterling(self):
         raise NotImplementedError
 
+
 _cluster_methods = ['estimate_bandwidth', 'ward_tree']
 
 
@@ -58,7 +59,6 @@ def _wrap_func(func):
     def f(self, *args, **kwargs):
         data = self.data
         result = func(data.values, *args, **kwargs)
-        # result = pd.Series(result, index=data.index)
         return result
     return f
 

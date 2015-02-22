@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from expandas.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class MetricsMethods(AccessorMethods):
@@ -114,7 +114,6 @@ def _wrap_func(func):
         result = func(self.target.values,
                       self.predicted.values,
                       *args, **kwargs)
-        # result = pd.DataFrame(result)
         return result
     return f
 

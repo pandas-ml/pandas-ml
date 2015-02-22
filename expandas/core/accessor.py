@@ -15,7 +15,10 @@ class AccessorMethods(object):
 
             for mobj in self._module.__all__:
                 if not hasattr(self, mobj):
-                    setattr(self, mobj, getattr(self._module, mobj))
+                    try:
+                        setattr(self, mobj, getattr(self._module, mobj))
+                    except AttributeError:
+                        pass
 
         self._df = df
 
