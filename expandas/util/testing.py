@@ -3,7 +3,9 @@
 import numpy as np
 import pandas as pd
 import pandas.compat as compat
+
 import pandas.util.testing as tm
+from pandas.util.testing import *
 
 class TestCase(tm.TestCase):
 

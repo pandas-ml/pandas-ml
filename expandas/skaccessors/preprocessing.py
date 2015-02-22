@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from expandas.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class PreprocessingMethods(AccessorMethods):

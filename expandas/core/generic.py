@@ -3,7 +3,7 @@
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from expandas.skaccessors import PreprocessingMethods
+import expandas.skaccessors as skaccessors
 
 
 class ModelGeneric(object):
@@ -16,4 +16,4 @@ class ModelGeneric(object):
 
     @cache_readonly
     def preprocessing(self):
-        return PreprocessingMethods(self)
+        return skaccessors.PreprocessingMethods(self)

@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
+import warnings
+
+import numpy as np
 import pandas as pd
+import pandas.compat as compat
 from pandas.util.decorators import cache_readonly
 
 from expandas.core.generic import ModelGeneric
 from expandas.core.series import ModelSeries
-from expandas.skaccessors import (ClusterMethods,
-                                  CrossValidationMethods,
-                                  MetricsMethods)
+import expandas.skaccessors as skaccessors
 
 
 class ModelFrame(ModelGeneric, pd.DataFrame):
@@ -22,8 +24,9 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
 
     _constructor_sliced = ModelSeries
 
+    _TARGET_NAME = '.target'
 
-    def __init__(self, data, target=None, target_name=None,
+    def __init__(self, data, target=None,
                  *args, **kwargs):
         try:
             from sklearn.datasets.base import Bunch
@@ -35,33 +38,52 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
                 # instanciate here to add column name
                 columns = getattr(data, 'feature_names', None)
                 data = pd.DataFrame(data.data, columns=columns)
-        except ImportError, e:
-            print(e)
+        except ImportError:
             pass
 
-        if target_name is None:
-            if isinstance(data, ModelFrame):
-                target_name = data.target_name
-            else:
-                # default
-                target_name = '.target'
+        if isinstance(data, ModelFrame):
+            target_name = data.target_name
+        elif isinstance(target, pd.Series):
+            target_name = target.name
+            if target_name is None:
+                target_name = self._TARGET_NAME
+                target = pd.Series(target, name=target_name)
+        else:
+            target_name = self._TARGET_NAME
 
-        if target is None:
+        if not isinstance(data, pd.DataFrame):
+            data = pd.DataFrame(data, *args, **kwargs)
+
+        if isinstance(target, compat.string_types):
+            if target in data.columns:
+                target_name = target
+                df = data
+            else:
+                msg = "Specified target '{0}' is not included in data"
+                raise ValueError(msg.format(target))
+
+        elif target is None:
             df = data
         else:
-            if not isinstance(data, pd.DataFrame):
-                data = pd.DataFrame(data)
-
             if not isinstance(target, pd.Series):
-                target = pd.Series(target, name=target_name)
-
-            df = pd.concat([target, data], axis=1)
+                target = pd.Series(target, name=target_name, index=data.index)
+            df = self._concat_target(data, target)
 
         self.target_name = target_name
         # estimator histories
         self.estimators = []
 
         pd.DataFrame.__init__(self, df, *args, **kwargs)
+
+    def _concat_target(self, data, target):
+        assert isinstance(target, pd.Series)
+
+        if len(data) != len(target):
+            raise ValueError('data and target must have same length')
+
+        if not data.index.equals(target.index):
+            raise ValueError('data and target must have equal index')
+        return pd.concat([target, data], axis=1)
 
     @property
     def data_columns(self):
@@ -71,9 +93,75 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
     def data(self):
         return self.loc[:, self.data_columns]
 
+    @data.setter
+    def data(self, value):
+        if value is None:
+            del self.data
+            return
+
+        if isinstance(value, ModelFrame):
+            if value.has_target():
+                msg = 'Cannot update with {0} which has target attribute'
+                raise ValueError(msg.format(self.__class__.__name__))
+
+        if not isinstance(value, pd.DataFrame):
+            value = pd.DataFrame(value, index=self.index)
+
+        if self.target_name in value.columns:
+            msg = "Passed data has the same column name as the target '{0}'"
+            raise ValueError(msg.format(self.target_name))
+
+        if self.has_target():
+            value = self._concat_target(value, self.target)
+        self._update_inplace(value)
+
+    # don't allow to delete data
+
+    def has_target(self):
+        return self.target_name in self.columns
+
     @property
     def target(self):
-        return self.loc[:, self.target_name]
+        if self.has_target():
+            return self.loc[:, self.target_name]
+        else:
+            msg = "{0} doesn't have target '{1}'"
+            raise ValueError(msg.format(self.__class__.__name__, self.target_name))
+
+    @target.setter
+    def target(self, target):
+        if target is None:
+            del self.target
+            return
+
+        if not self.has_target():
+            # allow to update target_name only when target attibute doesn't exist
+            if isinstance(target, pd.Series):
+                if target.name is not None:
+                    self.target_name = target.name
+
+        if isinstance(target, compat.string_types):
+            if target in self.columns:
+                self.target_name = target
+            else:
+                msg = "Specified target '{0}' is not included in data"
+                raise ValueError(msg.format(target))
+            return
+
+        if isinstance(target, pd.Series):
+            if target.name != self.target_name:
+                msg = "Passed data is being renamed to '{0}'".format(self.target_name)
+                warnings.warn(msg)
+                target = pd.Series(target, name=self.target_name)
+        else:
+            target = pd.Series(target, index=self.index, name=self.target_name)
+
+        df = self._concat_target(self.data, target)
+        self._update_inplace(df)
+
+    @target.deleter
+    def target(self):
+        self._update_inplace(self.data)
 
     @property
     def estimator(self):
@@ -91,68 +179,135 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
     def fit(self, estimator, history=True, *args, **kwargs):
         self._check_attr(estimator, 'fit')
 
+        data = self.data.values
+        target = self.target.values
+
         try:
-            estimator.fit(self.data.values, y=self.target, *args, **kwargs)
+            estimator.fit(data, y=target, *args, **kwargs)
         except TypeError:
-            estimator.fit(self.data.values, *args, **kwargs)
+            estimator.fit(data, *args, **kwargs)
 
         if history:
             self.estimators.append(estimator)
         else:
             # only store latest
             self.estimators = [estimator]
+        return estimator
 
 
     def predict(self, estimator, *args, **kwargs):
         self._check_attr(estimator, 'predict')
-        predicted = estimator.predict(self.data, *args, **kwargs)
 
+        data = self.data.values
+        target = self.target.values
+
+        predicted = estimator.predict(data, *args, **kwargs)
         self.predicted = pd.Series(predicted, index=self.index)
+
         return self.predicted
 
     def fit_predict(self, estimator, *args, **kwargs):
         self._check_attr(estimator, 'fit_predict')
-        predicted = estimator.fit_predict(self.data, *args, **kwargs)
+
+        data = self.data.values
+        target = self.target.values
+
+        try:
+            predicted = estimator.fit_predict(data, y=target,
+                                              *args, **kwargs)
+        except TypeError:
+            predicted = estimator.fit_predict(data, *args, **kwargs)
 
         self.predicted = pd.Series(predicted, index=self.index)
         return self.predicted
 
     def score(self, estimator, *args, **kwargs):
         self._check_attr(estimator, 'score')
-        predicted = estimator.score(self.data, y=self.target, *args, **kwargs)
+
+        data = self.data.values
+        target = self.target.values
+
+        try:
+            predicted = estimator.score(data, y=target, *args, **kwargs)
+        except TypeError:
+            predicted = estimator.score(data, *args, **kwargs)
 
         self.predicted = pd.Series(predicted, index=self.index)
         return self.predicted
 
     def transform(self, estimator, *args, **kwargs):
         self._check_attr(estimator, 'transform')
-        transformed = estimator.transform(self.data, y=self.target, *args, **kwargs)
 
-        return pd.DataFrame(transformed, index=self.index)
+        data = self.data.values
+        target = self.target.values
+
+        try:
+            transformed = estimator.transform(data, y=target, *args, **kwargs)
+        except TypeError:
+            transformed = estimator.transform(data, *args, **kwargs)
+
+        if self.has_target():
+            return ModelFrame(transformed, target=self.target, index=self.index)
+        else:
+            return ModelFrame(transformed, index=self.index)
 
     def fit_transform(self, estimator, *args, **kwargs):
         self._check_attr(estimator, 'fit_transform')
-        transformed = estimator.fit_transform(self.data, y=self.target, *args, **kwargs)
 
-        return pd.DataFrame(transformed, index=self.index)
+        data = self.data.values
+        target = self.target.values
+
+        try:
+            transformed = estimator.fit_transform(data, y=target, *args, **kwargs)
+        except TypeError:
+            transformed = estimator.fit_transform(data, *args, **kwargs)
+
+        if self.has_target():
+            return ModelFrame(transformed, target=self.target, index=self.index)
+        else:
+            return ModelFrame(transformed, index=self.index)
 
     @cache_readonly
     def cluster(self):
-        return ClusterMethods(self)
+        return skaccessors.ClusterMethods(self)
 
     @cache_readonly
     def cross_validation(self):
-        return CrossValidationMethods(self)
+        return skaccessors.CrossValidationMethods(self)
 
-    @property
+    @cache_readonly
     def decomposition(self):
-        raise NotImplementedError
+        return skaccessors.DecompositionMethods(self)
 
-    @property
+    @cache_readonly
+    def dummy(self):
+        return skaccessors.DummyMethods(self)
+
+    @cache_readonly
+    def ensemble(self):
+        return skaccessors.EnsembleMethods(self)
+
+    @cache_readonly
+    def linear_model(self):
+        return skaccessors.LinearModelMethods(self)
+
+    @cache_readonly
     def feature_selection(self):
         raise NotImplementedError
 
     @cache_readonly
     def metrics(self):
-        return MetricsMethods(self)
+        return skaccessors.MetricsMethods(self)
+
+    @cache_readonly
+    def naive_bayes(self):
+        return skaccessors.NaiveBayesMethods(self)
+
+    @cache_readonly
+    def svm(self):
+        return skaccessors.SVMMethods(self)
+
+    @cache_readonly
+    def tree(self):
+        return skaccessors.TreeMethods(self)
 

@@ -13,7 +13,7 @@ import expandas as expd
 import expandas.util.testing as tm
 
 
-class TestMetrics(tm.TestCase):
+class TestCluster(tm.TestCase):
 
     def test_objectmapper(self):
         df = expd.ModelFrame([])
@@ -146,6 +146,56 @@ class TestMetrics(tm.TestCase):
         self.assert_index_equal(result.index, df.index)
         self.assert_numpy_array_equal(result.values, expected)
 
+    def test_KMeans(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['KMeans', 'MiniBatchKMeans']
+        for model in models:
+            mod1 = getattr(df.cluster, model)(3, random_state=self.random_state)
+            mod2 = getattr(cluster, model)(3, random_state=self.random_state)
+
+            df.fit(mod1)
+            mod2.fit(iris.data)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, pd.Series))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_Classifications(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['AffinityPropagation', 'MeanShift']
+        for model in models:
+            mod1 = getattr(df.cluster, model)()
+            mod2 = getattr(cluster, model)()
+
+            df.fit(mod1)
+            mod2.fit(iris.data)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, pd.Series))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_fit_predict(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['KMeans', 'MiniBatchKMeans']
+        for model in models:
+            mod1 = getattr(df.cluster, model)(3, random_state=self.random_state)
+            mod2 = getattr(cluster, model)(3, random_state=self.random_state)
+
+            result = df.fit_predict(mod1)
+            expected = mod2.fit_predict(iris.data)
+
+            self.assertTrue(isinstance(result, pd.Series))
+            self.assert_numpy_array_almost_equal(result.values, expected)
 
 if __name__ == '__main__':
     import nose
