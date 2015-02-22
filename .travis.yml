@@ -3,8 +3,14 @@ python:
   - "2.7"
   - "3.3" 
   - "3.4"
-          
+
 install: 
+  - sudo pip install conda
+  - sudo conda init
+  # - sudo conda update conda --yes
+  - deps='pip numpy scipy scikit-learn pandas nose'
+  - conda create -p $HOME/py --yes $deps "python=$TRAVIS_PYTHON_VERSION"
+  - export PATH=$HOME/py/bin:$PATH
   - "pip install -r requirements_test.txt"
 
 script: nosetests

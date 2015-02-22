@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import unicode_literals
-
 import pandas as pd
 import pandas.compat as compat
 
@@ -165,6 +163,8 @@ class TestModelFrame(tm.TestCase):
         self.assertEqual(df.columns.tolist(), expected)
 
         s = df['.target']
+        self.assertTrue(isinstance(s, expd.ModelSeries))
+        s = s[1:5]
         self.assertTrue(isinstance(s, expd.ModelSeries))
 
         s = df[['.target']]

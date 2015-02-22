@@ -11,6 +11,10 @@ class ModelSeries(ModelGeneric, pd.Series):
     Wrapper to support preprocessing
     """
 
+    @property
+    def _constructor(self):
+        return ModelSeries
+
     def __init__(self, *args, **kwargs):
         pd.Series.__init__(self, *args, **kwargs)
 

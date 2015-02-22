@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import unicode_literals
-
 import numpy as np
 import pandas as pd
 import pandas.compat as compat
