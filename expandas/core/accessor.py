@@ -14,11 +14,14 @@ class AccessorMethods(object):
             self._module = importlib.import_module(self._module_name)
 
             for mobj in self._module.__all__:
-                if not hasattr(self, mobj):
-                    try:
-                        setattr(self, mobj, getattr(self._module, mobj))
-                    except AttributeError:
-                        pass
+                try:
+                    if not hasattr(self, mobj):
+                        try:
+                            setattr(self, mobj, getattr(self._module, mobj))
+                        except AttributeError:
+                            pass
+                except NotImplementedError:
+                    pass
 
         self._df = df
 

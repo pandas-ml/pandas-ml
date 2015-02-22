@@ -79,9 +79,11 @@ Supported Packages
     - decomposition
     - dummy
     - ensemble
+    - lda
     - linear_model
     - feature_selection
     - naive_bayes
+    - neighbors
     - metrics (partially)
     - preprocessing (not well tested)
     - svm

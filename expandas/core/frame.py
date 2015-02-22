@@ -288,12 +288,16 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
         return skaccessors.EnsembleMethods(self)
 
     @cache_readonly
+    def lda(self):
+        return skaccessors.LDAMethods(self)
+
+    @cache_readonly
     def linear_model(self):
         return skaccessors.LinearModelMethods(self)
 
     @cache_readonly
     def feature_selection(self):
-        raise NotImplementedError
+        return skaccessors.FeatureSelectionMethods(self)
 
     @cache_readonly
     def metrics(self):
@@ -302,6 +306,10 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
     @cache_readonly
     def naive_bayes(self):
         return skaccessors.NaiveBayesMethods(self)
+
+    @cache_readonly
+    def neighbors(self):
+        return skaccessors.NeighborsMethods(self)
 
     @cache_readonly
     def svm(self):
