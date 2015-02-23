@@ -15,7 +15,7 @@ import expandas.skaccessors as skaccessors
 class ModelFrame(ModelGeneric, pd.DataFrame):
 
     _internal_names = (pd.core.generic.NDFrame._internal_names +
-                       ['target_name', 'estimators', 'predict'])
+                       ['_target_name', '_estimator', '_predicted'])
     _internal_names_set = set(_internal_names)
 
     @property
@@ -69,9 +69,8 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
                 target = pd.Series(target, name=target_name, index=data.index)
             df = self._concat_target(data, target)
 
-        self.target_name = target_name
-        # estimator histories
-        self.estimators = []
+        self._target_name = target_name
+        self._estimator = None
 
         pd.DataFrame.__init__(self, df, *args, **kwargs)
 
@@ -121,6 +120,14 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
         return self.target_name in self.columns
 
     @property
+    def target_name(self):
+        return self._target_name
+
+    @target_name.setter
+    def target_name(self, value):
+        self._target_name = value
+
+    @property
     def target(self):
         if self.has_target():
             return self.loc[:, self.target_name]
@@ -165,11 +172,10 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
 
     @property
     def estimator(self):
-        if len(self.estimators) > 0:
-            # most recently used
-            return self.estimators[-1]
+        if self._estimator is None:
+            raise ValueError('No estimator has been applied.')
         else:
-            raise ValueError
+            return self._estimator
 
     def _check_attr(self, estimator, func_name):
         if not hasattr(estimator, func_name):
@@ -187,13 +193,8 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
         except TypeError:
             estimator.fit(data, *args, **kwargs)
 
-        if history:
-            self.estimators.append(estimator)
-        else:
-            # only store latest
-            self.estimators = [estimator]
+        self._estimator = estimator
         return estimator
-
 
     def predict(self, estimator, *args, **kwargs):
         self._check_attr(estimator, 'predict')
@@ -204,6 +205,7 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
         predicted = estimator.predict(data, *args, **kwargs)
         self.predicted = pd.Series(predicted, index=self.index)
 
+        self._estimator = estimator
         return self.predicted
 
     def fit_predict(self, estimator, *args, **kwargs):
@@ -219,6 +221,8 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
             predicted = estimator.fit_predict(data, *args, **kwargs)
 
         self.predicted = pd.Series(predicted, index=self.index)
+
+        self._estimator = estimator
         return self.predicted
 
     def score(self, estimator, *args, **kwargs):
@@ -233,6 +237,8 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
             predicted = estimator.score(data, *args, **kwargs)
 
         self.predicted = pd.Series(predicted, index=self.index)
+
+        self._estimator = estimator
         return self.predicted
 
     def transform(self, estimator, *args, **kwargs):
@@ -246,6 +252,7 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
         except TypeError:
             transformed = estimator.transform(data, *args, **kwargs)
 
+        self._estimator = estimator
         if self.has_target():
             return ModelFrame(transformed, target=self.target, index=self.index)
         else:
@@ -262,6 +269,24 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
         except TypeError:
             transformed = estimator.fit_transform(data, *args, **kwargs)
 
+        self._estimator = estimator
+        if self.has_target():
+            return ModelFrame(transformed, target=self.target, index=self.index)
+        else:
+            return ModelFrame(transformed, index=self.index)
+
+    def inverse_transform(self, estimator, *args, **kwargs):
+        self._check_attr(estimator, 'inverse_transform')
+
+        data = self.data.values
+        target = self.target.values
+
+        try:
+            transformed = estimator.inverse_transform(data, y=target, *args, **kwargs)
+        except TypeError:
+            transformed = estimator.inverse_transform(data, *args, **kwargs)
+
+        self._estimator = estimator
         if self.has_target():
             return ModelFrame(transformed, target=self.target, index=self.index)
         else:

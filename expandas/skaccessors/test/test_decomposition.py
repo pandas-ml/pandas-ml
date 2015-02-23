@@ -142,7 +142,6 @@ class TestDecomposition(tm.TestCase):
             self.assert_series_equal(df.target, result.target)
             self.assert_numpy_array_almost_equal(result.data.values, expected)
 
-
     def test_fit_transform(self):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
@@ -154,6 +153,32 @@ class TestDecomposition(tm.TestCase):
 
             result = df.fit_transform(mod1)
             expected = mod2.fit_transform(iris.data, iris.target)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_series_equal(df.target, result.target)
+            self.assert_numpy_array_almost_equal(result.data.values, expected)
+
+    def test_inverse_transform(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['PCA']
+        for model in models:
+            mod1 = getattr(df.decomposition, model)()
+            mod2 = getattr(decomposition, model)()
+
+            df.fit(mod1)
+            mod2.fit(iris.data, iris.target)
+
+            result = df.transform(mod1)
+            expected = mod2.transform(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_series_equal(df.target, result.target)
+            self.assert_numpy_array_almost_equal(result.data.values, expected)
+
+            result = df.inverse_transform(mod1)
+            expected = mod2.inverse_transform(iris.data)
 
             self.assertTrue(isinstance(result, expd.ModelFrame))
             self.assert_series_equal(df.target, result.target)
