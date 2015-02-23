@@ -13,6 +13,14 @@ Overview
 
 Expand pandas functionalities to be easier to use other statistics/ML packages, mainly forcusing on scikit-learn.
 
+Documentation
+~~~~~~~~~~~~~
+
+http://expandas.readthedocs.org/en/latest/
+
+Example
+~~~~~~~
+
 .. code-block:: python
 
     >>> import expandas as expd

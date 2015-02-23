@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+====================================
 Welcome to expandas's documentation!
 ====================================
 
@@ -11,12 +12,14 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   modelframe
+   sklearn
 
 
-Indices and tables
-==================
+API:
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+
+   generated/expandas
 
