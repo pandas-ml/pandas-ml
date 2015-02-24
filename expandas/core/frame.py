@@ -194,7 +194,6 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
             estimator.fit(data, *args, **kwargs)
 
         self._estimator = estimator
-        return estimator
 
     def predict(self, estimator, *args, **kwargs):
         self._check_attr(estimator, 'predict')
@@ -313,6 +312,10 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
         return skaccessors.EnsembleMethods(self)
 
     @cache_readonly
+    def grid_search(self):
+        return skaccessors.GridSearchMethods(self)
+
+    @cache_readonly
     def lda(self):
         return skaccessors.LDAMethods(self)
 
@@ -335,6 +338,10 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
     @cache_readonly
     def neighbors(self):
         return skaccessors.NeighborsMethods(self)
+
+    @cache_readonly
+    def pipeline(self):
+        return skaccessors.PipelineMethods(self)
 
     @cache_readonly
     def svm(self):
