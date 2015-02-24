@@ -3,7 +3,7 @@
    :suppress:
 
    from pandas import options
-   options.display.max_rows = 15
+   options.display.max_rows = 10
    options.display.max_columns = 7
 
 
@@ -25,8 +25,11 @@ You can create ``ModelFrame`` instance from ``scikit-learn`` datasets directly.
    df = expd.ModelFrame(datasets.load_iris())
    df.head()
 
+   # make readable
+   df.columns = ['.target', 'sepal length', 'sepal width', 'petal length', 'petal width']
 
-ModelFrame has accessor methods which makes easier access to ``scikit-learn`` namespace.
+
+``ModelFrame`` has accessor methods which makes easier access to ``scikit-learn`` namespace.
 
 .. ipython:: python
 
@@ -40,6 +43,7 @@ Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once crea
    df.fit(estimator)
    predicted = df.predict(estimator)
    predicted
+
 
 ``ModelFrame`` has following methods corresponding to various ``scikit-learn`` estimators.
 
@@ -65,10 +69,44 @@ Following example shows to perform PCA.
 
 .. note:: ``columns`` information will be lost once transformed to principal components.
 
+``ModelFrame`` preserves last predicted result, and perform evaluation using functions available in ``ModelFrame.metrics``.
+
+.. ipython:: python
+
+   estimator = df.svm.SVC()
+   df.fit(estimator)
+   df.predict(estimator)
+   df.metrics.confusion_matrix()
+
+Pipeline
+--------
+
+``ModelFrame`` can handle pipeline as the same as normal estimators.
+
+.. ipython:: python
+
+   estimators = [('reduce_dim', df.decomposition.PCA()),
+                 ('svm', df.svm.SVC())]
+   pipe = df.pipeline.Pipeline(estimators)
+
+   df.fit(pipe)
+   df.predict(pipe)
+
 Cross Validation
 ----------------
 
-``scikit-learn`` has some classes for cross validation, and these classes returns indexes for training sets and test sets. You can slice ``ModelFrame using these indexes.
+``scikit-learn`` has some classes for cross validation. The most easiest way is to use ``train_test_split`` to split data to training and test set. You can access to the function via ``cross_validation`` accessor.
+
+.. ipython:: python
+
+   df
+   train_df, test_df = df.cross_validation.train_test_split()
+
+   train_df
+   test_df
+
+
+Also, there are some iterative classes which returns indexes for training sets and test sets. You can slice ``ModelFrame`` using these indexes.
 
 .. ipython:: python
 
@@ -89,5 +127,26 @@ For further simplification, ``ModelFrame.cross_validation.iterate`` can accept s
 
 Grid Search
 -----------
+
+You can perform grid search using ``ModelFrame.fit``.
+
+.. ipython:: python
+
+   tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],
+                        'C': [1, 10, 100]},
+                       {'kernel': ['linear'], 'C': [1, 10, 100]}]
+
+   df = expd.ModelFrame(datasets.load_digits())
+   cv = df.grid_search.GridSearchCV(df.svm.SVC(C=1), tuned_parameters,
+                                    cv=5, scoring='precision')
+   df.fit(cv)
+   cv.best_estimator_
+
+In addition, ``ModelFrame.grid_search`` has a ``describe`` function to organize each grid search result as ``pd.DataFrame`` accepting estimator.
+
+.. ipython:: python
+
+   df.grid_search.describe(cv)
+
 
 
