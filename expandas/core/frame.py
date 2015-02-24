@@ -7,12 +7,11 @@ import pandas as pd
 import pandas.compat as compat
 from pandas.util.decorators import cache_readonly
 
-from expandas.core.generic import ModelGeneric
 from expandas.core.series import ModelSeries
 import expandas.skaccessors as skaccessors
 
 
-class ModelFrame(ModelGeneric, pd.DataFrame):
+class ModelFrame(pd.DataFrame):
 
     _internal_names = (pd.core.generic.NDFrame._internal_names +
                        ['_target_name', '_estimator', '_predicted'])
@@ -342,6 +341,10 @@ class ModelFrame(ModelGeneric, pd.DataFrame):
     @cache_readonly
     def pipeline(self):
         return skaccessors.PipelineMethods(self)
+
+    @cache_readonly
+    def preprocessing(self):
+        return skaccessors.PreprocessingMethods(self)
 
     @cache_readonly
     def svm(self):
