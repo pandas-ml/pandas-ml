@@ -3,10 +3,10 @@
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from expandas.core.generic import ModelGeneric
+import expandas.skaccessors as skaccessors
 
 
-class ModelSeries(ModelGeneric, pd.Series):
+class ModelSeries(pd.Series):
     """
     Wrapper to support preprocessing
     """
@@ -15,7 +15,7 @@ class ModelSeries(ModelGeneric, pd.Series):
     def _constructor(self):
         return ModelSeries
 
-    def __init__(self, *args, **kwargs):
-        pd.Series.__init__(self, *args, **kwargs)
+    @cache_readonly
+    def preprocessing(self):
+        return skaccessors.PreprocessingMethods(self)
 
-    pass
