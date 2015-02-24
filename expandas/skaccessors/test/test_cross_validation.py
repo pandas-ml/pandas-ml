@@ -55,6 +55,15 @@ class TestCrossValidation(tm.TestCase):
         # concatenated = concatenated.sort_index()
         # self.assert_frame_equal(df, concatenated)
 
+        df = expd.ModelFrame(datasets.load_digits())
+        df.target_name = 'xxx'
+
+        train_df, test_df = df.cross_validation.train_test_split()
+        self.assert_index_equal(df.columns, train_df.columns)
+        self.assert_index_equal(df.columns, test_df.columns)
+        self.assertEqual(train_df.target_name, 'xxx')
+        self.assertEqual(test_df.target_name, 'xxx')
+
     def test_cross_val_score(self):
         import sklearn.svm as svm
         digits = datasets.load_digits()

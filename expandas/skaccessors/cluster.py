@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from pandas.util.decorators import cache_readonly
 
 from expandas.core.accessor import AccessorMethods, _attach_methods
 
@@ -47,9 +48,13 @@ class ClusterMethods(AccessorMethods):
 
     # Biclustering
 
-    @property
-    def biclusterling(self):
-        raise NotImplementedError
+    @cache_readonly
+    def bicluster(self):
+        return BiclusterMethods(self._df)
+
+
+class BiclusterMethods(AccessorMethods):
+    _module_name = 'sklearn.cluster.bicluster'
 
 
 _cluster_methods = ['estimate_bandwidth', 'ward_tree']

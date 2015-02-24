@@ -48,6 +48,9 @@ class TestSVM(tm.TestCase):
             self.assertTrue(isinstance(result, pd.Series))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
+            self.assertTrue(isinstance(df.predicted, pd.Series))
+            self.assert_numpy_array_almost_equal(df.predicted.values, expected)
+
     def test_Classifications(self):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)

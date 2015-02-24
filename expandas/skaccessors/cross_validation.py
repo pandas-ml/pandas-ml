@@ -24,25 +24,35 @@ class CrossValidationMethods(AccessorMethods):
             yield train_df, test_df
 
     def train_test_split(self, *args, **kwargs):
-        from expandas import ModelFrame
-
         func = self._module.train_test_split
 
         data = self._df.data
-        target = self._df.target
+        if self._df.has_target():
+            target = self._df.target
+            tr_d, te_d, tr_l, te_l = func(data, target, *args, **kwargs)
 
-        tr_d, te_d, tr_l, te_l = func(data, target, *args, **kwargs)
+            # Create DataFrame here to retain data and target names
+            tr_d = pd.DataFrame(tr_d, columns=data.columns)
+            te_d = pd.DataFrame(te_d, columns=data.columns)
 
-        # Create DataFrame here to retain data and target names
-        tr_d = pd.DataFrame(tr_d, columns=data.columns)
-        te_d = pd.DataFrame(te_d, columns=data.columns)
+            tr_l = pd.Series(tr_l, name=target.name)
+            te_l = pd.Series(te_l, name=target.name)
 
-        tr_l = pd.Series(tr_l, name=target.name)
-        te_l = pd.Series(te_l, name=target.name)
+            train_df = self._df._constructor(data=tr_d, target=tr_l)
+            test_df = self._df._constructor(data=te_d, target=te_l)
+            return train_df, test_df
+        else:
+            tr_d, te_d = func(data, *args, **kwargs)
 
-        train_df = ModelFrame(data=tr_d, target=tr_l)
-        test_df = ModelFrame(data=te_d, target=te_l)
-        return train_df, test_df
+            # Create DataFrame here to retain data and target names
+            tr_d = pd.DataFrame(tr_d, columns=data.columns)
+            te_d = pd.DataFrame(te_d, columns=data.columns)
+
+            train_df = self._df._constructor(data=tr_d)
+            train_df.target_name = self._df.target_name
+            test_df = self._df._constructor(data=te_d)
+            test_df.target_name = self._df.target_name
+            return train_df, test_df
 
     def cross_val_score(self, estimator, *args, **kwargs):
         func = self._module.cross_val_score
