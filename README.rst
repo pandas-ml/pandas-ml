@@ -79,20 +79,20 @@ Example
 Supported Packages
 ~~~~~~~~~~~~~~~~~~
 
-**IMPORTANT**: All the implementations are highly experimental, and forced to be changed without notice.
-
 - scikit-learn
     - cluster
     - cross_validation
     - decomposition
     - dummy
     - ensemble
+    - grid_search
     - lda
     - linear_model
     - feature_selection
     - naive_bayes
     - neighbors
     - metrics (partially)
+    - pipeline
     - preprocessing (not well tested)
     - svm
     - tree
