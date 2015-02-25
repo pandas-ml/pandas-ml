@@ -176,123 +176,81 @@ class ModelFrame(pd.DataFrame):
         else:
             return self._estimator
 
-    def _check_attr(self, estimator, func_name):
-        if not hasattr(estimator, func_name):
-            msg = "class {0} doesn't have {1} method"
-            raise ValueError(msg.format(type(estimator), func_name))
+    @property
+    def predicted(self):
+        return self._predicted
 
-    def fit(self, estimator, history=True, *args, **kwargs):
-        self._check_attr(estimator, 'fit')
+    def _check_attr(self, estimator, method_name):
+        if not hasattr(estimator, method_name):
+            msg = "class {0} doesn't have {1} method"
+            raise ValueError(msg.format(type(estimator), method_name))
+        return getattr(estimator, method_name)
+
+    def _call(self, estimator, method_name, *args, **kwargs):
+        method = self._check_attr(estimator, method_name)
 
         data = self.data.values
-        target = self.target.values
+        if self.has_target():
+            target = self.target.values
+            try:
+                result = method(data, y=target, *args, **kwargs)
+            except TypeError:
+                result = method(data, *args, **kwargs)
+        else:
+            # not try to pass target if it doesn't exists
+            # to catch ValueError from estimator
+            result = method(data, *args, **kwargs)
+        return result
 
-        try:
-            estimator.fit(data, y=target, *args, **kwargs)
-        except TypeError:
-            estimator.fit(data, *args, **kwargs)
-
-        self._estimator = estimator
+    def fit(self, estimator, *args, **kwargs):
+        return self._call(estimator, 'fit', *args, **kwargs)
 
     def predict(self, estimator, *args, **kwargs):
-        self._check_attr(estimator, 'predict')
-
-        data = self.data.values
-        target = self.target.values
-
-        predicted = estimator.predict(data, *args, **kwargs)
-        self.predicted = pd.Series(predicted, index=self.index)
-
+        predicted = self._call(estimator, 'predict', *args, **kwargs)
+        self._predicted = self._constructor_sliced(predicted, index=self.index)
         self._estimator = estimator
-        return self.predicted
+        return self._predicted
 
     def fit_predict(self, estimator, *args, **kwargs):
-        self._check_attr(estimator, 'fit_predict')
-
-        data = self.data.values
-        target = self.target.values
-
-        try:
-            predicted = estimator.fit_predict(data, y=target,
-                                              *args, **kwargs)
-        except TypeError:
-            predicted = estimator.fit_predict(data, *args, **kwargs)
-
-        self.predicted = pd.Series(predicted, index=self.index)
-
-        self._estimator = estimator
-        return self.predicted
+        predicted = self._call(estimator, 'fit_predict', *args, **kwargs)
+        self._predicted = self._constructor_sliced(predicted, index=self.index)
+        return self._predicted
 
     def score(self, estimator, *args, **kwargs):
-        self._check_attr(estimator, 'score')
-
-        data = self.data.values
-        target = self.target.values
-
-        try:
-            predicted = estimator.score(data, y=target, *args, **kwargs)
-        except TypeError:
-            predicted = estimator.score(data, *args, **kwargs)
-
-        self.predicted = pd.Series(predicted, index=self.index)
-
-        self._estimator = estimator
-        return self.predicted
+        score = self._call(estimator, 'score', *args, **kwargs)
+        return score
 
     def transform(self, estimator, *args, **kwargs):
-        self._check_attr(estimator, 'transform')
+        transformed = self._call(estimator, 'transform', *args, **kwargs)
 
-        data = self.data.values
-        target = self.target.values
-
-        try:
-            transformed = estimator.transform(data, y=target, *args, **kwargs)
-        except TypeError:
-            transformed = estimator.transform(data, *args, **kwargs)
-
-        self._estimator = estimator
         if self.has_target():
-            return ModelFrame(transformed, target=self.target, index=self.index)
+            return self._constructor(transformed, target=self.target, index=self.index)
         else:
-            return ModelFrame(transformed, index=self.index)
+            return self._constructor(transformed, index=self.index)
 
     def fit_transform(self, estimator, *args, **kwargs):
-        self._check_attr(estimator, 'fit_transform')
+        transformed = self._call(estimator, 'fit_transform', *args, **kwargs)
 
-        data = self.data.values
-        target = self.target.values
-
-        try:
-            transformed = estimator.fit_transform(data, y=target, *args, **kwargs)
-        except TypeError:
-            transformed = estimator.fit_transform(data, *args, **kwargs)
-
-        self._estimator = estimator
         if self.has_target():
-            return ModelFrame(transformed, target=self.target, index=self.index)
+            return self._constructor(transformed, target=self.target, index=self.index)
         else:
-            return ModelFrame(transformed, index=self.index)
+            return self._constructor(transformed, index=self.index)
 
     def inverse_transform(self, estimator, *args, **kwargs):
-        self._check_attr(estimator, 'inverse_transform')
+        transformed = self._call(estimator, 'inverse_transform', *args, **kwargs)
 
-        data = self.data.values
-        target = self.target.values
-
-        try:
-            transformed = estimator.inverse_transform(data, y=target, *args, **kwargs)
-        except TypeError:
-            transformed = estimator.inverse_transform(data, *args, **kwargs)
-
-        self._estimator = estimator
         if self.has_target():
-            return ModelFrame(transformed, target=self.target, index=self.index)
+            return self._constructor(transformed, target=self.target, index=self.index)
         else:
-            return ModelFrame(transformed, index=self.index)
+            return self._constructor(transformed, index=self.index)
 
     @cache_readonly
     def cluster(self):
         return skaccessors.ClusterMethods(self)
+
+    @cache_readonly
+    def covariance(self):
+        return skaccessors.CovarianceMethods(self)
 
     @cache_readonly
     def cross_validation(self):

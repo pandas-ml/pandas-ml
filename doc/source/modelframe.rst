@@ -123,7 +123,7 @@ You can access to each property as the same as ``pandas.DataFrame``. Sliced resu
    >>> type(subset)
    <class 'expandas.core.frame.ModelFrame'>
 
-``ModelFrame`` has a special properties to access data (features) an target.
+``ModelFrame`` has a special properties ``data`` to access data (features) and ``target`` to access target.
 
 .. code-block:: python
 

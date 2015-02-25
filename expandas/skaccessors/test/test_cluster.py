@@ -25,6 +25,9 @@ class TestCluster(tm.TestCase):
         self.assertIs(df.cluster.SpectralClustering, cluster.SpectralClustering)
         self.assertIs(df.cluster.Ward, cluster.Ward)
 
+        self.assertIs(df.cluster.bicluster.SpectralBiclustering, cluster.bicluster.SpectralBiclustering)
+        self.assertIs(df.cluster.bicluster.SpectralCoclustering, cluster.bicluster.SpectralCoclustering)
+
     def test_estimate_bandwidth(self):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
@@ -137,7 +140,6 @@ class TestCluster(tm.TestCase):
         affinity = np.abs(affinity)
         df = expd.ModelFrame(affinity)
 
-
         with tm.RNGContext(1):
             # even though random_state is passed, the results are sometimes different
             result = df.cluster.spectral_clustering(random_state=self.random_state)
@@ -199,6 +201,27 @@ class TestCluster(tm.TestCase):
 
             self.assertTrue(isinstance(result, pd.Series))
             self.assert_numpy_array_almost_equal(result.values, expected)
+
+            result = df.score(mod1)
+            expected = mod2.score(iris.data)
+            self.assert_numpy_array_almost_equal(result, expected)
+
+    def test_Bicluster(self):
+        data, rows, columns = datasets.make_checkerboard(
+            shape=(300, 300), n_clusters=5, noise=10,
+            shuffle=True, random_state=self.random_state)
+        df = expd.ModelFrame(data)
+
+        models = ['SpectralBiclustering', 'SpectralCoclustering']
+        for model in models:
+            mod1 = getattr(df.cluster.bicluster, model)(3, random_state=self.random_state)
+            mod2 = getattr(cluster.bicluster, model)(3, random_state=self.random_state)
+
+            df.fit(mod1)
+            mod2.fit(data)
+
+            self.assert_numpy_array_almost_equal(mod1.biclusters_, mod2.biclusters_)
+
 
 if __name__ == '__main__':
     import nose

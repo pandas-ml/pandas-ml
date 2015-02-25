@@ -33,13 +33,47 @@ You can create ``ModelFrame`` instance from ``scikit-learn`` datasets directly.
    # make columns be readable
    >>> df.columns = ['.target', 'sepal length', 'sepal width', 'petal length', 'petal width']
 
-
 ``ModelFrame`` has accessor methods which makes easier access to ``scikit-learn`` namespace.
 
 .. code-block:: python
 
    >>> df.cluster.KMeans
    <class 'sklearn.cluster.k_means_.KMeans'>
+
+Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` module.
+
+================================  ================================
+``scikit-learn``                  ``ModelFrame`` accessor
+================================  ================================
+``sklearn.cluster``               ``ModelFrame.cluster``
+``sklearn.covariance``            ``ModelFrame.covariance``
+``sklearn.cross_validation``      ``ModelFrame.cross_validation``
+``sklearn.decomposition``         ``ModelFrame.decomposition``
+``sklearn.datasets``              (not accesible from accessor)
+``sklearn.dummy``                 ``ModelFrame.dummy``
+``sklearn.ensemble``              ``ModelFrame.ensemble``
+``sklearn.feature_extraction``
+``sklearn.gaussian_process``
+``sklearn.grid_search``           ``ModelFrame..grid_search``
+``sklearn.isotonic``
+``sklearn.kernel_approximation``
+``sklearn.lda``                   ``ModelFrame.lda``
+``sklearn.linear_model``          ``ModelFrame.linear_model``
+``sklearn.manifold``
+``sklearn.metrics``               ``ModelFrame..metrics``
+``sklearn.mixture``
+``sklearn.multiclass``
+``sklearn.naive_bayes``           ``ModelFrame..naive_bayes``
+``sklearn.neighbors``             ``ModelFrame..neighbors``
+``sklearn.cross_decomposition``
+``sklearn.pipeline``              ``ModelFrame.pipeline``
+``sklearn.preprocessing``         ``ModelFrame.preprocessing``
+``sklearn.qda``
+``sklearn.semi_supervised``
+``sklearn.svm``                   ``ModelFrame.svm``
+``sklearn.tree``
+``sklearn.utils``
+================================  ================================
 
 Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once create an estimator, you can pass it to ``ModelFrame.fit`` then ``predict``. `ModelFrame`` automatically uses its data and target properties for each operations.
 
@@ -107,7 +141,7 @@ Following example shows to perform PCA.
 
 .. note:: ``columns`` information will be lost once transformed to principal components.
 
-``ModelFrame`` preserves last predicted result, and perform evaluation using functions available in ``ModelFrame.metrics``.
+``ModelFrame`` preserves last predicted result in ``predicted`` attibute. If ``ModelFrame`` both has ``target`` and ``predicted`` values, the model evaluation can be performed using functions available in ``ModelFrame.metrics``.
 
 .. code-block:: python
 
@@ -115,6 +149,16 @@ Following example shows to perform PCA.
    >>> df.fit(estimator)
 
    >>> df.predict(estimator)
+   0    0
+   1    0
+   2    0
+   ...
+   147    2
+   148    2
+   149    2
+   Length: 150, dtype: int64
+
+   >>> df.predicted
    0    0
    1    0
    2    0
@@ -138,7 +182,7 @@ Pipeline
 .. code-block:: python
 
    >>> estimators = [('reduce_dim', df.decomposition.PCA()),
-                     ('svm', df.svm.SVC())]
+   ...               ('svm', df.svm.SVC())]
    >>> pipe = df.pipeline.Pipeline(estimators)
    >>> df.fit(pipe)
 
@@ -152,10 +196,32 @@ Pipeline
    149    2
    Length: 150, dtype: int64
 
+Above expression is the same as below:
+
+.. code-block:: python
+
+   >>> df2 = df.copy()
+   >>> df2 = df2.fit_transform(df2.decomposition.PCA())
+   >>> svm = df2.svm.SVC()
+   >>> df2.fit(svm)
+   SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, degree=3, gamma=0.0,
+     kernel='rbf', max_iter=-1, probability=False, random_state=None,
+     shrinking=True, tol=0.001, verbose=False)
+   >>> df2.predict(svm)
+   0     0
+   1     0
+   2     0
+   ...
+   147    2
+   148    2
+   149    2
+   Length: 150, dtype: int64
+
+
 Cross Validation
 ----------------
 
-``scikit-learn`` has some classes for cross validation. The most easiest way is to use ``train_test_split`` to split data to training and test set. You can access to the function via ``cross_validation`` accessor.
+``scikit-learn`` has some classes for cross validation. ``cross_validation.train_test_split`` splits data to training and test set. You can access to the function via ``cross_validation`` accessor.
 
 .. code-block:: python
 
@@ -234,7 +300,6 @@ You can perform grid search using ``ModelFrame.fit``.
    ...                                  cv=5, scoring='precision')
 
    >>> df.fit(cv)
-   cv.best_estimator_
 
    >>> cv.best_estimator_
    SVC(C=10, cache_size=200, class_weight=None, coef0=0.0, degree=3, gamma=0.001,
