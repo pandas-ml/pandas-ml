@@ -207,13 +207,24 @@ class ModelFrame(pd.DataFrame):
 
     def predict(self, estimator, *args, **kwargs):
         predicted = self._call(estimator, 'predict', *args, **kwargs)
-        self._predicted = self._constructor_sliced(predicted, index=self.index)
+        try:
+            predicted = self._constructor_sliced(predicted, index=self.index)
+        except ValueError:
+            msg = "Unable to instantiate ModelSeries for '{0}'"
+            warnings.warn(msg.format(estimator.__class__.__name__))
+        self._predicted = predicted
         self._estimator = estimator
         return self._predicted
 
     def fit_predict(self, estimator, *args, **kwargs):
         predicted = self._call(estimator, 'fit_predict', *args, **kwargs)
-        self._predicted = self._constructor_sliced(predicted, index=self.index)
+        try:
+            predicted = self._constructor_sliced(predicted, index=self.index)
+        except ValueError:
+            msg = "Unable to instantiate ModelSeries for '{0}'"
+            warnings.warn(msg.format(estimator.__class__.__name__))
+        self._predicted = predicted
+        self._estimator = estimator
         return self._predicted
 
     def score(self, estimator, *args, **kwargs):
@@ -269,8 +280,20 @@ class ModelFrame(pd.DataFrame):
         return skaccessors.EnsembleMethods(self)
 
     @cache_readonly
+    def feature_selection(self):
+        return skaccessors.FeatureSelectionMethods(self)
+
+    @cache_readonly
+    def gaussian_process(self):
+        return skaccessors.GaussianProcessMethods(self)
+
+    @cache_readonly
     def grid_search(self):
         return skaccessors.GridSearchMethods(self)
+
+    @cache_readonly
+    def isotonic(self):
+        return skaccessors.IsotonicMethods(self)
 
     @cache_readonly
     def lda(self):
@@ -281,8 +304,8 @@ class ModelFrame(pd.DataFrame):
         return skaccessors.LinearModelMethods(self)
 
     @cache_readonly
-    def feature_selection(self):
-        return skaccessors.FeatureSelectionMethods(self)
+    def manifold(self):
+        return skaccessors.ManifoldMethods(self)
 
     @cache_readonly
     def metrics(self):

@@ -10,20 +10,27 @@ class AccessorMethods(object):
     _module_name = None
 
     def __init__(self, df):
-        if self._module_name is not None:
-            self._module = importlib.import_module(self._module_name)
-
-            for mobj in self._module.__all__:
-                try:
-                    if not hasattr(self, mobj):
-                        try:
-                            setattr(self, mobj, getattr(self._module, mobj))
-                        except AttributeError:
-                            pass
-                except NotImplementedError:
-                    pass
-
         self._df = df
+
+        if self._module_name is None:
+            return
+
+        self._module = importlib.import_module(self._module_name)
+
+        try:
+            mobjs = self._module.__all__
+        except AttributeError:
+            return
+
+        for mobj in mobjs:
+            try:
+                if not hasattr(self, mobj):
+                    try:
+                        setattr(self, mobj, getattr(self._module, mobj))
+                    except AttributeError:
+                        pass
+            except NotImplementedError:
+                pass
 
     @property
     def data(self):
