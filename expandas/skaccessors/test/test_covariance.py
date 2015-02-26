@@ -25,7 +25,7 @@ class TestCovariance(tm.TestCase):
         self.assertIs(df.covariance.ShrunkCovariance, covariance.ShrunkCovariance)
 
         self.assertIs(df.covariance.shrunk_covariance, covariance.shrunk_covariance)
-        self.assertIs(covariance.graph_lasso, covariance.graph_lasso)
+        self.assertIs(df.covariance.graph_lasso, covariance.graph_lasso)
 
     def test_empirical_covariance(self):
         iris = datasets.load_iris()

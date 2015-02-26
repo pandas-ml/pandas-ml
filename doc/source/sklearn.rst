@@ -53,25 +53,25 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.dummy``                 ``ModelFrame.dummy``
 ``sklearn.ensemble``              ``ModelFrame.ensemble``
 ``sklearn.feature_extraction``
-``sklearn.gaussian_process``
-``sklearn.grid_search``           ``ModelFrame..grid_search``
-``sklearn.isotonic``
+``sklearn.gaussian_process``      ``ModelFrame.gaussian_process``
+``sklearn.grid_search``           ``ModelFrame.grid_search``
+``sklearn.isotonic``              ``ModelFrame.isotonic`` (WIP)
 ``sklearn.kernel_approximation``
 ``sklearn.lda``                   ``ModelFrame.lda``
 ``sklearn.linear_model``          ``ModelFrame.linear_model``
-``sklearn.manifold``
-``sklearn.metrics``               ``ModelFrame..metrics``
+``sklearn.manifold``              ``ModelFrame.manifold``
+``sklearn.metrics``               ``ModelFrame.metrics``
 ``sklearn.mixture``
 ``sklearn.multiclass``
-``sklearn.naive_bayes``           ``ModelFrame..naive_bayes``
-``sklearn.neighbors``             ``ModelFrame..neighbors``
+``sklearn.naive_bayes``           ``ModelFrame.naive_bayes``
+``sklearn.neighbors``             ``ModelFrame.neighbors``
 ``sklearn.cross_decomposition``
 ``sklearn.pipeline``              ``ModelFrame.pipeline``
 ``sklearn.preprocessing``         ``ModelFrame.preprocessing``
 ``sklearn.qda``
 ``sklearn.semi_supervised``
 ``sklearn.svm``                   ``ModelFrame.svm``
-``sklearn.tree``
+``sklearn.tree``                  ``ModelFrame.tree``
 ``sklearn.utils``
 ================================  ================================
 

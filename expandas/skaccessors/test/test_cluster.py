@@ -134,18 +134,13 @@ class TestCluster(tm.TestCase):
         self.assert_numpy_array_equal(result[1].values, expected[1])
 
     def test_spectral_clustering(self):
-        data = np.random.randn(100)
-        # create affinity matrix
-        affinity = np.subtract.outer(data, data)
-        affinity = np.abs(affinity)
-        df = expd.ModelFrame(affinity)
+        N = 50
+        m = np.random.random_integers(1, 200, size=(N, N))
+        m = (m + m.T) / 2
 
-        with tm.RNGContext(1):
-            # even though random_state is passed, the results are sometimes different
-            result = df.cluster.spectral_clustering(random_state=self.random_state)
-
-        with tm.RNGContext(1):
-            expected = cluster.spectral_clustering(affinity, random_state=self.random_state)
+        df = expd.ModelFrame(m)
+        result = df.cluster.spectral_clustering(random_state=self.random_state)
+        expected = cluster.spectral_clustering(m, random_state=self.random_state)
 
         self.assertTrue(isinstance(result, pd.Series))
         self.assert_index_equal(result.index, df.index)
