@@ -46,7 +46,7 @@ Example
     >>> train_df, test_df = df.cross_validation.train_test_split()
 
     # create estimator (accessor is mapped to sklearn namespace)
-    >>> estimator = df.svm.LinearSVC(C=1.0)
+    >>> estimator = df.svm.LinearSVC()
 
     # fit to training data
     >>> train_df.fit(estimator)
@@ -63,17 +63,18 @@ Example
 
     # Evaluate the result
     >>> test_df.metrics.confusion_matrix()
-        0   1   2   3   4   5   6   7   8   9
-    0  38   1   0   0   0   0   0   0   0   0
-    1   0  34   1   2   1   0   0   0   2   5
-    2   0   1  37   1   0   0   0   1   2   0
-    3   0   2   3  38   0   0   0   0   2   2
-    4   0   0   0   0  47   0   0   0   0   1
-    5   0   0   0   0   0  34   0   0   0   3
-    6   0   2   0   0   1   1  45   0   0   0
-    7   0   1   0   0   2   0   0  38   0   1
-    8   0   2   0   3   0   1   1   0  42   0
-    9   0   2   0   4   1   1   0   0   1  43
+    Predicted   0   1   2   3   4   5   6   7   8   9
+    Target
+    0          52   0   0   0   0   0   0   0   0   0
+    1           0  37   1   0   0   1   0   0   3   3
+    2           0   2  48   1   0   0   0   1   1   0
+    3           1   1   0  44   0   1   0   0   3   1
+    4           1   0   0   0  43   0   1   0   0   0
+    5           0   1   0   0   0  39   0   0   0   0
+    6           0   1   0   0   1   0  35   0   0   0
+    7           0   0   0   0   2   0   0  42   1   0
+    8           0   2   1   0   1   0   0   0  33   1
+    9           0   2   1   2   0   0   0   0   1  38
 
 
 Supported Packages

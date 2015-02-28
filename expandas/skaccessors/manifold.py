@@ -13,8 +13,12 @@ class ManifoldMethods(AccessorMethods):
         func = self._module.locally_linear_embedding
         y, squared_error = func(self.data.values, n_neighbors,
                                 n_components,  *args, **kwargs)
-        y = self._df._constructor(y, index=self._df.index)
+        y = self._constructor(y, index=self._df.index)
         return y, squared_error
 
     def spectral_embedding(self, *args, **kwargs):
-        raise NotImplementedError
+        func = self._module.spectral_embedding
+        data = self.data
+        embedding = func(data.values, *args, **kwargs)
+        embedding = self._constructor(embedding, index=data.index)
+        return embedding

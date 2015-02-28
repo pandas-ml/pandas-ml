@@ -35,6 +35,23 @@ class TestManifold(tm.TestCase):
 
         self.assertEqual(result[1], expected[1])
 
+    def test_spectral_embedding(self):
+        N = 10
+        m = np.random.random_integers(50, 200, size=(N, N))
+        m = (m + m.T) / 2
+
+        df = expd.ModelFrame(m)
+        self.assert_numpy_array_almost_equal(df.data.values, m)
+
+        result = df.manifold.spectral_embedding(random_state=self.random_state)
+        expected = manifold.spectral_embedding(m, random_state=self.random_state)
+
+        self.assertTrue(isinstance(result, expd.ModelFrame))
+        self.assert_index_equal(result.index, df.index)
+        # signs can be inversed
+        self.assert_numpy_array_almost_equal(np.abs(result.data.values),
+                                             np.abs(expected))
+
     def test_Isomap(self):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)

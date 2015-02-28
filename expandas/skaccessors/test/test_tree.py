@@ -21,6 +21,45 @@ class TestTree(tm.TestCase):
         self.assertIs(df.tree.ExtraTreeRegressor, tree.ExtraTreeRegressor)
         self.assertIs(df.tree.export_graphviz, tree.export_graphviz)
 
+    def test_Regressions(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['DecisionTreeRegressor', 'ExtraTreeRegressor']
+        for model in models:
+            mod1 = getattr(df.tree, model)(random_state=self.random_state)
+            mod2 = getattr(tree, model)(random_state=self.random_state)
+
+            df.fit(mod1)
+            mod2.fit(iris.data, iris.target)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            self.assertTrue(isinstance(df.predicted, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(df.predicted.values, expected)
+
+    def test_Classifications(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['DecisionTreeClassifier', 'ExtraTreeClassifier']
+        for model in models:
+            mod1 = getattr(df.tree, model)(random_state=self.random_state)
+            mod2 = getattr(tree, model)(random_state=self.random_state)
+
+            df.fit(mod1)
+            mod2.fit(iris.data, iris.target)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
 
 if __name__ == '__main__':
     import nose

@@ -8,6 +8,7 @@ import pandas.compat as compat
 from pandas.util.decorators import cache_readonly
 
 from expandas.core.series import ModelSeries
+from expandas.core.accessor import AccessorMethods
 import expandas.skaccessors as skaccessors
 
 
@@ -16,6 +17,9 @@ class ModelFrame(pd.DataFrame):
     _internal_names = (pd.core.generic.NDFrame._internal_names +
                        ['_target_name', '_estimator', '_predicted'])
     _internal_names_set = set(_internal_names)
+
+    _mapper = dict(fit=dict(),
+                   predict={'GaussianProcess': skaccessors.GaussianProcessMethods._predict})
 
     @property
     def _constructor(self):
@@ -178,6 +182,8 @@ class ModelFrame(pd.DataFrame):
 
     @property
     def predicted(self):
+        if self._predicted is None:
+            raise ValueError("Predicted values doesn't exist")
         return self._predicted
 
     def _check_attr(self, estimator, method_name):
@@ -185,6 +191,11 @@ class ModelFrame(pd.DataFrame):
             msg = "class {0} doesn't have {1} method"
             raise ValueError(msg.format(type(estimator), method_name))
         return getattr(estimator, method_name)
+
+    def _get_mapper(self, estimator, method_name):
+        if method_name in self._mapper:
+            mapper = self._mapper[method_name]
+        return mapper.get(estimator.__class__.__name__, None)
 
     def _call(self, estimator, method_name, *args, **kwargs):
         method = self._check_attr(estimator, method_name)
@@ -206,6 +217,10 @@ class ModelFrame(pd.DataFrame):
         return self._call(estimator, 'fit', *args, **kwargs)
 
     def predict(self, estimator, *args, **kwargs):
+        mapped = self._get_mapper(estimator, 'predict')
+        if mapped is not None:
+            return mapped(self, estimator, *args, **kwargs)
+
         predicted = self._call(estimator, 'predict', *args, **kwargs)
         try:
             predicted = self._constructor_sliced(predicted, index=self.index)
@@ -264,6 +279,12 @@ class ModelFrame(pd.DataFrame):
         return skaccessors.CovarianceMethods(self)
 
     @cache_readonly
+    def cross_decomposition(self):
+        attrs = ['PLSRegression', 'PLSCanonical', 'CCA', 'PLSSVD']
+        return AccessorMethods(self, module_name='sklearn.cross_decomposition',
+                               attrs=attrs)
+
+    @cache_readonly
     def cross_validation(self):
         return skaccessors.CrossValidationMethods(self)
 
@@ -273,11 +294,16 @@ class ModelFrame(pd.DataFrame):
 
     @cache_readonly
     def dummy(self):
-        return skaccessors.DummyMethods(self)
+        attrs = ['DummyClassifier', 'DummyRegressor']
+        return AccessorMethods(self, module_name='sklearn.dummy', attrs=attrs)
 
     @cache_readonly
     def ensemble(self):
         return skaccessors.EnsembleMethods(self)
+
+    @cache_readonly
+    def feature_extraction(self):
+        return skaccessors.FeatureExtractionMethods(self)
 
     @cache_readonly
     def feature_selection(self):
@@ -296,8 +322,14 @@ class ModelFrame(pd.DataFrame):
         return skaccessors.IsotonicMethods(self)
 
     @cache_readonly
+    def kernel_approximation(self):
+        attrs = ['AdditiveChi2Sampler', 'Nystroem', 'RBFSampler', 'SkewedChi2Sampler']
+        return AccessorMethods(self, module_name='sklearn.kernel_approximation',
+                               attrs=attrs)
+
+    @cache_readonly
     def lda(self):
-        return skaccessors.LDAMethods(self)
+        return AccessorMethods(self, module_name='sklearn.lda')
 
     @cache_readonly
     def linear_model(self):
@@ -308,12 +340,20 @@ class ModelFrame(pd.DataFrame):
         return skaccessors.ManifoldMethods(self)
 
     @cache_readonly
+    def mixture(self):
+        return AccessorMethods(self, module_name='sklearn.mixture')
+
+    @cache_readonly
     def metrics(self):
         return skaccessors.MetricsMethods(self)
 
     @cache_readonly
+    def multiclass(self):
+        return skaccessors.MultiClassMethods(self)
+
+    @cache_readonly
     def naive_bayes(self):
-        return skaccessors.NaiveBayesMethods(self)
+        return AccessorMethods(self, module_name='sklearn.naive_bayes')
 
     @cache_readonly
     def neighbors(self):
@@ -328,10 +368,18 @@ class ModelFrame(pd.DataFrame):
         return skaccessors.PreprocessingMethods(self)
 
     @cache_readonly
+    def qda(self):
+        return AccessorMethods(self, module_name='sklearn.qda')
+
+    @cache_readonly
+    def semi_supervised(self):
+        return AccessorMethods(self, module_name='sklearn.semi_supervised')
+
+    @cache_readonly
     def svm(self):
         return skaccessors.SVMMethods(self)
 
     @cache_readonly
     def tree(self):
-        return skaccessors.TreeMethods(self)
+        return AccessorMethods(self, module_name='sklearn.tree')
 

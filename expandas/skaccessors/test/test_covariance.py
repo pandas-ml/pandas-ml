@@ -33,7 +33,7 @@ class TestCovariance(tm.TestCase):
 
         result = df.covariance.empirical_covariance()
         expected = covariance.empirical_covariance(iris.data)
-        self.assertTrue(isinstance(result, pd.DataFrame))
+        self.assertTrue(isinstance(result, expd.ModelFrame))
         self.assert_index_equal(result.index, df.data.columns)
         self.assert_index_equal(result.columns, df.data.columns)
         self.assert_numpy_array_almost_equal(result.values, expected)
@@ -47,7 +47,7 @@ class TestCovariance(tm.TestCase):
 
         self.assertEqual(len(result), 2)
 
-        self.assertTrue(isinstance(result[0], pd.DataFrame))
+        self.assertTrue(isinstance(result[0], expd.ModelFrame))
         self.assert_index_equal(result[0].index, df.data.columns)
         self.assert_index_equal(result[0].columns, df.data.columns)
         self.assert_numpy_array_almost_equal(result[0].values, expected[0])
@@ -63,7 +63,7 @@ class TestCovariance(tm.TestCase):
 
         self.assertEqual(len(result), 2)
 
-        self.assertTrue(isinstance(result[0], pd.DataFrame))
+        self.assertTrue(isinstance(result[0], expd.ModelFrame))
         self.assert_index_equal(result[0].index, df.data.columns)
         self.assert_index_equal(result[0].columns, df.data.columns)
         self.assert_numpy_array_almost_equal(result[0].values, expected[0])

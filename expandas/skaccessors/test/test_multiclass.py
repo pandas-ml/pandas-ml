@@ -5,39 +5,31 @@ import pandas as pd
 import pandas.compat as compat
 
 import sklearn.datasets as datasets
+import sklearn.multiclass as multiclass
 import sklearn.svm as svm
 
 import expandas as expd
 import expandas.util.testing as tm
 
 
-class TestSVM(tm.TestCase):
+class TestMultiClass(tm.TestCase):
 
     def test_objectmapper(self):
         df = expd.ModelFrame([])
-        self.assertIs(df.svm.SVC, svm.SVC)
-        self.assertIs(df.svm.LinearSVC, svm.LinearSVC)
-        self.assertIs(df.svm.NuSVC, svm.NuSVC)
-        self.assertIs(df.svm.SVR, svm.SVR)
-        self.assertIs(df.svm.NuSVR, svm.NuSVR)
-        self.assertIs(df.svm.OneClassSVM, svm.OneClassSVM)
+        self.assertIs(df.multiclass.OneVsRestClassifier, multiclass.OneVsRestClassifier)
+        self.assertIs(df.multiclass.OneVsOneClassifier, multiclass.OneVsOneClassifier)
+        self.assertIs(df.multiclass.OutputCodeClassifier, multiclass.OutputCodeClassifier)
 
-    def test_l1_min_c(self):
+    def test_Classifications(self):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
 
-        result = df.svm.l1_min_c()
-        expected = svm.l1_min_c(iris.data, iris.target)
-        self.assertAlmostEqual(result, expected)
-
-    def test_Regressions(self):
-        iris = datasets.load_iris()
-        df = expd.ModelFrame(iris)
-
-        models = ['SVR', 'NuSVR']
+        models = ['OneVsOneClassifier', 'OneVsOneClassifier']
         for model in models:
-            mod1 = getattr(df.svm, model)(random_state=self.random_state)
-            mod2 = getattr(svm, model)(random_state=self.random_state)
+            svm1 = df.svm.LinearSVC(random_state=self.random_state)
+            svm2 = svm.LinearSVC(random_state=self.random_state)
+            mod1 = getattr(df.multiclass, model)(svm1)
+            mod2 = getattr(multiclass, model)(svm2)
 
             df.fit(mod1)
             mod2.fit(iris.data, iris.target)
@@ -48,17 +40,16 @@ class TestSVM(tm.TestCase):
             self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
-            self.assertTrue(isinstance(df.predicted, expd.ModelSeries))
-            self.assert_numpy_array_almost_equal(df.predicted.values, expected)
-
-    def test_Classifications(self):
+    def test_Classifications_Random(self):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
 
-        models = ['LinearSVC', 'NuSVC']
+        models = ['OutputCodeClassifier']
         for model in models:
-            mod1 = getattr(df.svm, model)(random_state=self.random_state)
-            mod2 = getattr(svm, model)(random_state=self.random_state)
+            svm1 = df.svm.LinearSVC(random_state=self.random_state)
+            svm2 = svm.LinearSVC(random_state=self.random_state)
+            mod1 = getattr(df.multiclass, model)(svm1, random_state=self.random_state)
+            mod2 = getattr(multiclass, model)(svm2, random_state=self.random_state)
 
             df.fit(mod1)
             mod2.fit(iris.data, iris.target)

@@ -19,6 +19,24 @@ class TestNaiveBayes(tm.TestCase):
         self.assertIs(df.naive_bayes.MultinomialNB, nb.MultinomialNB)
         self.assertIs(df.naive_bayes.BernoulliNB, nb.BernoulliNB)
 
+    def test_Classifications(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['GaussianNB', 'MultinomialNB', 'BernoulliNB']
+        for model in models:
+            mod1 = getattr(df.naive_bayes, model)()
+            mod2 = getattr(nb, model)()
+
+            df.fit(mod1)
+            mod2.fit(iris.data, iris.target)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
 
 if __name__ == '__main__':
     import nose

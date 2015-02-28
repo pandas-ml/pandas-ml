@@ -13,19 +13,19 @@ class CovarianceMethods(AccessorMethods):
         func = self._module.empirical_covariance
         data = self.data
         covariance = func(data.values, *args, **kwargs)
-        covariance = pd.DataFrame(covariance, index=data.columns, columns=data.columns)
+        covariance = self._constructor(covariance, index=data.columns, columns=data.columns)
         return covariance
 
     def ledoit_wolf(self, *args, **kwargs):
         func = self._module.ledoit_wolf
         data = self.data
         shrunk_cov, shrinkage = func(data.values, *args, **kwargs)
-        shrunk_cov = pd.DataFrame(shrunk_cov, index=data.columns, columns=data.columns)
+        shrunk_cov = self._constructor(shrunk_cov, index=data.columns, columns=data.columns)
         return shrunk_cov, shrinkage
 
     def oas(self, *args, **kwargs):
         func = self._module.oas
         data = self.data
         shrunk_cov, shrinkage = func(data.values, *args, **kwargs)
-        shrunk_cov = pd.DataFrame(shrunk_cov, index=data.columns, columns=data.columns)
+        shrunk_cov = self._constructor(shrunk_cov, index=data.columns, columns=data.columns)
         return shrunk_cov, shrinkage

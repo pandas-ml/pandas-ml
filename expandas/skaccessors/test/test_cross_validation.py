@@ -95,6 +95,26 @@ class TestCrossValidation(tm.TestCase):
         result = df.cross_validation.check_cv(cv=5)
         self.assertTrue(isinstance(result, cv.KFold))
 
+    def test_StratifiedShuffleSplit(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+        sf1 = df.cross_validation.StratifiedShuffleSplit(random_state=self.random_state)
+        sf2 = cv.StratifiedShuffleSplit(iris.target, random_state=self.random_state)
+        for idx1, idx2 in zip(sf1, sf2):
+            self.assert_numpy_array_equal(idx1[0], idx2[0])
+            self.assert_numpy_array_equal(idx1[1], idx2[1])
+
+        sf1 = df.cross_validation.StratifiedShuffleSplit(random_state=self.random_state)
+        with tm.assert_produces_warning(UserWarning):
+            # StratifiedShuffleSplit is not a subclass of PartitionIterator
+            for train_df, test_df in df.cross_validation.iterate(sf1):
+                self.assertTrue(isinstance(train_df, expd.ModelFrame))
+                self.assertTrue(isinstance(test_df, expd.ModelFrame))
+                self.assert_index_equal(df.columns, train_df.columns)
+                self.assert_index_equal(df.columns, test_df.columns)
+
+                self.assertTrue(df.shape[0], train_df.shape[0] + test_df.shape[1])
+
 
 if __name__ == '__main__':
     import nose

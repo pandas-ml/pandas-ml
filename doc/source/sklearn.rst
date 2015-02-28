@@ -42,9 +42,9 @@ You can create ``ModelFrame`` instance from ``scikit-learn`` datasets directly.
 
 Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` module.
 
-================================  ================================
+================================  ==========================================
 ``scikit-learn``                  ``ModelFrame`` accessor
-================================  ================================
+================================  ==========================================
 ``sklearn.cluster``               ``ModelFrame.cluster``
 ``sklearn.covariance``            ``ModelFrame.covariance``
 ``sklearn.cross_validation``      ``ModelFrame.cross_validation``
@@ -52,30 +52,30 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.datasets``              (not accesible from accessor)
 ``sklearn.dummy``                 ``ModelFrame.dummy``
 ``sklearn.ensemble``              ``ModelFrame.ensemble``
-``sklearn.feature_extraction``
-``sklearn.gaussian_process``      ``ModelFrame.gaussian_process``
+``sklearn.feature_extraction``    ``ModelFrame.feature_extraction``
+``sklearn.gaussian_process``      ``ModelFrame.gaussian_process``  (WIP)
 ``sklearn.grid_search``           ``ModelFrame.grid_search``
 ``sklearn.isotonic``              ``ModelFrame.isotonic`` (WIP)
-``sklearn.kernel_approximation``
+``sklearn.kernel_approximation``  ``ModelFrame.kernel_approximation``
 ``sklearn.lda``                   ``ModelFrame.lda``
 ``sklearn.linear_model``          ``ModelFrame.linear_model``
 ``sklearn.manifold``              ``ModelFrame.manifold``
 ``sklearn.metrics``               ``ModelFrame.metrics``
-``sklearn.mixture``
-``sklearn.multiclass``
+``sklearn.mixture``               ``ModelFrame.mixture``
+``sklearn.multiclass``            ``ModelFrame.multiclass``
 ``sklearn.naive_bayes``           ``ModelFrame.naive_bayes``
 ``sklearn.neighbors``             ``ModelFrame.neighbors``
-``sklearn.cross_decomposition``
+``sklearn.cross_decomposition``   ``ModelFrame.cross_decomposition`` (WIP)
 ``sklearn.pipeline``              ``ModelFrame.pipeline``
 ``sklearn.preprocessing``         ``ModelFrame.preprocessing``
-``sklearn.qda``
-``sklearn.semi_supervised``
+``sklearn.qda``                   ``ModelFrame.qda``
+``sklearn.semi_supervised``       ``ModelFrame.semi_supervised``
 ``sklearn.svm``                   ``ModelFrame.svm``
 ``sklearn.tree``                  ``ModelFrame.tree``
-``sklearn.utils``
-================================  ================================
+``sklearn.utils``                 (not accesible from accessor)
+================================  ==========================================
 
-Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once create an estimator, you can pass it to ``ModelFrame.fit`` then ``predict``. `ModelFrame`` automatically uses its data and target properties for each operations.
+Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once create an estimator, you can pass it to ``ModelFrame.fit`` then ``predict``. ``ModelFrame`` automatically uses its data and target properties for each operations.
 
 .. code-block:: python
 
@@ -103,7 +103,7 @@ Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once crea
 - ``ModelFrame.fit_predict``
 - ``ModelFrame.score``
 
-Following example shows to perform PCA.
+Following example shows to perform PCA, then revert principal components back to original space.
 
 .. code-block:: python
 
@@ -169,10 +169,11 @@ Following example shows to perform PCA.
    Length: 150, dtype: int64
 
    >>> df.metrics.confusion_matrix()
-       0   1   2
-   0  50   0   0
-   1   0  48   2
-   2   0   0  50
+   Predicted   0   1   2
+   Target
+   0          50   0   0
+   1           0  48   2
+   2           0   0  50
 
 Pipeline
 --------

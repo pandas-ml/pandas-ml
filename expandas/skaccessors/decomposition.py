@@ -16,23 +16,23 @@ class DecompositionMethods(AccessorMethods):
 
         if return_x_mean:
             K, W, S, X_mean = func(data.values, *args, **kwargs)
-            K = pd.DataFrame(K, index=data.columns)
-            W = pd.DataFrame(W)
-            S = pd.DataFrame(S, index=data.index)
+            K = self._constructor(K, index=data.columns)
+            W = self._constructor(W)
+            S = self._constructor(S, index=data.index)
             return K, W, S, X_mean
         else:
             K, W, S = func(data.values, *args, **kwargs)
-            K = pd.DataFrame(K, index=data.columns)
-            W = pd.DataFrame(W)
-            S = pd.DataFrame(S, index=data.index)
+            K = self._constructor(K, index=data.columns)
+            W = self._constructor(W)
+            S = self._constructor(S, index=data.index)
             return K, W, S
 
     def dict_learning(self, n_components, alpha, *args, **kwargs):
         func = self._module.dict_learning
         data = self.data
         code, dictionary, errors = func(data.values, n_components, alpha, *args, **kwargs)
-        code = pd.DataFrame(code, index=data.index)
-        dictionary = pd.DataFrame(dictionary, columns=data.columns)
+        code = self._constructor(code, index=data.index)
+        dictionary = self._constructor(dictionary, columns=data.columns)
         return code, dictionary, errors
 
     def dict_learning_online(self, *args, **kwargs):
@@ -41,17 +41,17 @@ class DecompositionMethods(AccessorMethods):
         return_code = kwargs.get('return_code', True)
         if return_code:
             code, dictionary = func(data.values, *args, **kwargs)
-            code = pd.DataFrame(code, index=data.index)
-            dictionary = pd.DataFrame(dictionary, columns=data.columns)
+            code = self._constructor(code, index=data.index)
+            dictionary = self._constructor(dictionary, columns=data.columns)
             return code, dictionary
         else:
             dictionary = func(data.values, *args, **kwargs)
-            dictionary = pd.DataFrame(dictionary, columns=data.columns)
+            dictionary = self._constructor(dictionary, columns=data.columns)
             return dictionary
 
     def sparse_encode(self, dictionary, *args, **kwargs):
         func = self._module.sparse_encode
         data = self.data
         code = func(data.values, dictionary, *args, **kwargs)
-        code = pd.DataFrame(code, index=data.index)
+        code = self._constructor(code, index=data.index)
         return code

@@ -18,7 +18,7 @@ class GridSearchMethods(AccessorMethods):
             row = dict(mean=mean_score, std=scores.std())
             row.update(params)
             results.append(row)
-        df = pd.DataFrame(results)
+        df = self._constructor(results)
 
         scores = pd.Index(['mean', 'std'])
         df = df[scores.append(df.columns[~df.columns.isin(scores)])]
