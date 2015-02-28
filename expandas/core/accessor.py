@@ -9,20 +9,25 @@ import pandas as pd
 class AccessorMethods(object):
     _module_name = None
 
-    def __init__(self, df):
+    def __init__(self, df, module_name=None, attrs=None):
         self._df = df
+
+        if module_name is not None:
+            # overwrite if exists
+            self._module_name = module_name
 
         if self._module_name is None:
             return
 
         self._module = importlib.import_module(self._module_name)
 
-        try:
-            mobjs = self._module.__all__
-        except AttributeError:
-            return
+        if attrs is None:
+            try:
+                attrs = self._module.__all__
+            except AttributeError:
+                return
 
-        for mobj in mobjs:
+        for mobj in attrs:
             try:
                 if not hasattr(self, mobj):
                     try:
@@ -43,6 +48,14 @@ class AccessorMethods(object):
     @property
     def predicted(self):
         return self._df.predicted
+
+    @property
+    def _constructor(self):
+        return self._df._constructor
+
+    @property
+    def _constructor_sliced(self):
+        return self._df._constructor_sliced
 
 
 def _attach_methods(cls, wrap_func, methods):

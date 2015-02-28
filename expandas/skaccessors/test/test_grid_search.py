@@ -41,6 +41,7 @@ class TestGridSearch(tm.TestCase):
                                            np.nan, np.nan, np.nan],
                                  'kernel': ['rbf'] * 6 + ['linear'] * 3},
                                  columns=['mean', 'std', 'C', 'gamma', 'kernel'])
+        self.assertTrue(isinstance(result, expd.ModelFrame))
         self.assert_frame_equal(result, expected)
 
 

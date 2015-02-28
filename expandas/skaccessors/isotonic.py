@@ -18,7 +18,7 @@ class IsotonicMethods(AccessorMethods):
         func = self._module.isotonic_regression
         target = self.target
         _y = func(target.values, *args, **kwargs)
-        _y = self._df._constructor_sliced(_y, index=target.index)
+        _y = self._constructor_sliced(_y, index=target.index)
         return _y
 
     def check_increasing(self, *args, **kwargs):

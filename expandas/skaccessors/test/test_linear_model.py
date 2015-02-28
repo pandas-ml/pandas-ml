@@ -57,7 +57,7 @@ class TestLinearModel(tm.TestCase):
         self.assertEqual(len(result), 3)
         self.assert_numpy_array_equal(result[0], expected[0])
         self.assert_numpy_array_equal(result[1], expected[1])
-        self.assertTrue(isinstance(result[2], pd.DataFrame))
+        self.assertTrue(isinstance(result[2], expd.ModelFrame))
         self.assert_index_equal(result[2].index, df.data.columns)
         self.assert_numpy_array_equal(result[2].values, expected[2])
 
@@ -70,7 +70,7 @@ class TestLinearModel(tm.TestCase):
 
         self.assertEqual(len(result), 3)
         self.assert_numpy_array_equal(result[0], expected[0])
-        self.assertTrue(isinstance(result[1], pd.DataFrame))
+        self.assertTrue(isinstance(result[1], expd.ModelFrame))
         self.assert_index_equal(result[1].index, df.data.columns)
         self.assert_numpy_array_equal(result[1].values, expected[1])
         self.assert_numpy_array_equal(result[2], expected[2])
@@ -93,7 +93,7 @@ class TestLinearModel(tm.TestCase):
         self.assertEqual(len(result), 2)
         self.assert_numpy_array_equal(result[0], expected[0])
 
-        self.assertTrue(isinstance(result[1], pd.DataFrame))
+        self.assertTrue(isinstance(result[1], expd.ModelFrame))
         self.assert_index_equal(result[1].index, df.data.columns)
         self.assert_numpy_array_equal(result[1].values, expected[1])
 
@@ -135,7 +135,7 @@ class TestLinearModel(tm.TestCase):
             result = df.predict(mod1)
             expected = mod2.predict(diabetes.data)
 
-            self.assertTrue(isinstance(result, pd.Series))
+            self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
 

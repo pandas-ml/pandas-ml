@@ -10,7 +10,7 @@ class MetricsMethods(AccessorMethods):
     _module_name = 'sklearn.metrics'
 
     # Model Selection Interface
-    # make_scorer shouls work with autoload
+    # ``make_scorer`` will be attached via autoload
 
     # Clasification metrics
 
@@ -34,7 +34,9 @@ class MetricsMethods(AccessorMethods):
         func = self._module.confusion_matrix
         result = func(self.target.values, self.predicted.values,
                       *args, **kwargs)
-        result = pd.DataFrame(result)
+        result = self._constructor(result)
+        result.index.name = 'Target'
+        result.columns.name = 'Predicted'
         return result
 
     def hinge_loss(self, *args, **kwargs):
@@ -71,7 +73,7 @@ class MetricsMethods(AccessorMethods):
         func = self._module.silhouette_samples
         result = func(self.data.values, self.predicted.values,
                       *args, **kwargs)
-        result = pd.Series(result, index=self._df.index)
+        result = self._constructor_sliced(result, index=self._df.index)
         return result
 
     # Biclustering metrics

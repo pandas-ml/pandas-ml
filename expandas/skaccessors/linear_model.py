@@ -14,7 +14,7 @@ class LinearModelMethods(AccessorMethods):
         data = self.data
         target = self.target
         alphas, active, coefs = func(data.values, y=target.values, *args, **kwargs)
-        coefs = pd.DataFrame(coefs, index=data.columns)
+        coefs = self._constructor(coefs, index=data.columns)
         return alphas, active, coefs
 
     def lasso_path(self, *args, **kwargs):
@@ -27,7 +27,7 @@ class LinearModelMethods(AccessorMethods):
             return models
         else:
             alphas, coefs, dual_gaps = func(data.values, y=target.values, *args, **kwargs)
-            coefs = pd.DataFrame(coefs, index=data.columns)
+            coefs = self._constructor(coefs, index=data.columns)
             return alphas, coefs, dual_gaps
 
     def lasso_stability_path(self, *args, **kwargs):
@@ -35,7 +35,7 @@ class LinearModelMethods(AccessorMethods):
         data = self.data
         target = self.target
         alpha_grid, scores_path = func(data.values, y=target.values, *args, **kwargs)
-        scores_path = pd.DataFrame(scores_path, index=data.columns)
+        scores_path = self._constructor(scores_path, index=data.columns)
         return alpha_grid, scores_path
 
     def orthogonal_mp_gram(self, *args, **kwargs):

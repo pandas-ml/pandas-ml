@@ -37,14 +37,14 @@ class TestDecomposition(tm.TestCase):
         expected = decomposition.fastica(iris.data, random_state=self.random_state)
 
         self.assertEqual(len(result), 3)
-        self.assertTrue(isinstance(result[0], pd.DataFrame))
+        self.assertTrue(isinstance(result[0], expd.ModelFrame))
         self.assert_index_equal(result[0].index, df.data.columns)
         self.assert_numpy_array_almost_equal(result[0].values, expected[0])
 
-        self.assertTrue(isinstance(result[1], pd.DataFrame))
+        self.assertTrue(isinstance(result[1], expd.ModelFrame))
         self.assert_numpy_array_almost_equal(result[1].values, expected[1])
 
-        self.assertTrue(isinstance(result[2], pd.DataFrame))
+        self.assertTrue(isinstance(result[2], expd.ModelFrame))
         self.assert_index_equal(result[2].index, df.index)
         self.assert_numpy_array_almost_equal(result[2].values, expected[2])
 
@@ -53,14 +53,14 @@ class TestDecomposition(tm.TestCase):
                                          random_state=self.random_state)
 
         self.assertEqual(len(result), 4)
-        self.assertTrue(isinstance(result[0], pd.DataFrame))
+        self.assertTrue(isinstance(result[0], expd.ModelFrame))
         self.assert_index_equal(result[0].index, df.data.columns)
         self.assert_numpy_array_almost_equal(result[0].values, expected[0])
 
-        self.assertTrue(isinstance(result[1], pd.DataFrame))
+        self.assertTrue(isinstance(result[1], expd.ModelFrame))
         self.assert_numpy_array_almost_equal(result[1].values, expected[1])
 
-        self.assertTrue(isinstance(result[2], pd.DataFrame))
+        self.assertTrue(isinstance(result[2], expd.ModelFrame))
         self.assert_index_equal(result[2].index, df.index)
         self.assert_numpy_array_almost_equal(result[2].values, expected[2])
 
@@ -74,11 +74,11 @@ class TestDecomposition(tm.TestCase):
         expected = decomposition.dict_learning(iris.data, 2, 1,
                                                random_state=self.random_state)
         self.assertEqual(len(result), 3)
-        self.assertTrue(isinstance(result[0], pd.DataFrame))
+        self.assertTrue(isinstance(result[0], expd.ModelFrame))
         self.assert_index_equal(result[0].index, df.data.index)
         self.assert_numpy_array_almost_equal(result[0].values, expected[0])
 
-        self.assertTrue(isinstance(result[1], pd.DataFrame))
+        self.assertTrue(isinstance(result[1], expd.ModelFrame))
         self.assert_index_equal(result[1].columns, df.data.columns)
         self.assert_numpy_array_almost_equal(result[1].values, expected[1])
 
@@ -93,11 +93,11 @@ class TestDecomposition(tm.TestCase):
                                                       random_state=self.random_state)
 
         self.assertEqual(len(result), 2)
-        self.assertTrue(isinstance(result[0], pd.DataFrame))
+        self.assertTrue(isinstance(result[0], expd.ModelFrame))
         self.assert_index_equal(result[0].index, df.data.index)
         self.assert_numpy_array_almost_equal(result[0].values, expected[0])
 
-        self.assertTrue(isinstance(result[1], pd.DataFrame))
+        self.assertTrue(isinstance(result[1], expd.ModelFrame))
         self.assert_index_equal(result[1].columns, df.data.columns)
         self.assert_numpy_array_almost_equal(result[1].values, expected[1])
 
@@ -106,7 +106,7 @@ class TestDecomposition(tm.TestCase):
         expected = decomposition.dict_learning_online(iris.data,
                                                       return_code=False,
                                                       random_state=self.random_state)
-        self.assertTrue(isinstance(result, pd.DataFrame))
+        self.assertTrue(isinstance(result, expd.ModelFrame))
         self.assert_index_equal(result.columns, df.data.columns)
         self.assert_numpy_array_almost_equal(result.values, expected)
 
@@ -119,7 +119,7 @@ class TestDecomposition(tm.TestCase):
 
         result = df.decomposition.sparse_encode(dictionary)
         expected = decomposition.sparse_encode(iris.data, dictionary)
-        self.assertTrue(isinstance(result, pd.DataFrame))
+        self.assertTrue(isinstance(result, expd.ModelFrame))
         self.assert_index_equal(result.index, df.data.index)
         self.assert_numpy_array_almost_equal(result.values, expected)
 

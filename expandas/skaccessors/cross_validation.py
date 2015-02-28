@@ -12,11 +12,13 @@ class CrossValidationMethods(AccessorMethods):
     _module_name = 'sklearn.cross_validation'
 
     def StratifiedShuffleSplit(self, *args, **kwargs):
-        raise NotImplementedError
+        target = self.target
+        return self._module.StratifiedShuffleSplit(target.values, *args, **kwargs)
 
     def iterate(self, cv):
         if not(isinstance(cv, self._module._PartitionIterator)):
-            warnings.warn("'cv' is not a subclass of PartitionIterator")
+            msg = "{0} is not a subclass of PartitionIterator"
+            warnings.warn(msg.format(cv.__class__.__name__))
 
         for train_index, test_index in cv:
             train_df = self._df.iloc[train_index, :]
@@ -26,9 +28,9 @@ class CrossValidationMethods(AccessorMethods):
     def train_test_split(self, *args, **kwargs):
         func = self._module.train_test_split
 
-        data = self._df.data
+        data = self.data
         if self._df.has_target():
-            target = self._df.target
+            target = self.target
             tr_d, te_d, tr_l, te_l = func(data, target, *args, **kwargs)
 
             # Create DataFrame here to retain data and target names
@@ -38,8 +40,8 @@ class CrossValidationMethods(AccessorMethods):
             tr_l = pd.Series(tr_l, name=target.name)
             te_l = pd.Series(te_l, name=target.name)
 
-            train_df = self._df._constructor(data=tr_d, target=tr_l)
-            test_df = self._df._constructor(data=te_d, target=te_l)
+            train_df = self._constructor(data=tr_d, target=tr_l)
+            test_df = self._constructor(data=te_d, target=te_l)
             return train_df, test_df
         else:
             tr_d, te_d = func(data, *args, **kwargs)
@@ -48,9 +50,9 @@ class CrossValidationMethods(AccessorMethods):
             tr_d = pd.DataFrame(tr_d, columns=data.columns)
             te_d = pd.DataFrame(te_d, columns=data.columns)
 
-            train_df = self._df._constructor(data=tr_d)
+            train_df = self._constructor(data=tr_d)
             train_df.target_name = self._df.target_name
-            test_df = self._df._constructor(data=te_d)
+            test_df = self._constructor(data=te_d)
             test_df.target_name = self._df.target_name
             return train_df, test_df
 
@@ -66,5 +68,5 @@ class CrossValidationMethods(AccessorMethods):
 
     def check_cv(self, cv, *args, **kwargs):
         func = self._module.check_cv
-        return func(cv, X=self.data, y=self.target, **kwargs)
+        return func(cv, X=self.data, y=self.target, *args, **kwargs)
 

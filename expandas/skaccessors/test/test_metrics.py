@@ -87,8 +87,7 @@ class TestClassificationMetrics(tm.TestCase):
         result = self.df.metrics.confusion_matrix()
         expected = metrics.confusion_matrix(self.digits.target,
                                             self.digits_pred)
-
-        self.assertTrue(isinstance(result, pd.DataFrame))
+        self.assertTrue(isinstance(result, expd.ModelFrame))
         self.assert_numpy_array_equal(result.values, expected)
 
     def test_f1_score(self):
@@ -268,7 +267,7 @@ class Test1ClusteringMetrics(tm.TestCase):
         result = self.df.metrics.silhouette_samples()
         expected = metrics.silhouette_samples(self.data, self.pred)
 
-        self.assertTrue(isinstance(result, pd.Series))
+        self.assertTrue(isinstance(result, expd.ModelSeries))
         self.assert_index_equal(result.index, self.df.index)
         self.assert_numpy_array_almost_equal(result.values, expected)
 

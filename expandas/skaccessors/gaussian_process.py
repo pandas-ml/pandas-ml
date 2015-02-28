@@ -12,39 +12,36 @@ class GaussianProcessMethods(AccessorMethods):
 
     @property
     def correlation_models(self):
-        return CorrelationModelsMethods(self._df)
+        module_name = 'sklearn.gaussian_process.correlation_models'
+        attrs = ['absolute_exponential', 'squared_exponential',
+                 'generalized_exponential', 'pure_nugget',
+                 'cubic', 'linear']
+        return AccessorMethods(self._df, module_name=module_name, attrs=attrs)
 
     @property
     def regression_models(self):
         return RegressionModelsMethods(self._df)
 
-
-class CorrelationModelsMethods(AccessorMethods):
-    _module_name = 'sklearn.gaussian_process.correlation_models'
-
-    @property
-    def absolute_exponential(self):
-        return self._module.absolute_exponential
-
-    @property
-    def squared_exponential(self):
-        return self._module.squared_exponential
-
-    @property
-    def generalized_exponential(self):
-        return self._module.generalized_exponential
-
-    @property
-    def pure_nugget(self):
-        return self._module.pure_nugget
-
-    @property
-    def cubic(self):
-        return self._module.cubic
-
-    @property
-    def linear(self):
-        return self._module.linear
+    @classmethod
+    def _predict(cls, df, estimator, *args, **kwargs):
+        data = df.data.values
+        eval_MSE = kwargs.get('eval_MSE', False)
+        if eval_MSE:
+            y, MSE = estimator.predict(data, *args, **kwargs)
+            if y.ndim == 1:
+                y = df._constructor_sliced(y, index=df.index)
+                MSE = df._constructor_sliced(MSE, index=df.index)
+            else:
+                y = df._constructor(y, index=df.index)
+                MSE = df._constructor(MSE, index=df.index)
+            return y, MSE
+        else:
+            y = estimator.predict(data, *args, **kwargs)
+            if y.ndim == 1:
+                y = df._constructor_sliced(y, index=df.index)
+            else:
+                y = df._constructor(y, index=df.index)
+            return y
 
 
 class RegressionModelsMethods(AccessorMethods):

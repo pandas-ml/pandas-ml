@@ -46,7 +46,7 @@ class TestCluster(tm.TestCase):
         self.assertEqual(len(result), 3)
         self.assert_numpy_array_almost_equal(result[0], expected[0])
 
-        self.assertTrue(isinstance(result[1], pd.Series))
+        self.assertTrue(isinstance(result[1], expd.ModelSeries))
         self.assert_index_equal(result[1].index, df.index)
         self.assert_numpy_array_equal(result[1].values, expected[1])
 
@@ -85,7 +85,7 @@ class TestCluster(tm.TestCase):
         self.assertEqual(len(result), 2)
         self.assert_numpy_array_almost_equal(result[0], expected[0])
 
-        self.assertTrue(isinstance(result[1], pd.Series))
+        self.assertTrue(isinstance(result[1], expd.ModelSeries))
         self.assert_index_equal(result[1].index, df.index)
         self.assert_numpy_array_equal(result[1].values, expected[1])
 
@@ -116,7 +116,7 @@ class TestCluster(tm.TestCase):
 
         self.assertEqual(len(result), 2)
         self.assert_numpy_array_almost_equal(result[0], expected[0])
-        self.assertTrue(isinstance(result[1], pd.Series))
+        self.assertTrue(isinstance(result[1], expd.ModelSeries))
         self.assert_index_equal(result[1].index, df.index)
         self.assert_numpy_array_equal(result[1].values, expected[1])
 
@@ -129,7 +129,7 @@ class TestCluster(tm.TestCase):
 
         self.assertEqual(len(result), 2)
         self.assert_numpy_array_almost_equal(result[0], expected[0])
-        self.assertTrue(isinstance(result[1], pd.Series))
+        self.assertTrue(isinstance(result[1], expd.ModelSeries))
         self.assert_index_equal(result[1].index, df.index)
         self.assert_numpy_array_equal(result[1].values, expected[1])
 
@@ -142,7 +142,7 @@ class TestCluster(tm.TestCase):
         result = df.cluster.spectral_clustering(random_state=self.random_state)
         expected = cluster.spectral_clustering(m, random_state=self.random_state)
 
-        self.assertTrue(isinstance(result, pd.Series))
+        self.assertTrue(isinstance(result, expd.ModelSeries))
         self.assert_index_equal(result.index, df.index)
         self.assert_numpy_array_equal(result.values, expected)
 
@@ -161,7 +161,7 @@ class TestCluster(tm.TestCase):
             result = df.predict(mod1)
             expected = mod2.predict(iris.data)
 
-            self.assertTrue(isinstance(result, pd.Series))
+            self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
     def test_Classifications(self):
@@ -179,7 +179,7 @@ class TestCluster(tm.TestCase):
             result = df.predict(mod1)
             expected = mod2.predict(iris.data)
 
-            self.assertTrue(isinstance(result, pd.Series))
+            self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
     def test_fit_predict(self):
@@ -194,7 +194,7 @@ class TestCluster(tm.TestCase):
             result = df.fit_predict(mod1)
             expected = mod2.fit_predict(iris.data)
 
-            self.assertTrue(isinstance(result, pd.Series))
+            self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
             result = df.score(mod1)
