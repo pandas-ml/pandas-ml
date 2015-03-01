@@ -16,7 +16,7 @@ Expand pandas functionalities to be easier to use other statistics/ML packages, 
 Documentation
 ~~~~~~~~~~~~~
 
-http://expandas.readthedocs.org/en/latest/
+http://expandas.readthedocs.org/en/stable/
 
 Example
 ~~~~~~~

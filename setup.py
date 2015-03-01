@@ -8,10 +8,8 @@ from setuptools import setup, find_packages
 PACKAGE = 'expandas'
 README = 'README.rst'
 REQUIREMENTS = 'requirements.txt'
-# required modules for test and doc build
-REQUIREMENTS_TEST = 'requirements_test.txt'
 
-VERSION = '0.0.1dev'
+VERSION = '0.0.1'
 
 def read(fname):
   # file must be read as utf-8 in py3 to avoid to be bytes
@@ -32,11 +30,12 @@ write_version_py(filename=version_file)
 
 setup(name=PACKAGE,
       version=VERSION,
-      description='scikit-learn integration to pandas interface',
+      description='Expand pandas functionalities to be easier to use other '
+                  'statistics/ML packages, mainly forcusing on scikit-learn.',
       long_description=read(README),
       author='sinhrks',
       author_email='sinhrks@gmail.com',
-      url='http://expandas.readthedocs.org',
+      url='http://expandas.readthedocs.org/en/stable',
       license = 'BSD',
       packages=find_packages(),
       install_requires=list(read(REQUIREMENTS).splitlines())
