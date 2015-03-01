@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class GridSearchMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.grid_search``.
+    """
+
     _module_name = 'sklearn.grid_search'
 
     def describe(self, estimator):

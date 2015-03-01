@@ -8,6 +8,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class IsotonicMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.isotonic``.
+    """
+
     _module_name = 'sklearn.isotonic'
 
     @property

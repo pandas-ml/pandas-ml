@@ -5,14 +5,30 @@ import warnings
 import numpy as np
 import pandas as pd
 import pandas.compat as compat
-from pandas.util.decorators import cache_readonly
+from pandas.util.decorators import Appender, cache_readonly
 
 from expandas.core.series import ModelSeries
 from expandas.core.accessor import AccessorMethods
 import expandas.skaccessors as skaccessors
 
 
+_shared_docs = dict()
+
+
 class ModelFrame(pd.DataFrame):
+
+    """
+    Data structure subclassing ``pandas.DataFrame`` to define a metadata to
+    specify target (response variable) and data (explanatory variable / features).
+
+    Parameters
+    ----------
+    data : same as ``pandas.DataFrame``
+    target : str or array-like
+        Column name or values to be used as target
+    args : arguments passed to ``pandas.DataFrame``
+    kwargs : keyword arguments passed to ``pandas.DataFrame``
+    """
 
     _internal_names = (pd.core.generic.NDFrame._internal_names +
                        ['_target_name', '_estimator', '_predicted'])
@@ -213,9 +229,26 @@ class ModelFrame(pd.DataFrame):
             result = method(data, *args, **kwargs)
         return result
 
+    _shared_docs['estimator_methods'] = """
+        Call estimator's %(funcname)s method.
+
+        Parameters
+        ----------
+        args : arguments passed to %(funcname)s method
+        kwargs : keyword arguments passed to %(funcname)s method
+
+        Returns
+        -------
+        %(returned)s
+        """
+
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='fit', returned='returned : None or fitted estimator'))
     def fit(self, estimator, *args, **kwargs):
         return self._call(estimator, 'fit', *args, **kwargs)
 
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='predict', returned='returned : predicted result'))
     def predict(self, estimator, *args, **kwargs):
         mapped = self._get_mapper(estimator, 'predict')
         if mapped is not None:
@@ -231,6 +264,8 @@ class ModelFrame(pd.DataFrame):
         self._estimator = estimator
         return self._predicted
 
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='fit_predict', returned='returned : predicted result'))
     def fit_predict(self, estimator, *args, **kwargs):
         predicted = self._call(estimator, 'fit_predict', *args, **kwargs)
         try:
@@ -242,10 +277,14 @@ class ModelFrame(pd.DataFrame):
         self._estimator = estimator
         return self._predicted
 
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='score', returned='returned : score'))
     def score(self, estimator, *args, **kwargs):
         score = self._call(estimator, 'score', *args, **kwargs)
         return score
 
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='transform', returned='returned : transformed result'))
     def transform(self, estimator, *args, **kwargs):
         transformed = self._call(estimator, 'transform', *args, **kwargs)
 
@@ -254,6 +293,8 @@ class ModelFrame(pd.DataFrame):
         else:
             return self._constructor(transformed, index=self.index)
 
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='fit_transform', returned='returned : transformed result'))
     def fit_transform(self, estimator, *args, **kwargs):
         transformed = self._call(estimator, 'fit_transform', *args, **kwargs)
 
@@ -262,6 +303,8 @@ class ModelFrame(pd.DataFrame):
         else:
             return self._constructor(transformed, index=self.index)
 
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='inverse_transform', returned='returned : transformed result'))
     def inverse_transform(self, estimator, *args, **kwargs):
         transformed = self._call(estimator, 'inverse_transform', *args, **kwargs)
 

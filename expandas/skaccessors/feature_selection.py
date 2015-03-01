@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class FeatureSelectionMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.feature_selection``.
+    """
+
     _module_name = 'sklearn.feature_selection'
 
 

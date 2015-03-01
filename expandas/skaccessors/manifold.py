@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class ManifoldMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.manifold``.
+    """
+
     _module_name = 'sklearn.manifold'
 
     def locally_linear_embedding(self, n_neighbors, n_components, *args, **kwargs):

@@ -8,6 +8,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class ClusterMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.cluster``.
+    """
+
     _module_name = 'sklearn.cluster'
 
     def k_means(self, n_clusters, *args, **kwargs):

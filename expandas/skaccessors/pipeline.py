@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class PipelineMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.pipeline``.
+    """
+
     _module_name = 'sklearn.pipeline'
 
     @property

@@ -4,9 +4,14 @@ import importlib
 
 import numpy as np
 import pandas as pd
+from pandas.util.decorators import Appender, cache_readonly
 
 
 class AccessorMethods(object):
+    """
+    Accessor to related functionalities.
+    """
+
     _module_name = None
 
     def __init__(self, df, module_name=None, attrs=None):

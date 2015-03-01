@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class NeighborsMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.neighbors``.
+    """
+
     _module_name = 'sklearn.neighbors'
 
 

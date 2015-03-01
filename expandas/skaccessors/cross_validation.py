@@ -9,6 +9,10 @@ from expandas.core.accessor import AccessorMethods
 
 
 class CrossValidationMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.cross_validation``.
+    """
+
     _module_name = 'sklearn.cross_validation'
 
     def StratifiedShuffleSplit(self, *args, **kwargs):

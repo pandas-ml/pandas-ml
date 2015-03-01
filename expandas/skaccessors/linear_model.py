@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class LinearModelMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.linear_model``.
+    """
+
     _module_name = 'sklearn.linear_model'
 
     def lars_path(self, *args, **kwargs):
