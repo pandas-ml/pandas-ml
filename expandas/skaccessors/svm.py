@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class SVMMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.svm``.
+    """
+
     _module_name = 'sklearn.svm'
 
     def l1_min_c(self, *args, **kwargs):

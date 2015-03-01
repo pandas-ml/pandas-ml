@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class MetricsMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.metrics``.
+    """
+
     _module_name = 'sklearn.metrics'
 
     # Model Selection Interface

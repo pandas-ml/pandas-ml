@@ -8,6 +8,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class EnsembleMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.ensemble``.
+    """
+
     _module_name = 'sklearn.ensemble'
 
     @property

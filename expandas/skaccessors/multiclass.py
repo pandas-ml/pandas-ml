@@ -8,6 +8,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class MultiClassMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.multiclass``.
+    """
+
     _module_name = 'sklearn.multiclass'
 
     @property

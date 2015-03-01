@@ -8,6 +8,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class FeatureExtractionMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.feature_extraction``.
+    """
+
     _module_name = 'sklearn.feature_extraction'
 
     # image

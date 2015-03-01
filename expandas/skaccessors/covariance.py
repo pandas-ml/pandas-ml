@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class CovarianceMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.covariance``.
+    """
+
     _module_name = 'sklearn.covariance'
 
     def empirical_covariance(self, *args, **kwargs):

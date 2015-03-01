@@ -8,6 +8,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class GaussianProcessMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.gaussian_process``.
+    """
+
     _module_name = 'sklearn.gaussian_process'
 
     @property

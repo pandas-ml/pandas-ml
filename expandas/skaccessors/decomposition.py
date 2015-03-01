@@ -7,6 +7,10 @@ from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
 class DecompositionMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.decomposition``.
+    """
+
     _module_name = 'sklearn.decomposition'
 
     def fastica(self, *args, **kwargs):
