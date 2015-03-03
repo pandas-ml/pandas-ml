@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import datetime
+
 import pandas as pd
 import pandas.compat as compat
 
@@ -149,10 +151,32 @@ class TestModelFrame(tm.TestCase):
         self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
         self.assert_index_equal(mdf.columns, pd.Index(['A', 'B', 'C']))
         self.assert_frame_equal(mdf.data, df)
+        self.assertTrue(mdf.has_data())
+        self.assertTrue(mdf.target is None)
+        self.assertEqual(mdf.target_name, '.target')
 
-        msg = "ModelFrame doesn't have target '.target'"
+    def test_frame_data_none(self):
+        msg = "ModelFrame must have either data or target"
         with self.assertRaisesRegexp(ValueError, msg):
-            mdf.target
+            mdf = expd.ModelFrame(None)
+
+        msg = "target must be list-like when data is None"
+        with self.assertRaisesRegexp(ValueError, msg):
+            mdf = expd.ModelFrame(None, target='X')
+
+        # initialization without data
+        s = pd.Series([1, 2, 3], index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(None, target=s)
+
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 1))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['.target']))
+        self.assertTrue(mdf.data is None)
+        self.assertFalse(mdf.has_data())
+        self.assert_series_equal(mdf.target, s)
+        self.assertEqual(mdf.target.name, '.target')
         self.assertEqual(mdf.target_name, '.target')
 
     def test_frame_slice(self):
@@ -229,9 +253,15 @@ class TestModelFrame(tm.TestCase):
             mdf.data = mdf
 
         # set delete property
-        with self.assertRaisesRegexp(AttributeError, "can't delete attribute"):
-            del mdf.data
-
+        del mdf.data
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 1))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['.target']))
+        self.assertTrue(mdf.data is None)
+        self.assert_series_equal(mdf.target, s)
+        self.assertEqual(mdf.target.name, '.target')
+        self.assertEqual(mdf.target_name, '.target')
 
     def test_frame_target_proparty(self):
         df = pd.DataFrame({'A': [1, 2, 3],
@@ -298,6 +328,78 @@ class TestModelFrame(tm.TestCase):
         self.assert_index_equal(mdf.columns, pd.Index(['A', 'B', 'C']))
         self.assert_frame_equal(mdf.data, df)
         self.assertEqual(mdf.target_name, '.target')
+
+    def test_frame_delete_proparty(self):
+        mdf = expd.ModelFrame(None, target=[1, 2, 3])
+        msg = 'ModelFrame must have either data or target'
+
+        with self.assertRaisesRegexp(ValueError, msg):
+            del mdf.target
+
+        with self.assertRaisesRegexp(ValueError, msg):
+            mdf.target = None
+
+        mdf = expd.ModelFrame([1, 2, 3])
+        msg = 'ModelFrame must have either data or target'
+
+        with self.assertRaisesRegexp(ValueError, msg):
+            del mdf.data
+
+        with self.assertRaisesRegexp(ValueError, msg):
+            mdf.data = None
+
+    def test_frame_target_object(self):
+        df = pd.DataFrame({datetime.datetime(2014, 1, 1): [1, 2, 3],
+                           datetime.datetime(2015, 1, 1): [4, 5, 6],
+                           datetime.datetime(2016, 1, 1): [7, 8, 9]},
+                           index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(df, target=datetime.datetime(2016, 1, 1))
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 3))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        expected = pd.DatetimeIndex(['2014-01-01', '2015-01-01', '2016-01-01'])
+        self.assert_index_equal(mdf.columns, expected)
+        self.assert_frame_equal(mdf.data, df.iloc[:, :2])
+        expected = pd.Series([7, 8, 9], index=['a', 'b', 'c'])
+        self.assert_series_equal(mdf.target, expected)
+        self.assertEqual(mdf.target.name, datetime.datetime(2016, 1, 1))
+        self.assertEqual(mdf.target_name, datetime.datetime(2016, 1, 1))
+
+    def test_frame_target_object_set(self):
+
+        df = pd.DataFrame({datetime.datetime(2014, 1, 1): [1, 2, 3],
+                           datetime.datetime(2015, 1, 1): [4, 5, 6],
+                           datetime.datetime(2016, 1, 1): [7, 8, 9]},
+                           index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(df)
+
+        mdf.target = pd.Series(['A', 'B', 'C'], index=['a', 'b', 'c'], name=5)
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 4))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        expected = pd.Index([5, datetime.datetime(2014, 1, 1),
+                             datetime.datetime(2015, 1, 1), datetime.datetime(2016, 1, 1)])
+        self.assert_index_equal(mdf.columns, expected)
+        self.assert_frame_equal(mdf.data, df)
+        expected = pd.Series(['A', 'B', 'C'], index=['a', 'b', 'c'])
+        self.assert_series_equal(mdf.target, expected)
+        self.assertEqual(mdf.target.name, 5)
+        self.assertEqual(mdf.target_name, 5)
+
+        # name will be ignored if ModelFrame already has a target
+        mdf.target = pd.Series([10, 11, 12], index=['a', 'b', 'c'], name='X')
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 4))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        expected = pd.Index([5, datetime.datetime(2014, 1, 1),
+                             datetime.datetime(2015, 1, 1), datetime.datetime(2016, 1, 1)])
+        self.assert_index_equal(mdf.columns, expected)
+        self.assert_frame_equal(mdf.data, df)
+        expected = pd.Series([10, 11, 12], index=['a', 'b', 'c'])
+        self.assert_series_equal(mdf.target, expected)
+        self.assertEqual(mdf.target.name, 5)
+        self.assertEqual(mdf.target_name, 5)
 
 
 if __name__ == '__main__':

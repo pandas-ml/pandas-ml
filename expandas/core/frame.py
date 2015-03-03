@@ -4,6 +4,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
+import pandas.core.common as com
 import pandas.compat as compat
 from pandas.util.decorators import Appender, cache_readonly
 
@@ -31,7 +32,8 @@ class ModelFrame(pd.DataFrame):
     """
 
     _internal_names = (pd.core.generic.NDFrame._internal_names +
-                       ['_target_name', '_estimator', '_predicted'])
+                       ['_target_name', '_estimator',
+                        '_predicted', '_probability'])
     _internal_names_set = set(_internal_names)
 
     _mapper = dict(fit=dict(),
@@ -47,6 +49,14 @@ class ModelFrame(pd.DataFrame):
 
     def __init__(self, data, target=None,
                  *args, **kwargs):
+
+        if data is None and target is None:
+            msg = '{0} must have either data or target'
+            raise ValueError(msg.format(self.__class__.__name__))
+        elif data is None and not com.is_list_like(target):
+            msg = 'target must be list-like when data is None'
+            raise ValueError(msg)
+
         try:
             from sklearn.datasets.base import Bunch
             if isinstance(data, Bunch):
@@ -60,6 +70,7 @@ class ModelFrame(pd.DataFrame):
         except ImportError:
             pass
 
+        # retrieve target_name
         if isinstance(data, ModelFrame):
             target_name = data.target_name
         elif isinstance(target, pd.Series):
@@ -70,22 +81,27 @@ class ModelFrame(pd.DataFrame):
         else:
             target_name = self._TARGET_NAME
 
-        if not isinstance(data, pd.DataFrame):
+        if data is not None and not isinstance(data, pd.DataFrame):
             data = pd.DataFrame(data, *args, **kwargs)
+        if target is not None:
+            if isinstance(target, pd.Series):
+                # overwrite target_name, done in aboveS
+                pass
+                # target = pd.Series(target, name=target_name)
+            elif com.is_list_like(target):
+                if data is not None:
+                    target = pd.Series(target, name=target_name, index=data.index)
+                else:
+                    target = pd.Series(target, name=target_name)
 
-        if isinstance(target, compat.string_types):
+        if target is not None and not com.is_list_like(target):
             if target in data.columns:
                 target_name = target
                 df = data
             else:
                 msg = "Specified target '{0}' is not included in data"
                 raise ValueError(msg.format(target))
-
-        elif target is None:
-            df = data
         else:
-            if not isinstance(target, pd.Series):
-                target = pd.Series(target, name=target_name, index=data.index)
             df = self._concat_target(data, target)
 
         self._target_name = target_name
@@ -94,6 +110,16 @@ class ModelFrame(pd.DataFrame):
         pd.DataFrame.__init__(self, df, *args, **kwargs)
 
     def _concat_target(self, data, target):
+        if data is None and target is None:
+            msg = '{0} must have either data or target'
+            raise ValueError(msg.format(self.__class__.__name__))
+
+        elif data is None:
+            return target
+
+        elif target is None:
+            return data
+
         assert isinstance(target, pd.Series)
 
         if len(data) != len(target):
@@ -103,13 +129,26 @@ class ModelFrame(pd.DataFrame):
             raise ValueError('data and target must have equal index')
         return pd.concat([target, data], axis=1)
 
+    def has_data(self):
+        """
+        Return whether ``ModelFrame`` has data
+
+        Returns
+        -------
+        has_data : bool
+        """
+        return len(self.data_columns) > 0
+
     @property
     def data_columns(self):
         return pd.Index([c for c in self.columns if c != self.target_name])
 
     @property
     def data(self):
-        return self.loc[:, self.data_columns]
+        if self.has_data():
+            return self.loc[:, self.data_columns]
+        else:
+            return None
 
     @data.setter
     def data(self, value):
@@ -133,9 +172,22 @@ class ModelFrame(pd.DataFrame):
             value = self._concat_target(value, self.target)
         self._update_inplace(value)
 
-    # don't allow to delete data
+    @data.deleter
+    def data(self):
+        if self.has_target():
+            self._update_inplace(self.target.to_frame())
+        else:
+            msg = '{0} must have either data or target'
+            raise ValueError(msg.format(self.__class__.__name__))
 
     def has_target(self):
+        """
+        Return whether ``ModelFrame`` has target
+
+        Returns
+        -------
+        has_target : bool
+        """
         return self.target_name in self.columns
 
     @property
@@ -151,8 +203,7 @@ class ModelFrame(pd.DataFrame):
         if self.has_target():
             return self.loc[:, self.target_name]
         else:
-            msg = "{0} doesn't have target '{1}'"
-            raise ValueError(msg.format(self.__class__.__name__, self.target_name))
+            return None
 
     @target.setter
     def target(self, target):
@@ -166,7 +217,7 @@ class ModelFrame(pd.DataFrame):
                 if target.name is not None:
                     self.target_name = target.name
 
-        if isinstance(target, compat.string_types):
+        if not com.is_list_like(target):
             if target in self.columns:
                 self.target_name = target
             else:
@@ -187,10 +238,21 @@ class ModelFrame(pd.DataFrame):
 
     @target.deleter
     def target(self):
-        self._update_inplace(self.data)
+        if self.has_data():
+            self._update_inplace(self.data)
+        else:
+            msg = '{0} must have either data or target'
+            raise ValueError(msg.format(self.__class__.__name__))
 
     @property
     def estimator(self):
+        """
+        Return most recently used estimator
+
+        Returns
+        -------
+        estimator : estimator
+        """
         if self._estimator is None:
             raise ValueError('No estimator has been applied.')
         else:
@@ -198,9 +260,29 @@ class ModelFrame(pd.DataFrame):
 
     @property
     def predicted(self):
+        """
+        Return most recent predicted values
+
+        Returns
+        -------
+        predicted : ``ModelSeries``
+        """
         if self._predicted is None:
             raise ValueError("Predicted values doesn't exist")
         return self._predicted
+
+    @property
+    def probability(self):
+        """
+        Return most recent probabilities
+
+        Returns
+        -------
+        predicted : ``ModelFrame``
+        """
+        if self._probability is None:
+            raise ValueError("Probability doesn't exist")
+        return self._probability
 
     def _check_attr(self, estimator, method_name):
         if not hasattr(estimator, method_name):
@@ -253,8 +335,19 @@ class ModelFrame(pd.DataFrame):
         mapped = self._get_mapper(estimator, 'predict')
         if mapped is not None:
             return mapped(self, estimator, *args, **kwargs)
-
         predicted = self._call(estimator, 'predict', *args, **kwargs)
+        return self._wrap_predicted(predicted, estimator)
+
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='fit_predict', returned='returned : predicted result'))
+    def fit_predict(self, estimator, *args, **kwargs):
+        predicted = self._call(estimator, 'fit_predict', *args, **kwargs)
+        return self._wrap_predicted(predicted, estimator)
+
+    def _wrap_predicted(self, predicted, estimator):
+        """
+        Wrapper for predict methods
+        """
         try:
             predicted = self._constructor_sliced(predicted, index=self.index)
         except ValueError:
@@ -265,17 +358,29 @@ class ModelFrame(pd.DataFrame):
         return self._predicted
 
     @Appender(_shared_docs['estimator_methods'] %
-              dict(funcname='fit_predict', returned='returned : predicted result'))
-    def fit_predict(self, estimator, *args, **kwargs):
-        predicted = self._call(estimator, 'fit_predict', *args, **kwargs)
+              dict(funcname='predict_proba', returned='returned : probabilities'))
+    def predict_proba(self, estimator, *args, **kwargs):
+        probability = self._call(estimator, 'predict_proba', *args, **kwargs)
+        return self._wrap_probability(probability, estimator)
+
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='predict_log_proba', returned='returned : probabilities'))
+    def predict_log_proba(self, estimator, *args, **kwargs):
+        probability = self._call(estimator, 'predict_log_proba', *args, **kwargs)
+        return self._wrap_probability(probability, estimator)
+
+    def _wrap_probability(self, probability, estimator):
+        """
+        Wrapper for probability methods
+        """
         try:
-            predicted = self._constructor_sliced(predicted, index=self.index)
+            probability = self._constructor(probability, index=self.index, columns=estimator.classes_)
         except ValueError:
-            msg = "Unable to instantiate ModelSeries for '{0}'"
+            msg = "Unable to instantiate ModelFrame for '{0}'"
             warnings.warn(msg.format(estimator.__class__.__name__))
-        self._predicted = predicted
+        self._probability = probability
         self._estimator = estimator
-        return self._predicted
+        return self._probability
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='score', returned='returned : score'))
@@ -287,17 +392,18 @@ class ModelFrame(pd.DataFrame):
               dict(funcname='transform', returned='returned : transformed result'))
     def transform(self, estimator, *args, **kwargs):
         transformed = self._call(estimator, 'transform', *args, **kwargs)
-
-        if self.has_target():
-            return self._constructor(transformed, target=self.target, index=self.index)
-        else:
-            return self._constructor(transformed, index=self.index)
+        return self._wrap_transform(transformed)
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='fit_transform', returned='returned : transformed result'))
     def fit_transform(self, estimator, *args, **kwargs):
         transformed = self._call(estimator, 'fit_transform', *args, **kwargs)
+        return self._wrap_transform(transformed)
 
+    def _wrap_transform(self, transformed):
+        """
+        Wrapper for transform methods
+        """
         if self.has_target():
             return self._constructor(transformed, target=self.target, index=self.index)
         else:
@@ -307,11 +413,7 @@ class ModelFrame(pd.DataFrame):
               dict(funcname='inverse_transform', returned='returned : transformed result'))
     def inverse_transform(self, estimator, *args, **kwargs):
         transformed = self._call(estimator, 'inverse_transform', *args, **kwargs)
-
-        if self.has_target():
-            return self._constructor(transformed, target=self.target, index=self.index)
-        else:
-            return self._constructor(transformed, index=self.index)
+        return self._wrap_transform(transformed)
 
     @cache_readonly
     def cluster(self):

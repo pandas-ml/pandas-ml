@@ -137,7 +137,15 @@ class TestClassificationMetrics(tm.TestCase):
         pass
 
     def test_precision_recall_fscore_support(self):
-        pass
+        result = self.df.metrics.precision_recall_fscore_support()
+        expected = metrics.precision_recall_fscore_support(self.digits.target, self.digits_pred)
+        self.assert_numpy_array_almost_equal(result['precision'].values, expected[0])
+        self.assert_numpy_array_almost_equal(result['recall'].values, expected[1])
+        self.assert_numpy_array_almost_equal(result['f1-score'].values, expected[2])
+        self.assert_numpy_array_almost_equal(result['support'].values, expected[3])
+
+        expected = pd.Index(['precision', 'recall', 'f1-score', 'support'])
+        self.assert_index_equal(result.columns, expected)
 
     def test_precision_score(self):
         result = self.df.metrics.precision_score()

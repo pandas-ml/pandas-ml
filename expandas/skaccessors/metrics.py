@@ -53,7 +53,14 @@ class MetricsMethods(AccessorMethods):
         raise NotImplementedError
 
     def precision_recall_fscore_support(self, *args, **kwargs):
-        raise NotImplementedError
+        func = self._module.precision_recall_fscore_support
+        precision, recall, fscore, support = func(self.target.values,
+                                                  self.predicted.values,
+                                                  *args, **kwargs)
+        result = self._constructor({'precision': precision, 'recall': recall,
+                                    'f1-score': fscore, 'support': support},
+                                   columns=['precision', 'recall', 'f1-score', 'support'])
+        return result
 
     def roc_auc_score(self, *args, **kwargs):
         raise NotImplementedError
