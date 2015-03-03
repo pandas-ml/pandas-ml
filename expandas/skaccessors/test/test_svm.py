@@ -69,6 +69,42 @@ class TestSVM(tm.TestCase):
             self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
+    def test_predict_proba(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['SVC']
+        for model in models:
+            mod1 = getattr(df.svm, model)(probability=True, random_state=self.random_state)
+            mod2 = getattr(svm, model)(probability=True, random_state=self.random_state)
+
+            df.fit(mod1)
+            mod2.fit(iris.data, iris.target)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            result = df.predict_proba(mod1)
+            expected = mod2.predict_proba(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            self.assert_numpy_array_almost_equal(df.probability.values, expected)
+
+            result = df.predict_log_proba(mod1)
+            expected = mod2.predict_log_proba(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            self.assert_numpy_array_almost_equal(df.probability.values, expected)
+
 
 if __name__ == '__main__':
     import nose
