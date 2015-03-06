@@ -33,7 +33,7 @@ class ModelFrame(pd.DataFrame):
 
     _internal_names = (pd.core.generic.NDFrame._internal_names +
                        ['_target_name', '_estimator',
-                        '_predicted', '_proba', '_log_proba'])
+                        '_predicted', '_proba', '_log_proba', '_decision'])
     _internal_names_set = set(_internal_names)
 
     _mapper = dict(fit=dict(),
@@ -106,11 +106,10 @@ class ModelFrame(pd.DataFrame):
 
         self._target_name = target_name
         self._estimator = None
-
-        # initialize caches
         self._predicted = None
         self._proba = None
         self._log_proba = None
+        self._decision = None
 
         pd.DataFrame.__init__(self, df, *args, **kwargs)
 
@@ -258,16 +257,22 @@ class ModelFrame(pd.DataFrame):
         -------
         estimator : estimator
         """
-        if self._estimator is None:
-            msg = 'No estimator has been applied to this {0}.'
-            raise ValueError(msg.format(self.__class__.__name__))
-        else:
-            return self._estimator
+        return self._estimator
+
+    @estimator.setter
+    def estimator(self, value):
+        if not self._estimator is value:
+            self._estimator = value
+            # reset other properties
+            self._predicted = None
+            self._proba = None
+            self._log_proba = None
+            self._decision = None
 
     @property
     def predicted(self):
         """
-        Return most recent predicted results
+        Return current estimator's predicted results
 
         Returns
         -------
@@ -282,7 +287,7 @@ class ModelFrame(pd.DataFrame):
     @property
     def proba(self):
         """
-        Return most recent probabilities
+        Return current estimator's probabilities
 
         Returns
         -------
@@ -290,14 +295,14 @@ class ModelFrame(pd.DataFrame):
         """
         if self._proba is None:
             self._proba = self.predict_proba(self.estimator)
-            msg = "Automatically call '{0}.predict_proba()' to probabilities"
+            msg = "Automatically call '{0}.predict_proba()' to get probabilities"
             warnings.warn(msg.format(self.estimator.__class__.__name__))
         return self._proba
 
     @property
     def log_proba(self):
         """
-        Return most recent log probabilities
+        Return current estimator's log probabilities
 
         Returns
         -------
@@ -305,9 +310,24 @@ class ModelFrame(pd.DataFrame):
         """
         if self._log_proba is None:
             self._log_proba = self.predict_log_proba(self.estimator)
-            msg = "Automatically call '{0}.predict_log_proba()' to log probabilities"
+            msg = "Automatically call '{0}.predict_log_proba()' to get log probabilities"
             warnings.warn(msg.format(self.estimator.__class__.__name__))
         return self._log_proba
+
+    @property
+    def decision(self):
+        """
+        Return current estimator's decision function
+
+        Returns
+        -------
+        probabilities : ``ModelFrame``
+        """
+        if self._decision is None:
+            self._decision = self.decision_function(self.estimator)
+            msg = "Automatically call '{0}.decition_function()' to get decision function"
+            warnings.warn(msg.format(self.estimator.__class__.__name__))
+        return self._decision
 
     def _check_attr(self, estimator, method_name):
         if not hasattr(estimator, method_name):
@@ -334,7 +354,7 @@ class ModelFrame(pd.DataFrame):
             # not try to pass target if it doesn't exists
             # to catch ValueError from estimator
             result = method(data, *args, **kwargs)
-        self._estimator = estimator
+        self.estimator = estimator
         return result
 
     _shared_docs['estimator_methods'] = """
@@ -362,7 +382,7 @@ class ModelFrame(pd.DataFrame):
         if mapped is not None:
             result = mapped(self, estimator, *args, **kwargs)
             # save estimator when succeeded
-            self._estimator = estimator
+            self.estimator = estimator
             return result
         predicted = self._call(estimator, 'predict', *args, **kwargs)
         return self._wrap_predicted(predicted, estimator)
@@ -399,12 +419,24 @@ class ModelFrame(pd.DataFrame):
         self._log_proba = self._wrap_probability(probability, estimator)
         return self._log_proba
 
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='decision_function', returned='returned : decisions'))
+    def decision_function(self, estimator, *args, **kwargs):
+        decision = self._call(estimator, 'decision_function', *args, **kwargs)
+        self._decision = self._wrap_probability(decision, estimator)
+        return self._decision
+
     def _wrap_probability(self, probability, estimator):
         """
         Wrapper for probability methods
         """
         try:
-            probability = self._constructor(probability, index=self.index, columns=estimator.classes_)
+            if len(probability.shape) < 2 or probability.shape[1] == 1:
+                # 2 class
+                probability = self._constructor(probability, index=self.index)
+            else:
+                probability = self._constructor(probability, index=self.index,
+                                                columns=estimator.classes_)
         except ValueError:
             msg = "Unable to instantiate ModelFrame for '{0}'"
             warnings.warn(msg.format(estimator.__class__.__name__))

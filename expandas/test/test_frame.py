@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 import datetime
+import warnings
 
 import pandas as pd
 import pandas.compat as compat
 
 import sklearn.datasets as datasets
+import sklearn.svm as svm
 
 import expandas as expd
 import expandas.util.testing as tm
@@ -400,6 +402,113 @@ class TestModelFrame(tm.TestCase):
         self.assert_series_equal(mdf.target, expected)
         self.assertEqual(mdf.target.name, 5)
         self.assertEqual(mdf.target_name, 5)
+
+    def test_predict_proba(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        models = ['SVC']
+        for model in models:
+            mod1 = getattr(df.svm, model)(probability=True, random_state=self.random_state)
+            mod2 = getattr(svm, model)(probability=True, random_state=self.random_state)
+
+            df.fit(mod1)
+            mod2.fit(iris.data, iris.target)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            result = df.predict_proba(mod1)
+            expected = mod2.predict_proba(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+            self.assert_numpy_array_almost_equal(df.proba.values, expected)
+
+            result = df.predict_log_proba(mod1)
+            expected = mod2.predict_log_proba(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+            self.assert_numpy_array_almost_equal(df.log_proba.values, expected)
+
+            result = df.decision_function(mod1)
+            expected = mod2.decision_function(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+            self.assert_numpy_array_almost_equal(df.decision.values, expected)
+
+            # not reset if estimator is identical
+            df.fit(mod1)
+            self.assertFalse(df._predicted is None)
+            self.assertFalse(df._proba is None)
+            self.assertFalse(df._log_proba is None)
+            self.assertFalse(df._decision is None)
+
+            # reset estimator
+            mod3 = getattr(df.svm, model)(probability=True, random_state=self.random_state)
+            df.fit(mod3)
+            self.assertTrue(df._predicted is None)
+            self.assertTrue(df._proba is None)
+            self.assertTrue(df._log_proba is None)
+            self.assertTrue(df._decision is None)
+
+    def test_predict_automatic(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("always", UserWarning)
+
+            iris = datasets.load_iris()
+            df = expd.ModelFrame(iris)
+
+            model = 'SVC'
+
+            df = expd.ModelFrame(iris)
+            mod1 = getattr(df.svm, model)(probability=True, random_state=self.random_state)
+            mod2 = getattr(svm, model)(probability=True, random_state=self.random_state)
+
+            df.fit(mod1)
+            mod2.fit(iris.data, iris.target)
+
+            # test automatically calls related methods
+            with tm.assert_produces_warning(UserWarning):
+                result = df.predicted
+            expected = mod2.predict(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            # with tm.assert_produces_warning(UserWarning):
+            result = df.proba
+            expected = mod2.predict_proba(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            with tm.assert_produces_warning(UserWarning):
+                result = df.log_proba
+            expected = mod2.predict_log_proba(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            # with tm.assert_produces_warning(UserWarning):
+            result = df.decision
+            expected = mod2.decision_function(iris.data)
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_index_equal(result.index, df.index)
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+        warnings.simplefilter("default")
 
 
 if __name__ == '__main__':

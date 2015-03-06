@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
+import numpy as np
 import pandas as pd
 import pandas.compat as compat
 
 import sklearn.datasets as datasets
 import sklearn.metrics as metrics
+import sklearn.multiclass as multiclass
 
 import expandas as expd
 import expandas.util.testing as tm
@@ -31,17 +33,21 @@ class TestClassificationMetrics(tm.TestCase):
 
     def setUp(self):
         import sklearn.svm as svm
-        self.digits = datasets.load_digits()
+        digits = datasets.load_digits()
+        self.data = digits.data
+        self.target = digits.target
+        self.df = expd.ModelFrame(digits)
 
-        self.df = expd.ModelFrame(self.digits)
-
-        estimator1 = svm.LinearSVC(C=1.0, random_state=self.random_state)
+        estimator1 = self.df.svm.LinearSVC(C=1.0, random_state=self.random_state)
         self.df.fit(estimator1)
-        self.df.predict(estimator1)
 
         estimator2 = svm.LinearSVC(C=1.0, random_state=self.random_state)
-        estimator2.fit(self.digits.data, self.digits.target)
-        self.digits_pred = estimator2.predict(self.digits.data)
+        estimator2.fit(self.data, self.target)
+        self.pred = estimator2.predict(self.data)
+        self.decision = estimator2.decision_function(self.data)
+
+        # argument for classification reports
+        self.labels = np.array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
 
     def test_objectmapper(self):
         df = expd.ModelFrame([])
@@ -59,86 +65,108 @@ class TestClassificationMetrics(tm.TestCase):
 
     def test_accuracy_score(self):
         result = self.df.metrics.accuracy_score()
-        expected = metrics.accuracy_score(self.digits.target, self.digits_pred)
+        expected = metrics.accuracy_score(self.target, self.pred)
         self.assertEqual(result, expected)
 
         result = self.df.metrics.accuracy_score(normalize=False)
-        expected = metrics.accuracy_score(self.digits.target,
-                                          self.digits_pred,
+        expected = metrics.accuracy_score(self.target, self.pred,
                                           normalize=False)
         self.assertEqual(result, expected)
 
     def test_auc(self):
         # result = self.df.metrics.auc(reorder=True)
-        # expected = metrics.auc(self.digits.data, self.digits.target, reorder=True)
+        # expected = metrics.auc(self.data, self.target, reorder=True)
         # self.assertEqual(result, expected)
         pass
 
     def test_average_precision_score(self):
-        pass
+        with self.assertRaisesRegexp(ValueError, 'multiclass format is not supported'):
+            result = self.df.metrics.average_precision_score()
 
     def test_classification_report(self):
         result = self.df.metrics.classification_report()
-        expected = metrics.classification_report(self.digits.target,
-                                                 self.digits_pred)
+        expected = metrics.classification_report(self.target, self.pred)
+        self.assertEqual(result, expected)
+
+        result = self.df.metrics.classification_report(labels=self.labels)
+        expected = metrics.classification_report(self.target, self.pred, labels=self.labels)
         self.assertEqual(result, expected)
 
     def test_confusion_matrix(self):
         result = self.df.metrics.confusion_matrix()
-        expected = metrics.confusion_matrix(self.digits.target,
-                                            self.digits_pred)
+        expected = metrics.confusion_matrix(self.target, self.pred)
+        self.assertTrue(isinstance(result, expd.ModelFrame))
+        self.assert_numpy_array_equal(result.values, expected)
+
+        result = self.df.metrics.confusion_matrix(labels=self.labels)
+        expected = metrics.confusion_matrix(self.target, self.pred, labels=self.labels)
         self.assertTrue(isinstance(result, expd.ModelFrame))
         self.assert_numpy_array_equal(result.values, expected)
 
     def test_f1_score(self):
         result = self.df.metrics.f1_score()
-        expected = metrics.f1_score(self.digits.target, self.digits_pred)
+        expected = metrics.f1_score(self.target, self.pred)
         self.assertEqual(result, expected)
+
+        result = self.df.metrics.f1_score(average=None)
+        expected = metrics.f1_score(self.target, self.pred, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
 
     def test_fbeta_score(self):
         result = self.df.metrics.fbeta_score(beta=0.5)
-        expected = metrics.fbeta_score(self.digits.target, self.digits_pred,
-                                       beta=0.5)
+        expected = metrics.fbeta_score(self.target, self.pred, beta=0.5)
         self.assertEqual(result, expected)
 
         result = self.df.metrics.fbeta_score(beta=0.5, average='macro')
-        expected = metrics.fbeta_score(self.digits.target, self.digits_pred,
+        expected = metrics.fbeta_score(self.target, self.pred,
                                        beta=0.5, average='macro')
         self.assertEqual(result, expected)
 
+        result = self.df.metrics.fbeta_score(beta=0.5, average=None)
+        expected = metrics.fbeta_score(self.target, self.pred, beta=0.5, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
     def test_hamming_loss(self):
         result = self.df.metrics.hamming_loss()
-        expected = metrics.hamming_loss(self.digits.target, self.digits_pred)
+        expected = metrics.hamming_loss(self.target, self.pred)
         self.assertEqual(result, expected)
 
     def test_hinge_loss(self):
-        pass
+        with self.assertRaisesRegexp(ValueError, 'Multi-class hinge loss not supported'):
+            result = self.df.metrics.hinge_loss()
 
     def test_jaccard_similarity_score(self):
         result = self.df.metrics.jaccard_similarity_score()
-        expected = metrics.jaccard_similarity_score(self.digits.target,
-                                                    self.digits_pred)
+        expected = metrics.jaccard_similarity_score(self.target, self.pred)
+        self.assertEqual(result, expected)
+
+        result = self.df.metrics.jaccard_similarity_score(normalize=False)
+        expected = metrics.jaccard_similarity_score(self.target, self.pred, normalize=False)
         self.assertEqual(result, expected)
 
     def test_log_loss(self):
-        pass
+        msg = "class <class 'sklearn.svm.classes.LinearSVC'> doesn't have predict_proba method"
+        with self.assertRaisesRegexp(ValueError, msg):
+            result = self.df.metrics.log_loss()
 
     def test_matthews_corrcoef(self):
-        pass
-        # ValueError: multiclass is not supported
-
-        """
-        result = self.df.metrics.matthews_corrcoef()
-        expected = metrics.matthews_corrcoef(self.digits.target, self.digits_pred)
-        self.assertEqual(result, expected)
-        """
+        with self.assertRaisesRegexp(ValueError, 'multiclass is not supported'):
+            result = self.df.metrics.matthews_corrcoef()
 
     def test_precision_recall_curve(self):
-        pass
+        results = self.df.metrics.precision_recall_curve()
+        for key, result in compat.iteritems(results):
+            expected = metrics.precision_recall_curve(self.target, self.decision[:, key],
+                                                      pos_label=key)
+            self.assert_numpy_array_almost_equal(result[0], expected[0])
+            self.assert_numpy_array_almost_equal(result[1], expected[1])
+            self.assert_numpy_array_almost_equal(result[2], expected[2])
 
     def test_precision_recall_fscore_support(self):
         result = self.df.metrics.precision_recall_fscore_support()
-        expected = metrics.precision_recall_fscore_support(self.digits.target, self.digits_pred)
+        expected = metrics.precision_recall_fscore_support(self.target, self.pred)
         self.assert_numpy_array_almost_equal(result['precision'].values, expected[0])
         self.assert_numpy_array_almost_equal(result['recall'].values, expected[1])
         self.assert_numpy_array_almost_equal(result['f1-score'].values, expected[2])
@@ -149,23 +177,158 @@ class TestClassificationMetrics(tm.TestCase):
 
     def test_precision_score(self):
         result = self.df.metrics.precision_score()
-        expected = metrics.precision_score(self.digits.target, self.digits_pred)
+        expected = metrics.precision_score(self.target, self.pred)
         self.assertEqual(result, expected)
+
+        result = self.df.metrics.precision_score(average=None)
+        expected = metrics.precision_score(self.target, self.pred, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
 
     def test_recall_score(self):
         result = self.df.metrics.recall_score()
-        expected = metrics.recall_score(self.digits.target, self.digits_pred)
+        expected = metrics.recall_score(self.target, self.pred)
         self.assertEqual(result, expected)
 
+        result = self.df.metrics.recall_score(average=None)
+        expected = metrics.recall_score(self.target, self.pred, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
     def test_roc_auc_score(self):
-        pass
+        with self.assertRaisesRegexp(ValueError, 'multiclass format is not supported'):
+            result = self.df.metrics.roc_auc_score()
 
     def test_roc_curve(self):
-        pass
+        results = self.df.metrics.roc_curve()
+        for key, result in compat.iteritems(results):
+            expected = metrics.roc_curve(self.target, self.decision[:, key],
+                                         pos_label=key)
+            self.assert_numpy_array_almost_equal(result[0], expected[0])
+            self.assert_numpy_array_almost_equal(result[1], expected[1])
+            self.assert_numpy_array_almost_equal(result[2], expected[2])
 
     def test_zero_one_loss(self):
         result = self.df.metrics.zero_one_loss()
-        expected = metrics.zero_one_loss(self.digits.target, self.digits_pred)
+        expected = metrics.zero_one_loss(self.target, self.pred)
+        self.assertEqual(result, expected)
+
+
+class TestClassificationMetrics2Classes(TestClassificationMetrics):
+
+    def setUp(self):
+        import sklearn.svm as svm
+        # 2 class
+        iris = datasets.load_iris()
+        self.data = iris.data[0:100]
+        self.target = [1 if t == 1 else -1 for t in iris.target[0:100]]
+        self.df = expd.ModelFrame(self.data, target=self.target)
+
+        estimator1 = self.df.svm.SVC(probability=True, random_state=self.random_state)
+        self.df.fit(estimator1)
+        self.df.predict(estimator1)
+
+        estimator2 = svm.SVC(probability=True, random_state=self.random_state)
+        estimator2.fit(self.data, self.target)
+        self.pred = estimator2.predict(self.data)
+        self.proba = estimator2.predict_proba(self.data)
+        self.decision = estimator2.decision_function(self.data)
+
+        # argument for classification reports
+        self.labels = np.array([1, -1])
+
+    def test_average_precision_score(self):
+        result = self.df.metrics.average_precision_score()
+        expected = metrics.average_precision_score(self.target, self.decision)
+        self.assertEqual(result, expected)
+
+        result = self.df.metrics.average_precision_score(average=None)
+        expected = metrics.average_precision_score(self.target, self.decision, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_hinge_loss(self):
+        result = self.df.metrics.hinge_loss()
+        expected = metrics.hinge_loss(self.target, self.decision)
+        self.assertEqual(result, expected)
+
+    def test_log_loss(self):
+        result = self.df.metrics.log_loss()
+        expected = metrics.log_loss(self.target, self.proba)
+        self.assertEqual(result, expected)
+
+    def test_matthews_corrcoef(self):
+        result = self.df.metrics.matthews_corrcoef()
+        expected = metrics.matthews_corrcoef(self.target, self.pred)
+        self.assertEqual(result, expected)
+
+    def test_precision_recall_curve(self):
+        result = self.df.metrics.precision_recall_curve()
+        expected = metrics.precision_recall_curve(self.target, self.decision)
+        self.assert_numpy_array_almost_equal(result[0], expected[0])
+        self.assert_numpy_array_almost_equal(result[1], expected[1])
+        self.assert_numpy_array_almost_equal(result[2], expected[2])
+
+        # test average_precision_score is identical as auc
+        result = self.df.metrics.auc(kind='precision_recall_curve')
+        expected = metrics.auc(expected[1], expected[0])
+        self.assertEqual(result, expected)
+
+        expected = metrics.average_precision_score(self.target, self.decision)
+        self.assertEqual(result, expected)
+
+    def test_roc_auc_score(self):
+        result = self.df.metrics.roc_auc_score()
+        expected = metrics.roc_auc_score(self.target, self.decision)
+        self.assertEqual(result, expected)
+
+        result = self.df.metrics.roc_auc_score(average=None)
+        expected = metrics.roc_auc_score(self.target, self.decision, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_roc_curve(self):
+        result = self.df.metrics.roc_curve()
+        expected = metrics.roc_curve(self.target, self.decision)
+        self.assert_numpy_array_almost_equal(result[0], expected[0])
+        self.assert_numpy_array_almost_equal(result[1], expected[1])
+        self.assert_numpy_array_almost_equal(result[2], expected[2])
+
+        # test roc_auc_score is identical as auc
+        result = self.df.metrics.auc(kind='roc')
+        expected = metrics.auc(expected[0], expected[1])
+        self.assertEqual(result, expected)
+
+        expected = metrics.roc_auc_score(self.target, self.decision)
+        self.assertEqual(result, expected)
+
+
+class TestClassificationMetrics3Classes(TestClassificationMetrics):
+
+    def setUp(self):
+        import sklearn.svm as svm
+        # 2 class
+        iris = datasets.load_iris()
+        self.data = iris.data
+        self.target = iris.target
+        self.df = expd.ModelFrame(self.data, target=self.target)
+
+        estimator1 = svm.SVC(probability=True, random_state=self.random_state)
+        self.df.fit(estimator1)
+        self.df.predict(estimator1)
+
+        estimator2 = svm.SVC(probability=True, random_state=self.random_state)
+        estimator2.fit(self.data, self.target)
+        self.pred = estimator2.predict(self.data)
+        self.proba = estimator2.predict_proba(self.data)
+        self.decision = estimator2.decision_function(self.data)
+
+        # argument for classification reports
+        self.labels = np.array([2, 1, 0])
+
+    def test_log_loss(self):
+        result = self.df.metrics.log_loss()
+        expected = metrics.log_loss(self.target, self.proba)
         self.assertEqual(result, expected)
 
 
@@ -213,7 +376,7 @@ class TestRegressionMetrics(tm.TestCase):
         self.assertEqual(result, expected)
 
 
-class Test1ClusteringMetrics(tm.TestCase):
+class TestClusteringMetrics(tm.TestCase):
 
     def setUp(self):
         from sklearn import cluster
