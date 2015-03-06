@@ -104,6 +104,7 @@ Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once crea
 - ``ModelFrame.score``
 - ``ModelFrame.predict_proba``
 - ``ModelFrame.predict_log_proba``
+- ``ModelFrame.decision_function``
 
 
 Following example shows to perform PCA, then revert principal components back to original space.

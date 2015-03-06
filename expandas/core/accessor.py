@@ -55,6 +55,10 @@ class AccessorMethods(object):
         return self._df.predicted
 
     @property
+    def decision(self):
+        return self._df.decision
+
+    @property
     def _constructor(self):
         return self._df._constructor
 
@@ -69,6 +73,8 @@ def _attach_methods(cls, wrap_func, methods):
 
         for method in methods:
             _f = getattr(module, method)
+            if hasattr(cls, method):
+                raise ValueError("{0} already has '{1}' method".format(cls, method))
             setattr(cls, method, wrap_func(_f))
 
     except ImportError:
