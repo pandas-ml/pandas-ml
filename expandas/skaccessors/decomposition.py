@@ -14,6 +14,11 @@ class DecompositionMethods(AccessorMethods):
     _module_name = 'sklearn.decomposition'
 
     def fastica(self, *args, **kwargs):
+        """
+        Call ``sklearn.decomposition.fastica`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """
         func = self._module.fastica
         data = self._data
         return_x_mean = kwargs.get('return_X_mean', False)
@@ -32,6 +37,11 @@ class DecompositionMethods(AccessorMethods):
             return K, W, S
 
     def dict_learning(self, n_components, alpha, *args, **kwargs):
+        """
+        Call ``sklearn.decomposition.dict_learning`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """
         func = self._module.dict_learning
         data = self._data
         code, dictionary, errors = func(data.values, n_components, alpha, *args, **kwargs)
@@ -40,6 +50,11 @@ class DecompositionMethods(AccessorMethods):
         return code, dictionary, errors
 
     def dict_learning_online(self, *args, **kwargs):
+        """
+        Call ``sklearn.decomposition.dict_learning_online`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """
         func = self._module.dict_learning_online
         data = self._data
         return_code = kwargs.get('return_code', True)
@@ -54,6 +69,11 @@ class DecompositionMethods(AccessorMethods):
             return dictionary
 
     def sparse_encode(self, dictionary, *args, **kwargs):
+        """
+        Call ``sklearn.decomposition.sparce_encode`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """
         func = self._module.sparse_encode
         data = self._data
         code = func(data.values, dictionary, *args, **kwargs)

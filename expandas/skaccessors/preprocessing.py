@@ -14,6 +14,11 @@ class PreprocessingMethods(AccessorMethods):
     _module_name = 'sklearn.preprocessing'
 
     def add_dummy_feature(self, value=1.0):
+        """
+        Call ``sklearn.preprocessing.add_dummy_feature`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """
         from expandas.core.series import ModelSeries
         from expandas.core.frame import ModelFrame
 
@@ -35,7 +40,7 @@ class PreprocessingMethods(AccessorMethods):
 
 _preprocessing_methods = ['binarize', 'normalize', 'scale']
 
-def _wrap_func(func):
+def _wrap_func(func, func_name):
     def f(self, *args, **kwargs):
         from expandas.core.frame import ModelFrame
         if isinstance(self._df, ModelFrame):
@@ -50,6 +55,12 @@ def _wrap_func(func):
             result = self._constructor(result[0], index=self._df.index,
                                        name=self._df.name)
         return result
+    f.__doc__ = (
+        """
+        Call ``%s`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """ % func_name)
     return f
 
 

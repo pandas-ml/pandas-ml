@@ -15,7 +15,15 @@ class GridSearchMethods(AccessorMethods):
 
     def describe(self, estimator):
         """
-        Return cross validation results as ``pd.DataFrame``.
+        Describe grid search results
+
+        Parameters
+        ----------
+        estimator : fitted grid search estimator
+
+        Returns
+        -------
+        described : ``ModelFrame``
         """
         results = []
         for params, mean_score, scores in estimator.grid_scores_:

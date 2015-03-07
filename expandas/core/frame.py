@@ -522,153 +522,275 @@ class ModelFrame(pd.DataFrame):
         transformed = self._call(estimator, 'inverse_transform', *args, **kwargs)
         return self._wrap_transform(transformed)
 
-    @cache_readonly
+    _shared_docs['skaccessor'] = """
+        Property to access ``sklearn.%(module)s``. See :mod:`expandas.skaccessors.%(module)s`
+        """
+
+    _shared_docs['skaccessor_nolink'] = """
+        Property to access ``sklearn.%(module)s```
+        """
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='cluster'))
     def cluster(self):
-        """Property to access ``sklearn.cluster``"""
+        return self._cluster
+
+    @cache_readonly
+    def _cluster(self):
         return skaccessors.ClusterMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='covariance'))
     def covariance(self):
-        """Property to access ``sklearn.covariance``"""
-        return skaccessors.CovarianceMethods(self)
+        return self._covariance
 
     @cache_readonly
+    def _covariance(self):
+        return skaccessors.CovarianceMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='cross_decomposition'))
     def cross_decomposition(self):
-        """Property to access ``sklearn.cross_decomposition``"""
+        return self._cross_decomposition
+
+    @cache_readonly
+    def _cross_decomposition(self):
         attrs = ['PLSRegression', 'PLSCanonical', 'CCA', 'PLSSVD']
         return AccessorMethods(self, module_name='sklearn.cross_decomposition',
                                attrs=attrs)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='cross_validation'))
     def cross_validation(self):
-        """Property to access ``sklearn.cross_validation``"""
+        return self._cross_validation
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='cross_validation'))
+    def crv(self):
+        return self._cross_validation
+
+    @cache_readonly
+    def _cross_validation(self):
         return skaccessors.CrossValidationMethods(self)
 
     @property
-    def crv(self):
-        """Property to access ``sklearn.cross_validation``"""
-        return self.cross_validation
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='decomposition'))
+    def decomposition(self):
+        return self._decomposition
 
     @cache_readonly
-    def decomposition(self):
-        """Property to access ``sklearn.decomposition``"""
+    def _decomposition(self):
         return skaccessors.DecompositionMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='dummy'))
     def dummy(self):
-        """Property to access ``sklearn.dummy``"""
+        return self._dummy
+
+    @cache_readonly
+    def _dummy(self):
         attrs = ['DummyClassifier', 'DummyRegressor']
         return AccessorMethods(self, module_name='sklearn.dummy', attrs=attrs)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='ensemble'))
     def ensemble(self):
-        """Property to access ``sklearn.ensemble``"""
+        return self._ensemble
+
+    @cache_readonly
+    def _ensemble(self):
         return skaccessors.EnsembleMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='feature_extraction'))
     def feature_extraction(self):
-        """Property to access ``sklearn.feature_extraction``"""
+        return self._feature_extraction
+
+    @cache_readonly
+    def _feature_extraction(self):
         return skaccessors.FeatureExtractionMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='feature_selection'))
     def feature_selection(self):
-        """Property to access ``sklearn.feature_selection``"""
+        return self._feature_selection
+
+    @cache_readonly
+    def _feature_selection(self):
         return skaccessors.FeatureSelectionMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='gaussian_process'))
     def gaussian_process(self):
-        """Property to access ``sklearn.gaussian_process``"""
+        return self._gaussian_process
+
+    @cache_readonly
+    def _gaussian_process(self):
         return skaccessors.GaussianProcessMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='grid_search'))
     def grid_search(self):
-        """Property to access ``sklearn.grid_search``"""
+        return self._grid_search
+
+    @cache_readonly
+    def _grid_search(self):
         return skaccessors.GridSearchMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='isotonic'))
     def isotonic(self):
-        """Property to access ``sklearn.isotonic``"""
-        return skaccessors.IsotonicMethods(self)
+        return self._isotonic
 
     @cache_readonly
+    def _isotonic(self):
+        return skaccessors.IsotonicMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='kernel_approximation'))
     def kernel_approximation(self):
-        """Property to access ``sklearn.kernel_approximation``"""
+        return self._kernel_approximation
+
+    @cache_readonly
+    def _kernel_approximation(self):
         attrs = ['AdditiveChi2Sampler', 'Nystroem', 'RBFSampler', 'SkewedChi2Sampler']
         return AccessorMethods(self, module_name='sklearn.kernel_approximation',
                                attrs=attrs)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='lda'))
     def lda(self):
+        """Property to access ``sklearn.lda``"""
+        return self._lda
+
+    @cache_readonly
+    def _lda(self):
         """Property to access ``sklearn.lda``"""
         return AccessorMethods(self, module_name='sklearn.lda')
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='linear_model'))
     def linear_model(self):
-        """Property to access ``sklearn.linear_model``"""
-        return skaccessors.LinearModelMethods(self)
-
-    @cache_readonly
-    def manifold(self):
-        """Property to access ``sklearn.manifold``"""
-        return skaccessors.ManifoldMethods(self)
-
-    @cache_readonly
-    def mixture(self):
-        """Property to access ``sklearn.mixture``"""
-        return AccessorMethods(self, module_name='sklearn.mixture')
-
-    @cache_readonly
-    def metrics(self):
-        """Property to access ``sklearn.metrics``"""
-        return skaccessors.MetricsMethods(self)
-
-    @cache_readonly
-    def multiclass(self):
-        """Property to access ``sklearn.multiclass``"""
-        return skaccessors.MultiClassMethods(self)
-
-    @cache_readonly
-    def naive_bayes(self):
-        """Property to access ``sklearn.naive_bayes``"""
-        return AccessorMethods(self, module_name='sklearn.naive_bayes')
-
-    @cache_readonly
-    def neighbors(self):
-        """Property to access ``sklearn.neighbors``"""
-        return skaccessors.NeighborsMethods(self)
-
-    @cache_readonly
-    def pipeline(self):
-        """Property to access ``sklearn.pipeline``"""
-        return skaccessors.PipelineMethods(self)
-
-    @cache_readonly
-    def preprocessing(self):
-        """Property to access ``sklearn.preprocessing``"""
-        return skaccessors.PreprocessingMethods(self)
+        return self._linear_model
 
     @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='linear_model'))
+    def lm(self):
+        return self._linear_model
+
+    @cache_readonly
+    def _linear_model(self):
+        return skaccessors.LinearModelMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='manifold'))
+    def manifold(self):
+        return self._manifold
+
+    @cache_readonly
+    def _manifold(self):
+        return skaccessors.ManifoldMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='mixture'))
+    def mixture(self):
+        return self._mixture
+
+    @cache_readonly
+    def _mixture(self):
+        return AccessorMethods(self, module_name='sklearn.mixture')
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='metrics'))
+    def metrics(self):
+        return self._metrics
+
+    @cache_readonly
+    def _metrics(self):
+        return skaccessors.MetricsMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='multiclass'))
+    def multiclass(self):
+        return self._multiclass
+
+    @cache_readonly
+    def _multiclass(self):
+        return skaccessors.MultiClassMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='naive_bayes'))
+    def naive_bayes(self):
+        return self._naive_bayes
+
+    @cache_readonly
+    def _naive_bayes(self):
+        return AccessorMethods(self, module_name='sklearn.naive_bayes')
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='neighbors'))
+    def neighbors(self):
+        return self._neighbors
+
+    @cache_readonly
+    def _neighbors(self):
+        return skaccessors.NeighborsMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='pipeline'))
+    def pipeline(self):
+        return self._pipeline
+
+    @cache_readonly
+    def _pipeline(self):
+        return skaccessors.PipelineMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='preprocessing'))
+    def preprocessing(self):
+        return self._preprocessing
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='preprocessing'))
     def pp(self):
-        """Property to access ``sklearn.preprocessing``"""
         return self.preprocessing
 
     @cache_readonly
+    def _preprocessing(self):
+        return skaccessors.PreprocessingMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='qda'))
     def qda(self):
-        """Property to access ``sklearn.qda``"""
+        return self._qda
+
+    @cache_readonly
+    def _qda(self):
         return AccessorMethods(self, module_name='sklearn.qda')
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='semi_supervised'))
     def semi_supervised(self):
-        """Property to access ``sklearn.semi_supervised``"""
+        return self._semi_supervised
+
+    @cache_readonly
+    def _semi_supervised(self):
         return AccessorMethods(self, module_name='sklearn.semi_supervised')
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='svm'))
     def svm(self):
-        """Property to access ``sklearn.svm``"""
+        return self._svm
+
+    @cache_readonly
+    def _svm(self):
         return skaccessors.SVMMethods(self)
 
-    @cache_readonly
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='tree'))
     def tree(self):
-        """Property to access ``sklearn.tree``"""
-        return AccessorMethods(self, module_name='sklearn.tree')
+        return self._tree
 
+    @cache_readonly
+    def _tree(self):
+        return AccessorMethods(self, module_name='sklearn.tree')
