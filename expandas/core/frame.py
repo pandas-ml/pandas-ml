@@ -17,7 +17,6 @@ _shared_docs = dict()
 
 
 class ModelFrame(pd.DataFrame):
-
     """
     Data structure subclassing ``pandas.DataFrame`` to define a metadata to
     specify target (response variable) and data (explanatory variable / features).
@@ -81,18 +80,7 @@ class ModelFrame(pd.DataFrame):
         else:
             target_name = self._TARGET_NAME
 
-        if data is not None and not isinstance(data, pd.DataFrame):
-            data = pd.DataFrame(data, *args, **kwargs)
-        if target is not None:
-            if isinstance(target, pd.Series):
-                # overwrite target_name, done in aboveS
-                pass
-                # target = pd.Series(target, name=target_name)
-            elif com.is_list_like(target):
-                if data is not None:
-                    target = pd.Series(target, name=target_name, index=data.index)
-                else:
-                    target = pd.Series(target, name=target_name)
+        data, target = self._maybe_convert_data(data, target, target_name, *args, **kwargs)
 
         if target is not None and not com.is_list_like(target):
             if target in data.columns:
@@ -113,6 +101,46 @@ class ModelFrame(pd.DataFrame):
 
         pd.DataFrame.__init__(self, df, *args, **kwargs)
 
+    def _maybe_convert_data(self, data, target, target_name, *args, **kwargs):
+        """
+        Internal function to instanciate data and target
+
+        Parameters
+        ----------
+        data : instance converted to ``pandas.DataFrame``
+        target : instance converted to ``pandas.Series``
+        args : argument passed from ``__init__``
+        kwargs : argument passed from ``__init__``
+        """
+
+        init_df = isinstance(data, pd.DataFrame)
+        init_target = isinstance(target, pd.Series)
+
+        if not init_df and not init_target:
+            if data is not None:
+                data = pd.DataFrame(data, *args, **kwargs)
+
+            if com.is_list_like(target):
+                if data is not None:
+                    target = pd.Series(target, name=target_name, index=data.index)
+                else:
+                    target = pd.Series(target, name=target_name)
+        elif not init_df:
+            if data is not None:
+                index = kwargs.pop('index', target.index)
+                data = pd.DataFrame(data, index=index, *args, **kwargs)
+        elif not init_target:
+            if com.is_list_like(target):
+                if data is not None:
+                    target = pd.Series(target, name=target_name, index=data.index)
+                else:
+                    target = pd.Series(target, name=target_name)
+        else:
+            # no conversion required
+            pass
+        return data, target
+
+
     def _concat_target(self, data, target):
         if data is None and target is None:
             msg = '{0} must have either data or target'
@@ -123,8 +151,6 @@ class ModelFrame(pd.DataFrame):
 
         elif target is None:
             return data
-
-        assert isinstance(target, pd.Series)
 
         if len(data) != len(target):
             raise ValueError('data and target must have same length')
@@ -141,40 +167,39 @@ class ModelFrame(pd.DataFrame):
         -------
         has_data : bool
         """
-        return len(self.data_columns) > 0
+        return len(self._data_columns) > 0
 
     @property
-    def data_columns(self):
+    def _data_columns(self):
         return pd.Index([c for c in self.columns if c != self.target_name])
 
     @property
     def data(self):
         if self.has_data():
-            return self.loc[:, self.data_columns]
+            return self.loc[:, self._data_columns]
         else:
             return None
 
     @data.setter
-    def data(self, value):
-        if value is None:
+    def data(self, data):
+        if data is None:
             del self.data
             return
 
-        if isinstance(value, ModelFrame):
-            if value.has_target():
+        if isinstance(data, ModelFrame):
+            if data.has_target():
                 msg = 'Cannot update with {0} which has target attribute'
                 raise ValueError(msg.format(self.__class__.__name__))
 
-        if not isinstance(value, pd.DataFrame):
-            value = pd.DataFrame(value, index=self.index)
+        data, _ = self._maybe_convert_data(data, self.target, self.target_name)
 
-        if self.target_name in value.columns:
+        if self.target_name in data.columns:
             msg = "Passed data has the same column name as the target '{0}'"
             raise ValueError(msg.format(self.target_name))
 
         if self.has_target():
-            value = self._concat_target(value, self.target)
-        self._update_inplace(value)
+            data = self._concat_target(data, self.target)
+        self._update_inplace(data)
 
     @data.deleter
     def data(self):
@@ -235,7 +260,8 @@ class ModelFrame(pd.DataFrame):
                 warnings.warn(msg)
                 target = pd.Series(target, name=self.target_name)
         else:
-            target = pd.Series(target, index=self.index, name=self.target_name)
+
+            _, target = self._maybe_convert_data(self.data, target, self.target_name)
 
         df = self._concat_target(self.data, target)
         self._update_inplace(df)

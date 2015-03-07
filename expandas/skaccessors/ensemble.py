@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from expandas.core.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods
 
 
 class EnsembleMethods(AccessorMethods):
@@ -27,13 +27,13 @@ class PartialDependenceMethods(AccessorMethods):
     def partial_dependence(self, gbrt, target_variables, **kwargs):
         import sklearn.ensemble.partial_dependence as pdp
         func = pdp.partial_dependence
-        data = self.data
-        pdp, axes = func(gbrt, target_variables, X=self.data, **kwargs)
+        data = self._data
+        pdp, axes = func(gbrt, target_variables, X=self._data, **kwargs)
         return pdp, axes
 
     def plot_partial_dependence(self, gbrt, features, **kwargs):
         import sklearn.ensemble.partial_dependence as pdp
         func = pdp.plot_partial_dependence
-        data = self.data
+        data = self._data
         fig, axes = func(gbrt, X=data, features=features, **kwargs)
         return fig, axes

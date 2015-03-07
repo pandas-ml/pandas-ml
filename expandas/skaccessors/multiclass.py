@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from expandas.core.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods
 
 
 class MultiClassMethods(AccessorMethods):

@@ -30,9 +30,7 @@ import os
 # ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.intersphinx',
-              'sphinx.ext.autosummary',
-              'IPython.sphinxext.ipython_directive',
-              'IPython.sphinxext.ipython_console_highlighting']
+              'sphinx.ext.autosummary']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -264,21 +262,6 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
-
-# -- mock -------------------------------------------------------------------
-
-import mock
-
-MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot',
-                'sklearn.datasets', 'sklearn.decomposition',
-                'sklearn.cluster', 'sklearn.cross_validation',
-                'pandas', 'pandas.util', 'pandas.util.decorators',
-                'pandas.compat',
-                'IPython', 'IPython.sphinxext',
-                'IPython.sphinxext.ipython_directive',
-                'IPython.sphinxext.ipython_console_highlighting']
-for mod_name in MOCK_MODULES:
-   sys.modules[mod_name] = mock.Mock()
 
 # -- Build API doc ----------------------------------------------------------
 

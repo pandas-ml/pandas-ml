@@ -43,19 +43,19 @@ class AccessorMethods(object):
                 pass
 
     @property
-    def data(self):
+    def _data(self):
         return self._df.data
 
     @property
-    def target(self):
+    def _target(self):
         return self._df.target
 
     @property
-    def predicted(self):
+    def _predicted(self):
         return self._df.predicted
 
     @property
-    def decision(self):
+    def _decision(self):
         return self._df.decision
 
     @property
@@ -79,3 +79,26 @@ def _attach_methods(cls, wrap_func, methods):
 
     except ImportError:
         pass
+
+
+def _wrap_data_func(func):
+    """
+    Wrapper to call func with data values
+    """
+    def f(self, *args, **kwargs):
+        data = self._data
+        result = func(data.values, *args, **kwargs)
+        return result
+    return f
+
+
+def _wrap_data_target_func(func):
+    """
+    Wrapper to call func with data and target values
+    """
+    def f(self, *args, **kwargs):
+        data = self._data
+        target = self._target
+        result = func(data.values, y=target.values, *args, **kwargs)
+        return result
+    return f

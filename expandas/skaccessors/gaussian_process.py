@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from expandas.core.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods, _attach_methods, _wrap_data_func
 
 
 class GaussianProcessMethods(AccessorMethods):
@@ -53,16 +53,5 @@ class RegressionModelsMethods(AccessorMethods):
 
 
 _regression_methods = ['constant', 'linear', 'quadratic']
-
-
-def _wrap_func(func):
-    def f(self, *args, **kwargs):
-        data = self.data
-        result = func(data.values, *args, **kwargs)
-        return result
-    return f
-
-
-# _attach_methods(CorrelationModelsMethods, lambda f: f, _correlation_methods)
-_attach_methods(RegressionModelsMethods, _wrap_func, _regression_methods)
+_attach_methods(RegressionModelsMethods, _wrap_data_func, _regression_methods)
 

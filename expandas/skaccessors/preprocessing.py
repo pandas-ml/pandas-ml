@@ -23,7 +23,7 @@ class PreprocessingMethods(AccessorMethods):
             data = self._df.to_frame()
             constructor = ModelFrame
         else:
-            data = self.data
+            data = self._data
             constructor = self._constructor
 
         result = func(data.values, value=value)
@@ -39,7 +39,7 @@ def _wrap_func(func):
     def f(self, *args, **kwargs):
         from expandas.core.frame import ModelFrame
         if isinstance(self._df, ModelFrame):
-            data = self.data
+            data = self._data
             result = func(data.values, *args, **kwargs)
             result = self._constructor(result, index=data.index,
                                        columns=data.columns)

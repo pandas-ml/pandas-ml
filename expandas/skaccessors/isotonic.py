@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from expandas.core.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods
 
 
 class IsotonicMethods(AccessorMethods):
@@ -20,14 +20,14 @@ class IsotonicMethods(AccessorMethods):
 
     def isotonic_regression(self, *args, **kwargs):
         func = self._module.isotonic_regression
-        target = self.target
+        target = self._target
         _y = func(target.values, *args, **kwargs)
         _y = self._constructor_sliced(_y, index=target.index)
         return _y
 
     def check_increasing(self, *args, **kwargs):
         func = self._module.check_increasing
-        target = self.target
+        target = self._target
         return func(target.index, target.values, *args, **kwargs)
 
 
