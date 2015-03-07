@@ -16,14 +16,17 @@ class MultiClassMethods(AccessorMethods):
 
     @property
     def OneVsRestClassifier(self):
+        """``sklearn.multiclass.OneVsRestClassifier``"""
         return self._module.OneVsRestClassifier
 
     @property
     def OneVsOneClassifier(self):
+        """``sklearn.multiclass.OneVsOneClassifier``"""
         return self._module.OneVsOneClassifier
 
     @property
     def OutputCodeClassifier(self):
+        """``sklearn.multiclass.OutputCodeClassifier``"""
         return self._module.OutputCodeClassifier
 
     def fit_ovr(self, *args, **kwargs):

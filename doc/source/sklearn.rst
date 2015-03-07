@@ -205,7 +205,7 @@ If ``ModelFrame`` both has ``target`` and ``predicted`` values, the model evalua
    1           0  48   2
    2           0   0  50
 
-Use module level functions
+Use Module Level Functions
 --------------------------
 
 Some ``scikit-learn`` modules define functions which handle data without instanciating estimators. You can call these functions from accessor methods directly, and ``ModelFrame`` will pass corresponding data on background. Following example shows to use ``sklearn.cluster.k_means`` function to perform K-means.
@@ -359,7 +359,7 @@ You can perform grid search using ``ModelFrame.fit``.
      kernel='rbf', max_iter=-1, probability=False, random_state=None,
      shrinking=True, tol=0.001, verbose=False)
 
-In addition, ``ModelFrame.grid_search`` has a ``describe`` function to organize each grid search result as ``pd.DataFrame`` accepting estimator.
+In addition, ``ModelFrame.grid_search`` has a ``describe`` function to organize each grid search result as ``ModelFrame`` accepting estimator.
 
 .. code-block:: python
 

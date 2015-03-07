@@ -15,6 +15,9 @@ import expandas.util.testing as tm
 
 class TestModelFrame(tm.TestCase):
 
+    def test_version(self):
+        self.assertTrue(len(expd.__version__) > 1)
+
     def test_frame_instance(self):
 
         df = expd.ModelFrame(datasets.load_digits())

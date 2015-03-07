@@ -11,6 +11,7 @@ from pandas.util.decorators import Appender, cache_readonly
 from expandas.core.series import ModelSeries
 from expandas.core.accessor import AccessorMethods
 import expandas.skaccessors as skaccessors
+import expandas.misc as misc
 
 
 _shared_docs = dict()
@@ -368,7 +369,7 @@ class ModelFrame(pd.DataFrame):
 
         Returns
         -------
-        probabilities : ``ModelFrame``
+        decisions : ``ModelFrame``
         """
         if self._decision is None:
             self._decision = self.decision_function(self.estimator)
@@ -498,6 +499,8 @@ class ModelFrame(pd.DataFrame):
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='transform', returned='returned : transformed result'))
     def transform(self, estimator, *args, **kwargs):
+        if isinstance(estimator, compat.string_types):
+            return misc.transform_with_patsy(estimator, self, *args, **kwargs)
         transformed = self._call(estimator, 'transform', *args, **kwargs)
         return self._wrap_transform(transformed)
 
@@ -527,7 +530,7 @@ class ModelFrame(pd.DataFrame):
         """
 
     _shared_docs['skaccessor_nolink'] = """
-        Property to access ``sklearn.%(module)s```
+        Property to access ``sklearn.%(module)s``
         """
 
     @property
@@ -660,12 +663,10 @@ class ModelFrame(pd.DataFrame):
     @property
     @Appender(_shared_docs['skaccessor_nolink'] % dict(module='lda'))
     def lda(self):
-        """Property to access ``sklearn.lda``"""
         return self._lda
 
     @cache_readonly
     def _lda(self):
-        """Property to access ``sklearn.lda``"""
         return AccessorMethods(self, module_name='sklearn.lda')
 
     @property

@@ -16,6 +16,7 @@ class IsotonicMethods(AccessorMethods):
 
     @property
     def IsotonicRegression(self):
+        """``sklearn.isotonic.IsotonicRegression``"""
         return self._module.IsotonicRegression
 
     def isotonic_regression(self, *args, **kwargs):
