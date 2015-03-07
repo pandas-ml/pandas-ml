@@ -19,6 +19,11 @@ class ModelSeries(pd.Series):
     def preprocessing(self):
         return skaccessors.PreprocessingMethods(self)
 
+    @property
+    def pp(self):
+        """Property to access ``sklearn.preprocessing``"""
+        return self.preprocessing
+
     @Appender(pd.Series.to_frame.__doc__)
     def to_frame(self, name=None):
         from expandas.core.frame import ModelFrame

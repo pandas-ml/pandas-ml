@@ -50,15 +50,35 @@ class TestCrossValidation(tm.TestCase):
         self.assert_index_equal(df.columns, train_df.columns)
         self.assert_index_equal(df.columns, test_df.columns)
 
-        # can't retain index
-        # concatenated = pd.concat([train_df, test_df])
-        # concatenated = concatenated.sort_index()
-        # self.assert_frame_equal(df, concatenated)
-
         df = expd.ModelFrame(datasets.load_digits())
         df.target_name = 'xxx'
 
         train_df, test_df = df.cross_validation.train_test_split()
+        self.assert_index_equal(df.columns, train_df.columns)
+        self.assert_index_equal(df.columns, test_df.columns)
+        self.assertEqual(train_df.target_name, 'xxx')
+        self.assertEqual(test_df.target_name, 'xxx')
+
+    def test_train_test_split_abbr(self):
+
+        df = expd.ModelFrame(datasets.load_digits())
+        self.assertTrue(isinstance(df, expd.ModelFrame))
+
+        train_df, test_df = df.crv.train_test_split()
+        self.assert_index_equal(df.columns, train_df.columns)
+        self.assert_index_equal(df.columns, test_df.columns)
+
+        self.assertTrue(df.shape[0], train_df.shape[0] + test_df.shape[1])
+        self.assertTrue(df.shape[1], train_df.shape[1])
+        self.assertTrue(df.shape[1], test_df.shape[1])
+
+        self.assert_index_equal(df.columns, train_df.columns)
+        self.assert_index_equal(df.columns, test_df.columns)
+
+        df = expd.ModelFrame(datasets.load_digits())
+        df.target_name = 'xxx'
+
+        train_df, test_df = df.crv.train_test_split()
         self.assert_index_equal(df.columns, train_df.columns)
         self.assert_index_equal(df.columns, test_df.columns)
         self.assertEqual(train_df.target_name, 'xxx')
