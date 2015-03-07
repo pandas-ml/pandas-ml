@@ -75,13 +75,14 @@ def _attach_methods(cls, wrap_func, methods):
             _f = getattr(module, method)
             if hasattr(cls, method):
                 raise ValueError("{0} already has '{1}' method".format(cls, method))
-            setattr(cls, method, wrap_func(_f))
+            func_name = cls._module_name + '.' + method
+            setattr(cls, method, wrap_func(_f, func_name))
 
     except ImportError:
         pass
 
 
-def _wrap_data_func(func):
+def _wrap_data_func(func, func_name):
     """
     Wrapper to call func with data values
     """
@@ -89,10 +90,16 @@ def _wrap_data_func(func):
         data = self._data
         result = func(data.values, *args, **kwargs)
         return result
+    f.__doc__ = (
+        """
+        Call ``%s`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """ % func_name)
     return f
 
 
-def _wrap_data_target_func(func):
+def _wrap_data_target_func(func, func_name):
     """
     Wrapper to call func with data and target values
     """
@@ -101,4 +108,47 @@ def _wrap_data_target_func(func):
         target = self._target
         result = func(data.values, y=target.values, *args, **kwargs)
         return result
+    f.__doc__ = (
+        """
+        Call ``%s`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        - ``y``: ``ModelFrame.target``
+        """ % func_name)
+    return f
+
+
+def _wrap_target_pred_func(func, func_name):
+    """
+    Wrapper to call func with target and predicted values
+    """
+    def f(self, *args, **kwargs):
+        result = func(self._target.values, self._predicted.values,
+                      *args, **kwargs)
+        return result
+    f.__doc__ = (
+        """
+        Call ``%s`` using automatic mapping.
+
+        - ``y_true``: ``ModelFrame.target``
+        - ``y_pred``: ``ModelFrame.predicted``
+        """ % func_name)
+    return f
+
+
+def _wrap_target_pred_noargs(func, func_name):
+    """
+    Wrapper to call func with target and predicted values, accepting
+    no other arguments
+    """
+    def f(self):
+        result = func(self._target.values, self._predicted.values)
+        return result
+    f.__doc__ = (
+        """
+        Call ``%s`` using automatic mapping.
+
+        - ``y_true``: ``ModelFrame.target``
+        - ``y_pred``: ``ModelFrame.predicted``
+        """ % func_name)
     return f

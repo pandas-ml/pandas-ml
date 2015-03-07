@@ -25,6 +25,11 @@ class PartialDependenceMethods(AccessorMethods):
     # 'sklearn.ensemble.partial_dependence' has no attribute '__all__'
 
     def partial_dependence(self, gbrt, target_variables, **kwargs):
+        """
+        Call ``sklearn.ensemble.partial_dependence`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """
         import sklearn.ensemble.partial_dependence as pdp
         func = pdp.partial_dependence
         data = self._data
@@ -32,6 +37,11 @@ class PartialDependenceMethods(AccessorMethods):
         return pdp, axes
 
     def plot_partial_dependence(self, gbrt, features, **kwargs):
+        """
+        Call ``sklearn.ensemble.plot_partial_dependence`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        """
         import sklearn.ensemble.partial_dependence as pdp
         func = pdp.plot_partial_dependence
         data = self._data

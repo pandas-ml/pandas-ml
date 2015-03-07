@@ -60,7 +60,7 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.isotonic``              ``ModelFrame.isotonic``
 ``sklearn.kernel_approximation``  ``ModelFrame.kernel_approximation``
 ``sklearn.lda``                   ``ModelFrame.lda``
-``sklearn.linear_model``          ``ModelFrame.linear_model``
+``sklearn.linear_model``          ``ModelFrame.linear_model``, ``lm``
 ``sklearn.manifold``              ``ModelFrame.manifold``
 ``sklearn.metrics``               ``ModelFrame.metrics``
 ``sklearn.mixture``               ``ModelFrame.mixture``

@@ -16,6 +16,8 @@ class GaussianProcessMethods(AccessorMethods):
 
     @property
     def correlation_models(self):
+        """Property to access ``sklearn.gaussian_process.correlation_models``"""
+
         module_name = 'sklearn.gaussian_process.correlation_models'
         attrs = ['absolute_exponential', 'squared_exponential',
                  'generalized_exponential', 'pure_nugget',
@@ -24,6 +26,8 @@ class GaussianProcessMethods(AccessorMethods):
 
     @property
     def regression_models(self):
+        """Property to access ``sklearn.gaussian_process.regression_models``"""
+
         return RegressionModelsMethods(self._df)
 
     @classmethod

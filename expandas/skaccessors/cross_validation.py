@@ -16,10 +16,26 @@ class CrossValidationMethods(AccessorMethods):
     _module_name = 'sklearn.cross_validation'
 
     def StratifiedShuffleSplit(self, *args, **kwargs):
+        """
+        Instanciate ``sklearn.cross_validation.StratifiedShuffleSplit`` using automatic mapping.
+
+        - ``y``: ``ModelFrame.target``
+        """
         target = self._target
         return self._module.StratifiedShuffleSplit(target.values, *args, **kwargs)
 
     def iterate(self, cv):
+        """
+        Generate ``ModelFrame`` using iterators for cross validation
+
+        Parameters
+        ----------
+        cv : cross validation iterator
+
+        Returns
+        -------
+        generated : generator of ``ModelFrame``
+        """
         if not(isinstance(cv, self._module._PartitionIterator)):
             msg = "{0} is not a subclass of PartitionIterator"
             warnings.warn(msg.format(cv.__class__.__name__))
@@ -30,6 +46,9 @@ class CrossValidationMethods(AccessorMethods):
             yield train_df, test_df
 
     def train_test_split(self, *args, **kwargs):
+        """
+        Call ``sklearn.cross_validation.train_test_split`` using automatic mapping.
+        """
         func = self._module.train_test_split
 
         data = self._data
@@ -61,16 +80,34 @@ class CrossValidationMethods(AccessorMethods):
             return train_df, test_df
 
     def cross_val_score(self, estimator, *args, **kwargs):
+        """
+        Call ``sklearn.cross_validation.cross_val_score`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        - ``y``: ``ModelFrame.target``
+        """
         func = self._module.cross_val_score
         return func(estimator, X=self._data, y=self._target, *args, **kwargs)
 
     def permutation_test_score(self, estimator, *args, **kwargs):
+        """
+        Call ``sklearn.cross_validation.permutation_test_score`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        - ``y``: ``ModelFrame.target``
+        """
         func = self._module.permutation_test_score
         score, pscores, pvalue = func(estimator, X=self._data, y=self._target,
                                       *args, **kwargs)
         return score, pscores, pvalue
 
     def check_cv(self, cv, *args, **kwargs):
+        """
+        Call ``sklearn.cross_validation.check_cv`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        - ``y``: ``ModelFrame.target``
+        """
         func = self._module.check_cv
         return func(cv, X=self._data, y=self._target, *args, **kwargs)
 

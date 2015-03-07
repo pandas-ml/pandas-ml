@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from expandas.core.accessor import AccessorMethods, _attach_methods
+from expandas.core.accessor import AccessorMethods, _attach_methods, _wrap_data_target_func
 
 
 class LinearModelMethods(AccessorMethods):
@@ -14,6 +14,12 @@ class LinearModelMethods(AccessorMethods):
     _module_name = 'sklearn.linear_model'
 
     def lars_path(self, *args, **kwargs):
+        """
+        Call ``sklearn.linear_model.lars_path`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        - ``y``: ``ModelFrame.target``
+        """
         func = self._module.lars_path
         data = self._data
         target = self._target
@@ -22,6 +28,12 @@ class LinearModelMethods(AccessorMethods):
         return alphas, active, coefs
 
     def lasso_path(self, *args, **kwargs):
+        """
+        Call ``sklearn.linear_model.lasso_path`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        - ``y``: ``ModelFrame.target``
+        """
         func = self._module.lasso_path
         data = self._data
         target = self._target
@@ -35,6 +47,12 @@ class LinearModelMethods(AccessorMethods):
             return alphas, coefs, dual_gaps
 
     def lasso_stability_path(self, *args, **kwargs):
+        """
+        Call ``sklearn.linear_model.lasso_stability_path`` using automatic mapping.
+
+        - ``X``: ``ModelFrame.data``
+        - ``y``: ``ModelFrame.target``
+        """
         func = self._module.lasso_stability_path
         data = self._data
         target = self._target
@@ -43,6 +61,12 @@ class LinearModelMethods(AccessorMethods):
         return alpha_grid, scores_path
 
     def orthogonal_mp_gram(self, *args, **kwargs):
+        """
+        Call ``sklearn.linear_model.orthogonal_mp_gram`` using automatic mapping.
+
+        - ``Gram``: ``ModelFrame.data.T.dot(ModelFrame.data)``
+        - ``Xy``: ``ModelFrame.data.T.dot(ModelFrame.target)``
+        """
         func = self._module.orthogonal_mp_gram
         data = self._data.values
         target = self._target.values
@@ -53,18 +77,6 @@ class LinearModelMethods(AccessorMethods):
 
 
 _lm_methods = ['orthogonal_mp']
-
-
-def _wrap_func(func):
-    def f(self, *args, **kwargs):
-        data = self._data
-        target = self._target
-        # needs keyword y
-        result = func(data.values, y=target.values, *args, **kwargs)
-        return result
-    return f
-
-
-_attach_methods(LinearModelMethods, _wrap_func, _lm_methods)
+_attach_methods(LinearModelMethods, _wrap_data_target_func, _lm_methods)
 
 
