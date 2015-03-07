@@ -14,12 +14,12 @@ You can create ``ModelFrame`` as the same manner as ``pandas.DataFrame``. The be
    >>> import expandas as expd
 
    >>> df = expd.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
-   ...                       'C': [3, 4, 5]}, index=['A', 'B', 'C'])
+   ...                       'C': [3, 4, 5]}, index=['a', 'b', 'c'])
    >>> df
       A  B  C
-   A  1  2  3
-   B  2  3  4
-   C  3  4  5
+   a  1  2  3
+   b  2  3  4
+   c  3  4  5
 
    >>> type(df)
    <class 'expandas.core.frame.ModelFrame'>
@@ -99,15 +99,15 @@ You can access to each property as the same as ``pandas.DataFrame``. Sliced resu
 
    >>> df
       A  B  C
-   A  1  2  3
-   B  2  3  4
-   C  3  4  5
+   a  1  2  3
+   b  2  3  4
+   c  3  4  5
 
    >>> sliced = df['A']
    >>> sliced
-   A    1
-   B    2
-   C    3
+   a    1
+   b    2
+   c    3
    Name: A, dtype: int64
 
    >>> type(sliced)
@@ -116,9 +116,9 @@ You can access to each property as the same as ``pandas.DataFrame``. Sliced resu
    >>> subset = df[['A', 'B']]
    >>> subset
       A  B
-   A  1  2
-   B  2  3
-   C  3  4
+   a  1  2
+   b  2  3
+   c  3  4
 
    >>> type(subset)
    <class 'expandas.core.frame.ModelFrame'>

@@ -14,6 +14,7 @@ Contents:
 
    modelframe
    sklearn
+   patsy
 
 
 API:

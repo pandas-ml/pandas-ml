@@ -16,11 +16,21 @@ class FeatureExtractionMethods(AccessorMethods):
 
     # image
 
-    @cache_readonly
+    @property
     def image(self):
+        """Property to access ``sklearn.feature_extraction.image``"""
+        return self._image
+
+    @cache_readonly
+    def _image(self):
         return AccessorMethods(self._df, module_name='sklearn.feature_extraction.image')
 
     # text
+
+    @property
+    def text(self):
+        """Property to access ``sklearn.feature_extraction.text``"""
+        return self._text
 
     @cache_readonly
     def text(self):

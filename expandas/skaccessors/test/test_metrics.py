@@ -74,9 +74,10 @@ class TestClassificationMetrics(tm.TestCase):
         self.assertEqual(result, expected)
 
     def test_auc(self):
-        # result = self.df.metrics.auc(reorder=True)
-        # expected = metrics.auc(self.data, self.target, reorder=True)
-        # self.assertEqual(result, expected)
+        # Tested in:
+        #
+        # - test_precision_recall_curve
+        # - test_roc_curve
         pass
 
     def test_average_precision_score(self):
@@ -241,11 +242,15 @@ class TestClassificationMetrics2Classes(TestClassificationMetrics):
         result = self.df.metrics.average_precision_score()
         expected = metrics.average_precision_score(self.target, self.decision)
         self.assertEqual(result, expected)
+        curve, _, _ = self.df.metrics.precision_recall_curve()
+        self.assertEqual(result, curve.mean())
 
         result = self.df.metrics.average_precision_score(average=None)
+
         expected = metrics.average_precision_score(self.target, self.decision, average=None)
         self.assertTrue(isinstance(result, expd.ModelSeries))
         self.assert_numpy_array_almost_equal(result.values, expected)
+        print(expected)
 
     def test_hinge_loss(self):
         result = self.df.metrics.hinge_loss()
@@ -330,6 +335,22 @@ class TestClassificationMetrics3Classes(TestClassificationMetrics):
         result = self.df.metrics.log_loss()
         expected = metrics.log_loss(self.target, self.proba)
         self.assertEqual(result, expected)
+
+
+class TestClassificationMetricsExamples(tm.TestCase):
+
+    def test_hinge_loss(self):
+        X = [[0], [1]]
+        y = [-1, 1]
+        df = expd.ModelFrame(X, target=y)
+        est = df.svm.LinearSVC(random_state=self.random_state)
+        df.fit(est)
+
+        test_df = expd.ModelFrame([[-2], [3], [0.5]], target=[-1, 1, 1])
+        decisions = test_df.decision_function(est)
+        expected = np.array([[-2.18177943769], [2.36355887537], [0.0908897188437]])
+        self.assert_numpy_array_almost_equal(decisions.values, expected)
+        self.assertAlmostEqual(test_df.metrics.hinge_loss(), 0.30303676038544253)
 
 
 class TestRegressionMetrics(tm.TestCase):

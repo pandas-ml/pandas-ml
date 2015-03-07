@@ -74,9 +74,13 @@ class ClusterMethods(AccessorMethods):
 
     # Biclustering
 
-    @cache_readonly
+    @property
     def bicluster(self):
         """Property to access ``sklearn.cluster.bicluster``"""
+        return self._bicluster
+
+    @cache_readonly
+    def _bicluster(self):
         return AccessorMethods(self._df, module_name='sklearn.cluster.bicluster')
 
 

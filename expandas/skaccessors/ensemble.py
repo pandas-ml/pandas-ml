@@ -16,6 +16,7 @@ class EnsembleMethods(AccessorMethods):
 
     @property
     def partial_dependence(self):
+        """Property to access ``sklearn.ensemble.partial_dependence``"""
         # unable to set with cache_readonly
         return PartialDependenceMethods(self._df)
 

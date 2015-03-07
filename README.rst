@@ -1,6 +1,10 @@
 expandas
 ========
 
+.. image:: https://pypip.in/version/expandas/badge.svg
+    :target: https://pypi.python.org/pypi/expandas/
+    :alt: Latest Version
+
 .. image:: https://readthedocs.org/projects/expandas/badge/?version=latest
     :target: http://expandas.readthedocs.org/en/latest/
     :alt: Latest Docs
@@ -80,5 +84,5 @@ Example
 Supported Packages
 ~~~~~~~~~~~~~~~~~~
 
-- scikit-learn
-
+- ``scikit-learn``
+- ``patsy``
