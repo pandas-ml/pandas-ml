@@ -175,6 +175,13 @@ class ModelFrame(pd.DataFrame):
 
     @property
     def data(self):
+        """
+        Return data (explanatory variable / features)
+
+        Returns
+        -------
+        data : ``ModelFrame``
+        """
         if self.has_data():
             return self.loc[:, self._data_columns]
         else:
@@ -221,6 +228,13 @@ class ModelFrame(pd.DataFrame):
 
     @property
     def target_name(self):
+        """
+        Return target column name
+
+        Returns
+        -------
+        target : object
+        """
         return self._target_name
 
     @target_name.setter
@@ -229,6 +243,13 @@ class ModelFrame(pd.DataFrame):
 
     @property
     def target(self):
+        """
+        Return target (response variable)
+
+        Returns
+        -------
+        target : ``ModelSeries``
+        """
         if self.has_target():
             return self.loc[:, self.target_name]
         else:
@@ -503,114 +524,151 @@ class ModelFrame(pd.DataFrame):
 
     @cache_readonly
     def cluster(self):
+        """Property to access ``sklearn.cluster``"""
         return skaccessors.ClusterMethods(self)
 
     @cache_readonly
     def covariance(self):
+        """Property to access ``sklearn.covariance``"""
         return skaccessors.CovarianceMethods(self)
 
     @cache_readonly
     def cross_decomposition(self):
+        """Property to access ``sklearn.cross_decomposition``"""
         attrs = ['PLSRegression', 'PLSCanonical', 'CCA', 'PLSSVD']
         return AccessorMethods(self, module_name='sklearn.cross_decomposition',
                                attrs=attrs)
 
     @cache_readonly
     def cross_validation(self):
+        """Property to access ``sklearn.cross_validation``"""
         return skaccessors.CrossValidationMethods(self)
+
+    @property
+    def crv(self):
+        """Property to access ``sklearn.cross_validation``"""
+        return self.cross_validation
 
     @cache_readonly
     def decomposition(self):
+        """Property to access ``sklearn.decomposition``"""
         return skaccessors.DecompositionMethods(self)
 
     @cache_readonly
     def dummy(self):
+        """Property to access ``sklearn.dummy``"""
         attrs = ['DummyClassifier', 'DummyRegressor']
         return AccessorMethods(self, module_name='sklearn.dummy', attrs=attrs)
 
     @cache_readonly
     def ensemble(self):
+        """Property to access ``sklearn.ensemble``"""
         return skaccessors.EnsembleMethods(self)
 
     @cache_readonly
     def feature_extraction(self):
+        """Property to access ``sklearn.feature_extraction``"""
         return skaccessors.FeatureExtractionMethods(self)
 
     @cache_readonly
     def feature_selection(self):
+        """Property to access ``sklearn.feature_selection``"""
         return skaccessors.FeatureSelectionMethods(self)
 
     @cache_readonly
     def gaussian_process(self):
+        """Property to access ``sklearn.gaussian_process``"""
         return skaccessors.GaussianProcessMethods(self)
 
     @cache_readonly
     def grid_search(self):
+        """Property to access ``sklearn.grid_search``"""
         return skaccessors.GridSearchMethods(self)
 
     @cache_readonly
     def isotonic(self):
+        """Property to access ``sklearn.isotonic``"""
         return skaccessors.IsotonicMethods(self)
 
     @cache_readonly
     def kernel_approximation(self):
+        """Property to access ``sklearn.kernel_approximation``"""
         attrs = ['AdditiveChi2Sampler', 'Nystroem', 'RBFSampler', 'SkewedChi2Sampler']
         return AccessorMethods(self, module_name='sklearn.kernel_approximation',
                                attrs=attrs)
 
     @cache_readonly
     def lda(self):
+        """Property to access ``sklearn.lda``"""
         return AccessorMethods(self, module_name='sklearn.lda')
 
     @cache_readonly
     def linear_model(self):
+        """Property to access ``sklearn.linear_model``"""
         return skaccessors.LinearModelMethods(self)
 
     @cache_readonly
     def manifold(self):
+        """Property to access ``sklearn.manifold``"""
         return skaccessors.ManifoldMethods(self)
 
     @cache_readonly
     def mixture(self):
+        """Property to access ``sklearn.mixture``"""
         return AccessorMethods(self, module_name='sklearn.mixture')
 
     @cache_readonly
     def metrics(self):
+        """Property to access ``sklearn.metrics``"""
         return skaccessors.MetricsMethods(self)
 
     @cache_readonly
     def multiclass(self):
+        """Property to access ``sklearn.multiclass``"""
         return skaccessors.MultiClassMethods(self)
 
     @cache_readonly
     def naive_bayes(self):
+        """Property to access ``sklearn.naive_bayes``"""
         return AccessorMethods(self, module_name='sklearn.naive_bayes')
 
     @cache_readonly
     def neighbors(self):
+        """Property to access ``sklearn.neighbors``"""
         return skaccessors.NeighborsMethods(self)
 
     @cache_readonly
     def pipeline(self):
+        """Property to access ``sklearn.pipeline``"""
         return skaccessors.PipelineMethods(self)
 
     @cache_readonly
     def preprocessing(self):
+        """Property to access ``sklearn.preprocessing``"""
         return skaccessors.PreprocessingMethods(self)
+
+    @property
+    def pp(self):
+        """Property to access ``sklearn.preprocessing``"""
+        return self.preprocessing
 
     @cache_readonly
     def qda(self):
+        """Property to access ``sklearn.qda``"""
         return AccessorMethods(self, module_name='sklearn.qda')
 
     @cache_readonly
     def semi_supervised(self):
+        """Property to access ``sklearn.semi_supervised``"""
         return AccessorMethods(self, module_name='sklearn.semi_supervised')
 
     @cache_readonly
     def svm(self):
+        """Property to access ``sklearn.svm``"""
         return skaccessors.SVMMethods(self)
 
     @cache_readonly
     def tree(self):
+        """Property to access ``sklearn.tree``"""
         return AccessorMethods(self, module_name='sklearn.tree')
 

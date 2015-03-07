@@ -40,14 +40,16 @@ You can create ``ModelFrame`` instance from ``scikit-learn`` datasets directly.
    >>> df.cluster.KMeans
    <class 'sklearn.cluster.k_means_.KMeans'>
 
-Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` module.
+Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` module. Some accessors has its abbreviated versions.
+
+.. note:: Currently, ``ModelFrame`` can handle target which consists from a single column. Modules which uses multiple target columns cannot be handled automatically, and marked with `(WIP)`.
 
 ================================  ==========================================
 ``scikit-learn``                  ``ModelFrame`` accessor
 ================================  ==========================================
 ``sklearn.cluster``               ``ModelFrame.cluster``
 ``sklearn.covariance``            ``ModelFrame.covariance``
-``sklearn.cross_validation``      ``ModelFrame.cross_validation``
+``sklearn.cross_validation``      ``ModelFrame.cross_validation``, ``crv``
 ``sklearn.decomposition``         ``ModelFrame.decomposition``
 ``sklearn.datasets``              (not accesible from accessor)
 ``sklearn.dummy``                 ``ModelFrame.dummy``
@@ -55,7 +57,7 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.feature_extraction``    ``ModelFrame.feature_extraction``
 ``sklearn.gaussian_process``      ``ModelFrame.gaussian_process``  (WIP)
 ``sklearn.grid_search``           ``ModelFrame.grid_search``
-``sklearn.isotonic``              ``ModelFrame.isotonic`` (WIP)
+``sklearn.isotonic``              ``ModelFrame.isotonic``
 ``sklearn.kernel_approximation``  ``ModelFrame.kernel_approximation``
 ``sklearn.lda``                   ``ModelFrame.lda``
 ``sklearn.linear_model``          ``ModelFrame.linear_model``
@@ -67,7 +69,7 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.neighbors``             ``ModelFrame.neighbors``
 ``sklearn.cross_decomposition``   ``ModelFrame.cross_decomposition`` (WIP)
 ``sklearn.pipeline``              ``ModelFrame.pipeline``
-``sklearn.preprocessing``         ``ModelFrame.preprocessing``
+``sklearn.preprocessing``         ``ModelFrame.preprocessing``, ``pp``
 ``sklearn.qda``                   ``ModelFrame.qda``
 ``sklearn.semi_supervised``       ``ModelFrame.semi_supervised``
 ``sklearn.svm``                   ``ModelFrame.svm``
@@ -93,19 +95,43 @@ Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once crea
    149    0
    Length: 150, dtype: int32
 
-``ModelFrame`` has following methods corresponding to various ``scikit-learn`` estimators.
+``ModelFrame`` preserves the most recently used estimator in ``estimator`` atribute, and predicted results in ``predicted`` attibute.
 
-- ``ModelFrame.fit``
-- ``ModelFrame.transform``
-- ``ModelFrame.fit_transform``
-- ``ModelFrame.inverse_transform``
-- ``ModelFrame.predict``
-- ``ModelFrame.fit_predict``
-- ``ModelFrame.score``
-- ``ModelFrame.predict_proba``
-- ``ModelFrame.predict_log_proba``
-- ``ModelFrame.decision_function``
+.. code-block:: python
 
+   >>> df.estimator
+   KMeans(copy_x=True, init='k-means++', max_iter=300, n_clusters=3, n_init=10,
+       n_jobs=1, precompute_distances=True, random_state=None, tol=0.0001,
+       verbose=0)
+
+   >>> df.predicted
+   0    1
+   1    1
+   2    1
+   ...
+   147    2
+   148    2
+   149    0
+   Length: 150, dtype: int32
+
+``ModelFrame`` has following methods corresponding to various ``scikit-learn`` estimators. The last results are saved as corresponding ``ModelFrame`` properties.
+
+================================  ==========================================
+``ModelFrame`` method             ``ModelFrame`` property
+================================  ==========================================
+``ModelFrame.fit``                (None)
+``ModelFrame.transform``          (None)
+``ModelFrame.fit_transform``      (None)
+``ModelFrame.inverse_transform``  (None)
+``ModelFrame.predict``            ``ModelFrame.predicted``
+``ModelFrame.fit_predict``        ``ModelFrame.predicted``
+``ModelFrame.score``              (None)
+``ModelFrame.predict_proba``      ``ModelFrame.proba``
+``ModelFrame.predict_log_proba``  ``ModelFrame.log_proba``
+``ModelFrame.decision_function``  ``ModelFrame.decision``
+================================  ==========================================
+
+.. note:: If you access to a property before calling ``ModelFrame`` methods, ``ModelFrame`` automatically calls corresponding method of the latest estimator and return the result.
 
 Following example shows to perform PCA, then revert principal components back to original space.
 
@@ -145,7 +171,7 @@ Following example shows to perform PCA, then revert principal components back to
 
 .. note:: ``columns`` information will be lost once transformed to principal components.
 
-``ModelFrame`` preserves last predicted result in ``predicted`` attibute. If ``ModelFrame`` both has ``target`` and ``predicted`` values, the model evaluation can be performed using functions available in ``ModelFrame.metrics``.
+If ``ModelFrame`` both has ``target`` and ``predicted`` values, the model evaluation can be performed using functions available in ``ModelFrame.metrics``.
 
 .. code-block:: python
 
@@ -178,6 +204,28 @@ Following example shows to perform PCA, then revert principal components back to
    0          50   0   0
    1           0  48   2
    2           0   0  50
+
+Use module level functions
+--------------------------
+
+Some ``scikit-learn`` modules define functions which handle data without instanciating estimators. You can call these functions from accessor methods directly, and ``ModelFrame`` will pass corresponding data on background. Following example shows to use ``sklearn.cluster.k_means`` function to perform K-means.
+
+.. important:: When you use module level function, ``ModelFrame.predicted`` WILL NOT be updated. Thus, using estimator is recommended.
+
+.. code-block:: python
+
+   # no need to pass data explicitly
+   # sklearn.cluster.kmeans returns centroids, cluster labels and inertia
+   >>> c, l, i = df.cluster.k_means(n_clusters=3)
+   >>> l
+   0     1
+   1     1
+   2     1
+   ...
+   147    2
+   148    2
+   149    0
+   Length: 150, dtype: int32
 
 Pipeline
 --------
