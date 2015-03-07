@@ -15,8 +15,8 @@ class SVMMethods(AccessorMethods):
 
     def l1_min_c(self, *args, **kwargs):
         func = self._module.l1_min_c
-        data = self.data
-        target = self.target
+        data = self._data
+        target = self._target
         l1_min_c = func(data.values, y=target.values, *args, **kwargs)
         return l1_min_c
 

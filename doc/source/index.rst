@@ -21,5 +21,5 @@ API:
 .. toctree::
    :maxdepth: 2
 
-   generated/expandas
-
+   generated/expandas.core
+   generated/expandas.skaccessors

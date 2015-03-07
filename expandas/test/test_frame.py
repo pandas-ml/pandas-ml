@@ -139,6 +139,21 @@ class TestModelFrame(tm.TestCase):
         self.assert_frame_equal(mdf.data, mdf)
         self.assertEqual(mdf.target_name, '.target')
 
+    def test_frame_init_dict_list_series_index(self):
+        # initialization by dataframe and list
+        df = {'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]}
+        target = pd.Series([9, 8, 7], name='X', index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(df, target=target)
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 4))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['X', 'A', 'B', 'C']))
+        expected = pd.DataFrame(df, index=['a', 'b', 'c'])
+        self.assert_frame_equal(mdf.data, expected)
+        self.assert_series_equal(mdf.target, target)
+        self.assertEqual(mdf.target_name, 'X')
+
     def test_frame_init_df_none(self):
         # initialization by dataframe and none
         df = pd.DataFrame({'A': [1, 2, 3],

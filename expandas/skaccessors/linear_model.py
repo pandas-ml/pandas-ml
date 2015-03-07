@@ -15,16 +15,16 @@ class LinearModelMethods(AccessorMethods):
 
     def lars_path(self, *args, **kwargs):
         func = self._module.lars_path
-        data = self.data
-        target = self.target
+        data = self._data
+        target = self._target
         alphas, active, coefs = func(data.values, y=target.values, *args, **kwargs)
         coefs = self._constructor(coefs, index=data.columns)
         return alphas, active, coefs
 
     def lasso_path(self, *args, **kwargs):
         func = self._module.lasso_path
-        data = self.data
-        target = self.target
+        data = self._data
+        target = self._target
         return_models = kwargs.get('return_models', False)
         if return_models:
             models = func(data.values, y=target.values, *args, **kwargs)
@@ -36,16 +36,16 @@ class LinearModelMethods(AccessorMethods):
 
     def lasso_stability_path(self, *args, **kwargs):
         func = self._module.lasso_stability_path
-        data = self.data
-        target = self.target
+        data = self._data
+        target = self._target
         alpha_grid, scores_path = func(data.values, y=target.values, *args, **kwargs)
         scores_path = self._constructor(scores_path, index=data.columns)
         return alpha_grid, scores_path
 
     def orthogonal_mp_gram(self, *args, **kwargs):
         func = self._module.orthogonal_mp_gram
-        data = self.data.values
-        target = self.target.values
+        data = self._data.values
+        target = self._target.values
         gram = data.T.dot(data)
         Xy = data.T.dot(target)
         coef = func(gram, Xy, *args, **kwargs)
@@ -57,8 +57,9 @@ _lm_methods = ['orthogonal_mp']
 
 def _wrap_func(func):
     def f(self, *args, **kwargs):
-        data = self.data
-        target = self.target
+        data = self._data
+        target = self._target
+        # needs keyword y
         result = func(data.values, y=target.values, *args, **kwargs)
         return result
     return f

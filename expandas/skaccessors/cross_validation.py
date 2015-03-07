@@ -16,7 +16,7 @@ class CrossValidationMethods(AccessorMethods):
     _module_name = 'sklearn.cross_validation'
 
     def StratifiedShuffleSplit(self, *args, **kwargs):
-        target = self.target
+        target = self._target
         return self._module.StratifiedShuffleSplit(target.values, *args, **kwargs)
 
     def iterate(self, cv):
@@ -32,9 +32,9 @@ class CrossValidationMethods(AccessorMethods):
     def train_test_split(self, *args, **kwargs):
         func = self._module.train_test_split
 
-        data = self.data
+        data = self._data
         if self._df.has_target():
-            target = self.target
+            target = self._target
             tr_d, te_d, tr_l, te_l = func(data, target, *args, **kwargs)
 
             # Create DataFrame here to retain data and target names
@@ -62,15 +62,15 @@ class CrossValidationMethods(AccessorMethods):
 
     def cross_val_score(self, estimator, *args, **kwargs):
         func = self._module.cross_val_score
-        return func(estimator, X=self.data, y=self.target, *args, **kwargs)
+        return func(estimator, X=self._data, y=self._target, *args, **kwargs)
 
     def permutation_test_score(self, estimator, *args, **kwargs):
         func = self._module.permutation_test_score
-        score, pscores, pvalue = func(estimator, X=self.data, y=self.target,
+        score, pscores, pvalue = func(estimator, X=self._data, y=self._target,
                                       *args, **kwargs)
         return score, pscores, pvalue
 
     def check_cv(self, cv, *args, **kwargs):
         func = self._module.check_cv
-        return func(cv, X=self.data, y=self.target, *args, **kwargs)
+        return func(cv, X=self._data, y=self._target, *args, **kwargs)
 
