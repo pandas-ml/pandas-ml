@@ -107,6 +107,26 @@ class TestPreprocessing(tm.TestCase):
         self.assert_numpy_array_almost_equal(result.values, expected)
         self.assertEqual(result.name, 'sepal length (cm)')
 
+    def test_normalize_abbr(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        result = df.pp.normalize()
+        expected = pp.normalize(iris.data)
+
+        self.assertTrue(isinstance(result, expd.ModelFrame))
+        self.assert_numpy_array_almost_equal(result.data.values, expected)
+        self.assert_index_equal(result.columns, df.data.columns)
+
+        s = df['sepal length (cm)']
+        self.assertTrue(isinstance(s, expd.ModelSeries))
+        result = s.pp.normalize()
+        expected = pp.normalize(np.atleast_2d(iris.data[:, 0]))[0]
+
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+        self.assertEqual(result.name, 'sepal length (cm)')
+
     def test_scale(self):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
