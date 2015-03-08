@@ -33,7 +33,7 @@ class FeatureExtractionMethods(AccessorMethods):
         return self._text
 
     @cache_readonly
-    def text(self):
+    def _text(self):
         attrs = ['CountVectorizer', 'HashingVectorizer',
                  'TfidfTransformer', 'TfidfVectorizer']
         return AccessorMethods(self._df, module_name='sklearn.feature_extraction.text',

@@ -10,6 +10,7 @@ from expandas.skaccessors.feature_selection import FeatureSelectionMethods
 from expandas.skaccessors.gaussian_process import GaussianProcessMethods
 from expandas.skaccessors.grid_search import GridSearchMethods
 from expandas.skaccessors.isotonic import IsotonicMethods
+from expandas.skaccessors.learning_curve import LearningCurveMethods
 from expandas.skaccessors.linear_model import LinearModelMethods
 from expandas.skaccessors.manifold import ManifoldMethods
 from expandas.skaccessors.metrics import MetricsMethods
