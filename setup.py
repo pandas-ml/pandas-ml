@@ -9,7 +9,7 @@ PACKAGE = 'expandas'
 README = 'README.rst'
 REQUIREMENTS = 'requirements.txt'
 
-VERSION = '0.1.1'
+VERSION = '0.2.0dev'
 
 def read(fname):
   # file must be read as utf-8 in py3 to avoid to be bytes

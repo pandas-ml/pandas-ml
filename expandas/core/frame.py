@@ -11,6 +11,7 @@ from pandas.util.decorators import Appender, cache_readonly
 from expandas.core.series import ModelSeries
 from expandas.core.accessor import AccessorMethods
 import expandas.skaccessors as skaccessors
+import expandas.smaccessors as smaccessors
 import expandas.misc as misc
 
 
@@ -58,6 +59,7 @@ class ModelFrame(pd.DataFrame):
             raise ValueError(msg)
 
         data, target = skaccessors._maybe_sklearn_data(data, target)
+        data, target = smaccessors._maybe_statsmodels_data(data, target)
 
         # retrieve target_name
         if isinstance(data, ModelFrame):
