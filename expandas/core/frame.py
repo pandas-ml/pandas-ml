@@ -670,6 +670,15 @@ class ModelFrame(pd.DataFrame):
         return AccessorMethods(self, module_name='sklearn.lda')
 
     @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='learning_curve'))
+    def learning_curve(self):
+        return self._learning_curve
+
+    @cache_readonly
+    def _learning_curve(self):
+        return skaccessors.LearningCurveMethods(self)
+
+    @property
     @Appender(_shared_docs['skaccessor'] % dict(module='linear_model'))
     def linear_model(self):
         return self._linear_model
@@ -736,6 +745,15 @@ class ModelFrame(pd.DataFrame):
     @cache_readonly
     def _neighbors(self):
         return skaccessors.NeighborsMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='neural_network'))
+    def neural_network(self):
+        return self._neural_network
+
+    @cache_readonly
+    def _neural_network(self):
+        return AccessorMethods(self, module_name='sklearn.neural_network')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='pipeline'))

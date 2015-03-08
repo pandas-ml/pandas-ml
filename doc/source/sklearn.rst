@@ -60,6 +60,7 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.isotonic``              ``ModelFrame.isotonic``
 ``sklearn.kernel_approximation``  ``ModelFrame.kernel_approximation``
 ``sklearn.lda``                   ``ModelFrame.lda``
+``sklearn.learning_curve``        ``ModelFrame.learning_curve``
 ``sklearn.linear_model``          ``ModelFrame.linear_model``, ``lm``
 ``sklearn.manifold``              ``ModelFrame.manifold``
 ``sklearn.metrics``               ``ModelFrame.metrics``
@@ -67,6 +68,7 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.multiclass``            ``ModelFrame.multiclass``
 ``sklearn.naive_bayes``           ``ModelFrame.naive_bayes``
 ``sklearn.neighbors``             ``ModelFrame.neighbors``
+``sklearn.neural_network``        ``ModelFrame.neural_network``
 ``sklearn.cross_decomposition``   ``ModelFrame.cross_decomposition`` (WIP)
 ``sklearn.pipeline``              ``ModelFrame.pipeline``
 ``sklearn.preprocessing``         ``ModelFrame.preprocessing``, ``pp``
