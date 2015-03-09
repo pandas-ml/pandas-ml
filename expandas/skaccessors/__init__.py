@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from expandas.skaccessors.base import _maybe_sklearn_data
+
 from expandas.skaccessors.cluster import ClusterMethods
 from expandas.skaccessors.covariance import CovarianceMethods
 from expandas.skaccessors.cross_validation import CrossValidationMethods
