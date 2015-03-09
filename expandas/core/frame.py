@@ -57,18 +57,7 @@ class ModelFrame(pd.DataFrame):
             msg = 'target must be list-like when data is None'
             raise ValueError(msg)
 
-        try:
-            from sklearn.datasets.base import Bunch
-            if isinstance(data, Bunch):
-                if target is not None:
-                    raise ValueError
-                # this should be first
-                target = data.target
-                # instanciate here to add column name
-                columns = getattr(data, 'feature_names', None)
-                data = pd.DataFrame(data.data, columns=columns)
-        except ImportError:
-            pass
+        data, target = skaccessors._maybe_sklearn_data(data, target)
 
         # retrieve target_name
         if isinstance(data, ModelFrame):
