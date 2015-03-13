@@ -87,7 +87,7 @@ Also, you can use formula which doesn't have left side.
    c    9
    Name: .target, dtype: int64
 
-Below examples is performing deviation coding via patsy formula.
+Below example is performing deviation coding via patsy formula.
 
    >>> df3 = expd.ModelFrame({'X': [1, 2, 3, 4, 5], 'Y': [1, 3, 2, 2, 1],
    ...                        'Z': [1, 1, 1, 2, 2]}, target='Z',
