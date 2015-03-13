@@ -49,12 +49,14 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ================================  ==========================================
 ``sklearn.cluster``               ``ModelFrame.cluster``
 ``sklearn.covariance``            ``ModelFrame.covariance``
+``sklearn.cross_decomposition``   ``ModelFrame.cross_decomposition`` (WIP)
 ``sklearn.cross_validation``      ``ModelFrame.cross_validation``, ``crv``
-``sklearn.decomposition``         ``ModelFrame.decomposition``
 ``sklearn.datasets``              (not accesible from accessor)
+``sklearn.decomposition``         ``ModelFrame.decomposition``
 ``sklearn.dummy``                 ``ModelFrame.dummy``
 ``sklearn.ensemble``              ``ModelFrame.ensemble``
 ``sklearn.feature_extraction``    ``ModelFrame.feature_extraction``
+``sklearn.feature_selection``     ``ModelFrame.feature_selection``
 ``sklearn.gaussian_process``      ``ModelFrame.gaussian_process``  (WIP)
 ``sklearn.grid_search``           ``ModelFrame.grid_search``
 ``sklearn.isotonic``              ``ModelFrame.isotonic``
@@ -69,7 +71,6 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.naive_bayes``           ``ModelFrame.naive_bayes``
 ``sklearn.neighbors``             ``ModelFrame.neighbors``
 ``sklearn.neural_network``        ``ModelFrame.neural_network``
-``sklearn.cross_decomposition``   ``ModelFrame.cross_decomposition`` (WIP)
 ``sklearn.pipeline``              ``ModelFrame.pipeline``
 ``sklearn.preprocessing``         ``ModelFrame.preprocessing``, ``pp``
 ``sklearn.qda``                   ``ModelFrame.qda``

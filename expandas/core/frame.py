@@ -691,15 +691,6 @@ class ModelFrame(pd.DataFrame):
         return skaccessors.ManifoldMethods(self)
 
     @property
-    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='mixture'))
-    def mixture(self):
-        return self._mixture
-
-    @cache_readonly
-    def _mixture(self):
-        return AccessorMethods(self, module_name='sklearn.mixture')
-
-    @property
     @Appender(_shared_docs['skaccessor'] % dict(module='metrics'))
     def metrics(self):
         return self._metrics
@@ -707,6 +698,15 @@ class ModelFrame(pd.DataFrame):
     @cache_readonly
     def _metrics(self):
         return skaccessors.MetricsMethods(self)
+
+    @property
+    @Appender(_shared_docs['skaccessor_nolink'] % dict(module='mixture'))
+    def mixture(self):
+        return self._mixture
+
+    @cache_readonly
+    def _mixture(self):
+        return AccessorMethods(self, module_name='sklearn.mixture')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='multiclass'))
@@ -775,6 +775,15 @@ class ModelFrame(pd.DataFrame):
     @cache_readonly
     def _qda(self):
         return AccessorMethods(self, module_name='sklearn.qda')
+
+    @property
+    @Appender(_shared_docs['skaccessor'] % dict(module='random_projection'))
+    def random_projection(self):
+        return self._random_projection
+
+    @cache_readonly
+    def _random_projection(self):
+        return AccessorMethods(self, module_name='sklearn.random_projection')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='semi_supervised'))
