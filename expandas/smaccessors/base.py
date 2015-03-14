@@ -12,8 +12,6 @@ def _maybe_statsmodels_data(data, target):
             if target is not None:
                 raise ValueError("'target' can't be specified for sklearn.datasets")
 
-
-            # try:
             # this should be first
             target_name = getattr(data, 'endog_name', None)
             target = pd.Series(data.endog, name=target_name)
