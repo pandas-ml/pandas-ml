@@ -188,7 +188,6 @@ class TestModelFrame(tm.TestCase):
         s = pd.Series([1, 2, 3], index=['a', 'b', 'c'])
         mdf = expd.ModelFrame(None, target=s)
 
-
         self.assertTrue(isinstance(mdf, expd.ModelFrame))
         self.assertEqual(mdf.shape, (3, 1))
         self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
