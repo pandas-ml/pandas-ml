@@ -50,3 +50,13 @@ class ModelSeries(pd.Series):
             df = ModelFrame({name: self})
 
         return df
+
+    @Appender(pd.core.generic.NDFrame.groupby.__doc__)
+    def groupby(self, by=None, axis=0, level=None, as_index=True, sort=True,
+                group_keys=True, squeeze=False):
+        from expandas.core.groupby import groupby
+        if level is None and by is None:
+            raise TypeError("You have to supply one of 'by' and 'level'")
+        axis = self._get_axis_number(axis)
+        return groupby(self, by=by, axis=axis, level=level, as_index=as_index,
+                       sort=sort, group_keys=group_keys, squeeze=squeeze)
