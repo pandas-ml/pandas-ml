@@ -147,7 +147,7 @@ class MetricsMethods(AccessorMethods):
         Call ``sklearn.metrics.precision_recall_fscore_support`` using automatic mapping.
 
         - ``y_true``: ``ModelFrame.target``
-        - ``y_pred``: ``ModelFrame.predicted`
+        - ``y_pred``: ``ModelFrame.predicted``
         """
         func = self._module.precision_recall_fscore_support
         p, r, f, s = func(self._target.values, self._predicted.values,

@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
+import numpy as np
 import pandas as pd
 from pandas.util.decorators import Appender, cache_readonly
 
+from expandas.core.generic import AbstractModel, _shared_docs
 import expandas.skaccessors as skaccessors
 
 
-_shared_docs = dict()
-
-
-class ModelSeries(pd.Series):
+class ModelSeries(pd.Series, AbstractModel):
     """
     Wrapper for ``pandas.Series`` to support ``sklearn.preprocessing``
     """
@@ -18,10 +17,23 @@ class ModelSeries(pd.Series):
     def _constructor(self):
         return ModelSeries
 
-    # copied from expandas.core.frame
-    _shared_docs['skaccessor'] = """
-        Property to access ``sklearn.%(module)s``. See :mod:`expandas.skaccessors.%(module)s`
+    def _call(self, estimator, method_name, *args, **kwargs):
+        method = self._check_attr(estimator, method_name)
+        data = self.values
+        result = method(data, *args, **kwargs)
+        return result
+
+    def _wrap_transform(self, transformed):
         """
+        Wrapper for transform methods
+        """
+        if len(transformed.shape) == 2:
+            if transformed.shape[0] != 1:
+                from expandas.core.frame import ModelFrame
+                return ModelFrame(transformed, index=self.index)
+            else:
+                transformed = transformed.flatten()
+        return self._constructor(transformed, index=self.index, name=self.name)
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='preprocessing'))

@@ -175,8 +175,8 @@ class TestPreprocessing(tm.TestCase):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
 
-        models = ['Binarizer', 'Imputer', 'KernelCenterer',
-                  'Normalizer', 'StandardScaler']
+        models = ['Binarizer', 'Imputer', 'Normalizer',
+                  'StandardScaler', 'MinMaxScaler']
         for model in models:
             mod1 = getattr(df.preprocessing, model)()
             mod2 = getattr(pp, model)()
@@ -190,6 +190,7 @@ class TestPreprocessing(tm.TestCase):
             self.assertTrue(isinstance(result, expd.ModelFrame))
             self.assert_series_equal(df.target, result.target)
             self.assert_numpy_array_almost_equal(result.data.values, expected)
+            self.assert_index_equal(result.columns, df.columns)
 
             mod1 = getattr(df.preprocessing, model)()
             mod2 = getattr(pp, model)()
@@ -200,6 +201,136 @@ class TestPreprocessing(tm.TestCase):
             self.assertTrue(isinstance(result, expd.ModelFrame))
             self.assert_series_equal(df.target, result.target)
             self.assert_numpy_array_almost_equal(result.data.values, expected)
+            self.assert_index_equal(result.columns, df.columns)
+
+    def test_transform_1d_frame(self):
+        arr = np.array([1, 2, 3, 1, 2, 3, 1, 2, 3])
+        idx = pd.Index('a b c d e f g h i'.split(' '))
+        df = expd.ModelFrame(arr, index=idx, columns=['X'])
+        self.assertEqual(len(df.columns), 1)
+
+        models = ['Binarizer', 'Imputer', 'StandardScaler', 'MinMaxScaler']
+        for model in models:
+            mod1 = getattr(df.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            df.fit(mod1)
+            mod2.fit(arr)
+
+            result = df.transform(mod1)
+            expected = mod2.transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_numpy_array_almost_equal(result.values.flatten(), expected)
+            self.assert_index_equal(result.index, idx)
+            self.assert_index_equal(result.columns, pd.Index(['X']))
+
+            mod1 = getattr(df.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            result = df.fit_transform(mod1)
+            expected = mod2.fit_transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, expd.ModelFrame))
+            self.assert_numpy_array_almost_equal(result.values.flatten(), expected)
+            self.assert_index_equal(result.index, idx)
+            self.assert_index_equal(result.columns, pd.Index(['X']))
+
+    def test_transform_series(self):
+        arr = np.array([1, 2, 3, 1, 2, 3, 1, 2, 3])
+        s = expd.ModelSeries(arr, index='a b c d e f g h i'.split(' '))
+
+        models = ['Binarizer', 'Imputer', 'StandardScaler', 'MinMaxScaler']
+        for model in models:
+            mod1 = getattr(s.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            s.fit(mod1)
+            mod2.fit(arr)
+
+            result = s.transform(mod1)
+            expected = mod2.transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            mod1 = getattr(s.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            result = s.fit_transform(mod1)
+            expected = mod2.fit_transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_Imputer(self):
+        arr = np.array([1, np.nan, 3, 2])
+        s = expd.ModelSeries(arr)
+
+        mod1 = s.pp.Imputer(axis=1)
+        s.fit(mod1)
+        result = s.transform(mod1)
+
+        expected = np.array([1, 2, 3, 2])
+
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+        mod1 = s.pp.Imputer(axis=1)
+        result = s.fit_transform(mod1)
+
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_LabelBinarizer(self):
+        arr = np.array([1, 2, 3, 2])
+        s = expd.ModelSeries(arr, index=['a', 'b', 'c', 'd'])
+
+        mod1 = s.pp.LabelBinarizer()
+        s.fit(mod1)
+        result = s.transform(mod1)
+
+        expected = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 1, 0]])
+
+        self.assertTrue(isinstance(result, expd.ModelFrame))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
+
+        mod1 = s.pp.LabelBinarizer()
+        result = s.fit_transform(mod1)
+
+        self.assertTrue(isinstance(result, expd.ModelFrame))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+        inversed = result.inverse_transform(mod1)
+        self.assertTrue(isinstance(inversed, expd.ModelFrame))
+        self.assert_numpy_array_almost_equal(inversed.values.flatten(), arr)
+        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
+
+    def test_LabelEncoder(self):
+        arr = np.array(['X', 'Y', 'Z', 'X'])
+        s = expd.ModelSeries(arr, index=['a', 'b', 'c', 'd'])
+
+        mod1 = s.pp.LabelEncoder()
+        s.fit(mod1)
+        result = s.transform(mod1)
+
+        expected = np.array([0, 1, 2, 0])
+
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
+
+        mod1 = s.pp.LabelEncoder()
+        result = s.fit_transform(mod1)
+
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+        inversed = result.inverse_transform(mod1)
+        self.assertTrue(isinstance(inversed, expd.ModelSeries))
+        self.assert_numpy_array_equal(inversed.values.flatten(), arr)
+        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
 
 
 if __name__ == '__main__':
