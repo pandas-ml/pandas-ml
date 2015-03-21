@@ -3,7 +3,10 @@
 import datetime
 import warnings
 
+import numpy as np
 import pandas as pd
+
+import sklearn.datasets as datasets
 
 import expandas as expd
 import expandas.util.testing as tm
@@ -30,6 +33,89 @@ class TestModelFrameGroupBy(tm.TestCase):
         expected = pd.Series([1, 3], index=[0, 2], name='.target')
         self.assert_series_equal(df.target, expected)
         self.assertTrue(isinstance(df.target, expd.ModelSeries))
+
+    def test_transform_standard(self):
+        # check pandas standard transform works
+
+        df = pd.DataFrame({'A': ['A', 'B', 'A', 'A', 'A', 'B', 'B', 'B'],
+                           'B': np.random.randn(8),
+                           'C': np.random.randn(8)})
+
+        mdf = expd.ModelFrame(df)
+        self.assert_frame_equal(df.groupby('A').transform('mean'),
+                                mdf.groupby('A').transform('mean'))
+
+    def test_grouped_estimator_SVC(self):
+        df = expd.ModelFrame(datasets.load_iris())
+        df['sepal length (cm)'] = df['sepal length (cm)'].pp.binarize(threshold=5.8)
+        grouped = df.groupby('sepal length (cm)')
+        self.assertTrue(isinstance(grouped, expd.core.groupby.ModelFrameGroupBy))
+        for name, group in grouped:
+            self.assertTrue(isinstance(group, expd.ModelFrame))
+            self.assertEqual(group.target_name, '.target')
+            self.assertTrue(group.has_target())
+            self.assert_index_equal(group.columns, df.columns)
+        svc = df.svm.SVC(random_state=self.random_state)
+        gclf = grouped.fit(svc)
+        self.assertTrue(isinstance(gclf, expd.core.groupby.GroupedEstimator))
+        self.assertEqual(len(gclf.groups), 2)
+
+        results = grouped.predict(gclf)
+        self.assertTrue(isinstance(results, expd.core.groupby.ModelSeriesGroupBy))
+        self.assertTrue(isinstance(results.get_group(0), expd.ModelSeries))
+        self.assertTrue(isinstance(results.get_group(1), expd.ModelSeries))
+        # test indexes are preserved
+        self.assert_index_equal(results.get_group(0).index, grouped.get_group(0).index)
+        self.assert_index_equal(results.get_group(1).index, grouped.get_group(1).index)
+
+        import sklearn.svm as svm
+        svc1 = svm.SVC(random_state=self.random_state)
+        svc2 = svm.SVC(random_state=self.random_state)
+
+        group1 = df[df['sepal length (cm)'] == 0]
+        svc1.fit(group1.data.values, group1.target.values)
+        expected1 = svc1.predict(group1.data.values)
+
+        group2 = df[df['sepal length (cm)'] == 1]
+        svc2.fit(group2.data.values, group2.target.values)
+        expected2 = svc2.predict(group2.data.values)
+
+        self.assert_numpy_array_equal(results.get_group(0).values, expected1)
+        self.assert_numpy_array_equal(results.get_group(1).values, expected2)
+
+    def test_grouped_estimator_PCA(self):
+        df = expd.ModelFrame(datasets.load_iris())
+        grouped = df.groupby('.target')
+        self.assertTrue(isinstance(grouped, expd.core.groupby.ModelFrameGroupBy))
+        for name, group in grouped:
+            self.assertTrue(isinstance(group, expd.ModelFrame))
+            self.assertEqual(group.target_name, '.target')
+            self.assertTrue(group.has_target())
+            self.assert_index_equal(group.columns, df.columns)
+        pca = df.decomposition.PCA()
+        gclf = grouped.fit(pca)
+        self.assertTrue(isinstance(gclf, expd.core.groupby.GroupedEstimator))
+        self.assertEqual(len(gclf.groups), 3)
+
+        results = grouped.transform(gclf)
+        self.assertTrue(isinstance(results, expd.core.groupby.ModelFrameGroupBy))
+
+        self.assertTrue(isinstance(results.get_group(0), expd.ModelFrame))
+        self.assertTrue(isinstance(results.get_group(1), expd.ModelFrame))
+        self.assertTrue(isinstance(results.get_group(2), expd.ModelFrame))
+        # test indexes are preserved
+        self.assert_index_equal(results.get_group(0).index, grouped.get_group(0).index)
+        self.assert_index_equal(results.get_group(1).index, grouped.get_group(1).index)
+        self.assert_index_equal(results.get_group(2).index, grouped.get_group(2).index)
+
+        import sklearn.decomposition as dc
+        for i in range(3):
+            group = df[df['.target'] == i]
+            pca = dc.PCA()
+            pca.fit(group.data.values)
+            expected = pca.transform(group.data.values)
+            result = results.get_group(i).data
+            self.assert_numpy_array_almost_equal(result.values, expected)
 
 
 class TestModelSeriesGroupBy(tm.TestCase):

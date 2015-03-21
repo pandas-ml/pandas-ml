@@ -4,11 +4,12 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import Appender, cache_readonly
 
-from expandas.core.generic import AbstractModel, _shared_docs
+from expandas.core.generic import ModelTransformer, _shared_docs
 import expandas.skaccessors as skaccessors
+import expandas.util as util
 
 
-class ModelSeries(pd.Series, AbstractModel):
+class ModelSeries(pd.Series, ModelTransformer):
     """
     Wrapper for ``pandas.Series`` to support ``sklearn.preprocessing``
     """
@@ -28,11 +29,11 @@ class ModelSeries(pd.Series, AbstractModel):
         Wrapper for transform methods
         """
         if len(transformed.shape) == 2:
-            if transformed.shape[0] != 1:
+            if util._is_1d_harray(transformed):
+                transformed = transformed.flatten()
+            else:
                 from expandas.core.frame import ModelFrame
                 return ModelFrame(transformed, index=self.index)
-            else:
-                transformed = transformed.flatten()
         return self._constructor(transformed, index=self.index, name=self.name)
 
     @property

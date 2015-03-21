@@ -8,16 +8,16 @@ import pandas.core.common as com
 import pandas.compat as compat
 from pandas.util.decorators import Appender, cache_readonly
 
-from expandas.core.generic import AbstractModel, _shared_docs
+from expandas.core.generic import ModelPredictor, _shared_docs
 from expandas.core.series import ModelSeries
 from expandas.core.accessor import AccessorMethods
 import expandas.skaccessors as skaccessors
 import expandas.smaccessors as smaccessors
 import expandas.misc as misc
+import expandas.util as util
 
 
-
-class ModelFrame(pd.DataFrame, AbstractModel):
+class ModelFrame(pd.DataFrame, ModelPredictor):
     """
     Data structure subclassing ``pandas.DataFrame`` to define a metadata to
     specify target (response variable) and data (explanatory variable / features).
@@ -31,9 +31,9 @@ class ModelFrame(pd.DataFrame, AbstractModel):
     kwargs : keyword arguments passed to ``pandas.DataFrame``
     """
 
+    _internal_caches = ['_estimator', '_predicted', '_proba', '_log_proba', '_decision']
     _internal_names = (pd.core.generic.NDFrame._internal_names +
-                       ['_target_name', '_estimator',
-                        '_predicted', '_proba', '_log_proba', '_decision'])
+                       ['_target_name'] + _internal_caches)
     _internal_names_set = set(_internal_names)
 
     _mapper = dict(fit=dict(),
@@ -84,12 +84,6 @@ class ModelFrame(pd.DataFrame, AbstractModel):
             df = self._concat_target(data, target)
 
         self._target_name = target_name
-        self._estimator = None
-        self._predicted = None
-        self._proba = None
-        self._log_proba = None
-        self._decision = None
-
         pd.DataFrame.__init__(self, df)
 
     def _maybe_convert_data(self, data, target, target_name, *args, **kwargs):
@@ -130,7 +124,6 @@ class ModelFrame(pd.DataFrame, AbstractModel):
             # no conversion required
             pass
         return data, target
-
 
     def _concat_target(self, data, target):
         if data is None and target is None:
@@ -290,87 +283,6 @@ class ModelFrame(pd.DataFrame, AbstractModel):
             msg = '{0} must have either data or target'
             raise ValueError(msg.format(self.__class__.__name__))
 
-    @property
-    def estimator(self):
-        """
-        Return most recently used estimator
-
-        Returns
-        -------
-        estimator : estimator
-        """
-        return self._estimator
-
-    @estimator.setter
-    def estimator(self, value):
-        if not self._estimator is value:
-            self._estimator = value
-            # reset other properties
-            self._predicted = None
-            self._proba = None
-            self._log_proba = None
-            self._decision = None
-
-    @property
-    def predicted(self):
-        """
-        Return current estimator's predicted results
-
-        Returns
-        -------
-        predicted : ``ModelSeries``
-        """
-        if self._predicted is None:
-            self._predicted = self.predict(self.estimator)
-            msg = "Automatically call '{0}.predict()'' to get predicted results"
-            warnings.warn(msg.format(self.estimator.__class__.__name__))
-        return self._predicted
-
-    @property
-    def proba(self):
-        """
-        Return current estimator's probabilities
-
-        Returns
-        -------
-        probabilities : ``ModelFrame``
-        """
-        if self._proba is None:
-            self._proba = self.predict_proba(self.estimator)
-            msg = "Automatically call '{0}.predict_proba()' to get probabilities"
-            warnings.warn(msg.format(self.estimator.__class__.__name__))
-        return self._proba
-
-    @property
-    def log_proba(self):
-        """
-        Return current estimator's log probabilities
-
-        Returns
-        -------
-        probabilities : ``ModelFrame``
-        """
-        if self._log_proba is None:
-            self._log_proba = self.predict_log_proba(self.estimator)
-            msg = "Automatically call '{0}.predict_log_proba()' to get log probabilities"
-            warnings.warn(msg.format(self.estimator.__class__.__name__))
-        return self._log_proba
-
-    @property
-    def decision(self):
-        """
-        Return current estimator's decision function
-
-        Returns
-        -------
-        decisions : ``ModelFrame``
-        """
-        if self._decision is None:
-            self._decision = self.decision_function(self.estimator)
-            msg = "Automatically call '{0}.decition_function()' to get decision function"
-            warnings.warn(msg.format(self.estimator.__class__.__name__))
-        return self._decision
-
     def _get_mapper(self, estimator, method_name):
         if method_name in self._mapper:
             mapper = self._mapper[method_name]
@@ -392,18 +304,6 @@ class ModelFrame(pd.DataFrame, AbstractModel):
             result = method(data, *args, **kwargs)
         self.estimator = estimator
         return result
-
-    @Appender(_shared_docs['estimator_methods'] %
-              dict(funcname='predict', returned='returned : predicted result'))
-    def predict(self, estimator, *args, **kwargs):
-        mapped = self._get_mapper(estimator, 'predict')
-        if mapped is not None:
-            result = mapped(self, estimator, *args, **kwargs)
-            # save estimator when succeeded
-            self.estimator = estimator
-            return result
-        predicted = self._call(estimator, 'predict', *args, **kwargs)
-        return self._wrap_predicted(predicted, estimator)
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='fit_predict', returned='returned : predicted result'))
@@ -465,7 +365,7 @@ class ModelFrame(pd.DataFrame, AbstractModel):
         Wrapper for probability methods
         """
         try:
-            if len(probability.shape) < 2 or probability.shape[1] == 1:
+            if util._is_1d_varray(probability):
                 # 2 class
                 probability = self._constructor(probability, index=self.index)
             else:
