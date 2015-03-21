@@ -6,6 +6,7 @@ import pandas as pd
 from expandas.core.accessor import (AccessorMethods, _attach_methods,
                                     _wrap_target_pred_func,
                                     _wrap_target_pred_noargs)
+import expandas.util as util
 
 
 class MetricsMethods(AccessorMethods):
@@ -129,7 +130,7 @@ class MetricsMethods(AccessorMethods):
 
     def _curve_wraps(self, func, *args, **kwargs):
         decision = self._df.decision
-        if len(decision.shape) < 2 or decision.shape[1] == 1:
+        if util._is_1d_varray(decision):
             c1, c2, threshold = func(self._target.values, decision.values,
                                      *args, **kwargs)
             return c1, c2, threshold
