@@ -12,136 +12,181 @@ import expandas.util.testing as tm
 
 class TestStatsModelsDatasets(tm.TestCase):
 
+    load_method = 'load'
+
     def test_anes96(self):
-        data = sm.datasets.anes96.load()
+        data = getattr(sm.datasets.anes96, self.load_method)()
         df = expd.ModelFrame(data)
 
         self.assertEqual(df.shape, (944, 6))
         self.assertEqual(df.target_name, 'PID')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_cancer(self):
-        data = sm.datasets.cancer.load()
+        data = getattr(sm.datasets.cancer, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (301, 2))
         self.assertEqual(df.target_name, 'cancer')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_ccard(self):
-        data = sm.datasets.ccard.load()
+        data = getattr(sm.datasets.ccard, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (72, 5))
         self.assertEqual(df.target_name, 'AVGEXP')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_committee(self):
-        data = sm.datasets.committee.load()
+        data = getattr(sm.datasets.committee, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (20, 6))
         self.assertEqual(df.target_name, 'BILLS104')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_copper(self):
-        data = sm.datasets.copper.load()
+        data = getattr(sm.datasets.copper, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (25, 6))
         self.assertEqual(df.target_name, 'WORLDCONSUMPTION')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_cpunish(self):
-        data = sm.datasets.cpunish.load()
+        data = getattr(sm.datasets.cpunish, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (17, 7))
         self.assertEqual(df.target_name, 'EXECUTIONS')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_elnino(self):
-        data = sm.datasets.elnino.load()
-        return
+        data = getattr(sm.datasets.elnino, self.load_method)()
+        msg = "Unable to read statsmodels Dataset without exog"
+        with self.assertRaisesRegexp(ValueError, msg):
+            df = expd.ModelFrame(data)
 
     def test_engel(self):
-        data = sm.datasets.engel.load()
+        data = getattr(sm.datasets.engel, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (235, 2))
         self.assertEqual(df.target_name, 'income')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_grunfeld(self):
-        data = sm.datasets.grunfeld.load()
+        data = getattr(sm.datasets.grunfeld, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (220, 5))
         self.assertEqual(df.target_name, 'invest')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_longley(self):
-        data = sm.datasets.longley.load()
+        data = getattr(sm.datasets.longley, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (16, 7))
         self.assertEqual(df.target_name, 'TOTEMP')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_macrodata(self):
-        data = sm.datasets.macrodata.load()
-        return
+        data = getattr(sm.datasets.macrodata, self.load_method)()
+        msg = "Unable to read statsmodels Dataset without exog"
+        with self.assertRaisesRegexp(ValueError, msg):
+            df = expd.ModelFrame(data)
 
     def test_modechoice(self):
-        data = sm.datasets.modechoice.load()
+        data = getattr(sm.datasets.modechoice, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (840, 7))
         self.assertEqual(df.target_name, 'choice')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_nile(self):
-        data = sm.datasets.nile.load()
-        return
+        data = getattr(sm.datasets.nile, self.load_method)()
+        msg = "Unable to read statsmodels Dataset without exog"
+        with self.assertRaisesRegexp(ValueError, msg):
+            df = expd.ModelFrame(data)
 
     def test_randhie(self):
-        data = sm.datasets.randhie.load()
+        data = getattr(sm.datasets.randhie, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (20190, 10))
         self.assertEqual(df.target_name, 'mdvis')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_scotland(self):
-        data = sm.datasets.scotland.load()
+        data = getattr(sm.datasets.scotland, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (32, 8))
         self.assertEqual(df.target_name, 'YES')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_spector(self):
-        data = sm.datasets.spector.load()
+        data = getattr(sm.datasets.spector, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (32, 4))
         self.assertEqual(df.target_name, 'GRADE')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_stackloss(self):
-        data = sm.datasets.stackloss.load()
+        data = getattr(sm.datasets.stackloss, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (21, 4))
         self.assertEqual(df.target_name, 'STACKLOSS')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_star98(self):
-        data = sm.datasets.star98.load()
-        return
+        data = getattr(sm.datasets.star98, self.load_method)()
+        msg = 'Data must be 1-dimensional'
+        with self.assertRaisesRegexp(Exception, msg):
+            df = expd.ModelFrame(data)
 
     def test_strikes(self):
-        data = sm.datasets.strikes.load()
+        data = getattr(sm.datasets.strikes, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (62, 2))
         self.assertEqual(df.target_name, 'duration')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_sunspots(self):
-        data = sm.datasets.sunspots.load()
-        return
+        data = getattr(sm.datasets.sunspots, self.load_method)()
+        msg = "Unable to read statsmodels Dataset without exog"
+        with self.assertRaisesRegexp(ValueError, msg):
+            df = expd.ModelFrame(data)
 
     def test_fair(self):
-        data = sm.datasets.fair.load()
+        data = getattr(sm.datasets.fair, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (6366, 9))
         self.assertEqual(df.target_name, 'affairs')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_heart(self):
-        data = sm.datasets.heart.load()
-        return
+        data = getattr(sm.datasets.heart, self.load_method)()
+        df = expd.ModelFrame(data)
+        self.assertEqual(df.shape, (69, 3))
+        self.assertEqual(df.target_name, 'survival')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_statecrime(self):
-        data = sm.datasets.statecrime.load()
+        data = getattr(sm.datasets.statecrime, self.load_method)()
         df = expd.ModelFrame(data)
         self.assertEqual(df.shape, (51, 5))
         self.assertEqual(df.target_name, 'murder')
+        self.assert_index_equal(df.data.columns, pd.Index(data.exog_name))
 
     def test_co2(self):
-        data = sm.datasets.co2.load()
-        return
+        data = getattr(sm.datasets.co2, self.load_method)()
+        msg = "Unable to read statsmodels Dataset without exog"
+        with self.assertRaisesRegexp(ValueError, msg):
+            df = expd.ModelFrame(data)
+
+
+class TestStatsModelsDatasets_LoadPandas(TestStatsModelsDatasets):
+
+    load_method = 'load_pandas'
+
+    def test_star98(self):
+        data = sm.datasets.star98.load_pandas()
+        msg = 'cannot copy sequence with size 2 to array axis with dimension 303'
+        with self.assertRaisesRegexp(Exception, msg):
+            df = expd.ModelFrame(data)
 
 
 if __name__ == '__main__':

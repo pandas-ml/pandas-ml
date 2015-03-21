@@ -13,11 +13,22 @@ def _maybe_statsmodels_data(data, target):
                 raise ValueError("'target' can't be specified for sklearn.datasets")
 
             # this should be first
-            target_name = getattr(data, 'endog_name', None)
-            target = pd.Series(data.endog, name=target_name)
+            try:
+                target_name = getattr(data, 'endog_name', None)
+                target = pd.Series(data.endog, name=target_name)
+            except AttributeError:
+                target = None
+            try:
+                columns = getattr(data, 'exog_name', None)
+                if hasattr(data, 'censors'):
+                    data = {columns[0]: data.censors, columns[1]: data.exog}
+                    # hack for "heart" dataset
+                    data = pd.DataFrame(data, columns=columns)
+                else:
+                    data = pd.DataFrame(data.exog, columns=columns)
+            except AttributeError:
+                raise ValueError("Unable to read statsmodels Dataset without exog")
 
-            columns = getattr(data, 'exog_name', None)
-            data = pd.DataFrame(data.exog, columns=columns)
             return data, target
     except ImportError:
         pass
