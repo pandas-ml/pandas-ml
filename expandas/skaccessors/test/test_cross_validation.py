@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import numpy as np
 import pandas as pd
 import pandas.compat as compat
 
@@ -33,6 +34,31 @@ class TestCrossValidation(tm.TestCase):
             self.assert_index_equal(df.columns, test_df.columns)
 
             self.assertTrue(df.shape[0], train_df.shape[0] + test_df.shape[1])
+
+    def test_iterate_keep_index(self):
+        df = expd.ModelFrame({'A': [1, 2, 3, 4, 5, 6, 7, 8],
+                              'B': [1, 2, 3, 4, 5, 6, 7, 8]},
+                             index='a b c d e f g h'.split(' '))
+        kf = df.cross_validation.KFold(len(df), n_folds=3,
+                                       random_state=self.random_state)
+        folded = [f for f in df.cross_validation.iterate(kf)]
+        self.assertEqual(len(folded), 3)
+        self.assert_frame_equal(folded[0][0], df.iloc[3:, :])
+        self.assert_frame_equal(folded[0][1], df.iloc[:3, :])
+        self.assert_frame_equal(folded[1][0], df.iloc[[0, 1, 2, 6, 7], :])
+        self.assert_frame_equal(folded[1][1], df.iloc[3:6, :])
+        self.assert_frame_equal(folded[2][0], df.iloc[:6, :])
+        self.assert_frame_equal(folded[2][1], df.iloc[6:, :])
+
+        folded = [f for f in df.cross_validation.iterate(kf, reset_index=True)]
+        self.assertEqual(len(folded), 3)
+        self.assert_frame_equal(folded[0][0], df.iloc[3:, :].reset_index(drop=True))
+        self.assert_frame_equal(folded[0][1], df.iloc[:3, :].reset_index(drop=True))
+        self.assert_frame_equal(folded[1][0],
+                                df.iloc[[0, 1, 2, 6, 7], :].reset_index(drop=True))
+        self.assert_frame_equal(folded[1][1], df.iloc[3:6, :].reset_index(drop=True))
+        self.assert_frame_equal(folded[2][0], df.iloc[:6, :].reset_index(drop=True))
+        self.assert_frame_equal(folded[2][1], df.iloc[6:, :].reset_index(drop=True))
 
     def test_train_test_split(self):
 
@@ -83,6 +109,34 @@ class TestCrossValidation(tm.TestCase):
         self.assert_index_equal(df.columns, test_df.columns)
         self.assertEqual(train_df.target_name, 'xxx')
         self.assertEqual(test_df.target_name, 'xxx')
+
+    def test_train_test_split_keep_index(self):
+        df = expd.ModelFrame({'A': [1, 2, 3, 4, 5, 6, 7, 8],
+                              'B': [1, 2, 3, 4, 5, 6, 7, 8]},
+                             index='a b c d e f g h'.split(' '))
+        tr, te = df.crv.train_test_split(random_state=self.random_state)
+        self.assert_frame_equal(tr, df.loc[['g', 'a', 'e', 'f', 'd', 'h']])
+        self.assert_frame_equal(te, df.loc[['c', 'b']])
+
+        tr, te = df.crv.train_test_split(random_state=self.random_state, reset_index=True)
+        self.assert_frame_equal(tr, df.loc[['g', 'a', 'e', 'f', 'd', 'h']].reset_index(drop=True))
+        self.assert_frame_equal(te, df.loc[['c', 'b']].reset_index(drop=True))
+
+        df = expd.ModelFrame({'A': [1, 2, 3, 4, 5, 6, 7, 8],
+                              'B': [1, 2, 3, 4, 5, 6, 7, 8]},
+                             index='a b c d e f g h'.split(' '),
+                             target=[1, 2, 3, 4, 5, 6, 7, 8])
+        tr, te = df.crv.train_test_split(random_state=self.random_state)
+        self.assert_frame_equal(tr, df.loc[['g', 'a', 'e', 'f', 'd', 'h']])
+        self.assert_numpy_array_equal(tr.target.values, np.array([7, 1, 5, 6, 4, 8]))
+        self.assert_frame_equal(te, df.loc[['c', 'b']])
+        self.assert_numpy_array_equal(te.target.values, np.array([3, 2]))
+
+        tr, te = df.crv.train_test_split(random_state=self.random_state, reset_index=True)
+        self.assert_frame_equal(tr, df.loc[['g', 'a', 'e', 'f', 'd', 'h']].reset_index(drop=True))
+        self.assert_numpy_array_equal(tr.target.values, np.array([7, 1, 5, 6, 4, 8]))
+        self.assert_frame_equal(te, df.loc[['c', 'b']].reset_index(drop=True))
+        self.assert_numpy_array_equal(te.target.values, np.array([3, 2]))
 
     def test_cross_val_score(self):
         import sklearn.svm as svm
