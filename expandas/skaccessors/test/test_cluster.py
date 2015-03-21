@@ -6,6 +6,8 @@ import pandas.compat as compat
 
 import sklearn.datasets as datasets
 import sklearn.cluster as cluster
+import sklearn.preprocessing as pp
+import sklearn.metrics as m
 
 import expandas as expd
 import expandas.util.testing as tm
@@ -163,6 +165,42 @@ class TestCluster(tm.TestCase):
 
             self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_KMeans_scores(self):
+        digits = datasets.load_digits()
+        df = expd.ModelFrame(digits)
+
+        scaled = pp.scale(digits.data)
+        df.data = df.data.pp.scale()
+        self.assert_numpy_array_almost_equal(df.data.values, scaled)
+
+        clf1 = cluster.KMeans(init='k-means++', n_clusters=10,
+                              n_init=10, random_state=self.random_state)
+        clf2 = df.cluster.KMeans(init='k-means++', n_clusters=10,
+                                 n_init=10, random_state=self.random_state)
+        clf1.fit(scaled)
+        df.fit_predict(clf2)
+
+        expected = m.homogeneity_score(digits.target, clf1.labels_)
+        self.assertEqual(df.metrics.homogeneity_score(), expected)
+
+        expected = m.completeness_score(digits.target, clf1.labels_)
+        self.assertEqual(df.metrics.completeness_score(), expected)
+
+        expected = m.v_measure_score(digits.target, clf1.labels_)
+        self.assertEqual(df.metrics.v_measure_score(), expected)
+
+        expected = m.adjusted_rand_score(digits.target, clf1.labels_)
+        self.assertEqual(df.metrics.adjusted_rand_score(), expected)
+
+        expected = m.homogeneity_score(digits.target, clf1.labels_)
+        self.assertEqual(df.metrics.homogeneity_score(), expected)
+
+        expected = m.silhouette_score(scaled, clf1.labels_, metric='euclidean',
+                                      sample_size=300, random_state=self.random_state)
+        result = df.metrics.silhouette_score(metric='euclidean', sample_size=300,
+                                             random_state=self.random_state)
+        self.assertAlmostEqual(result, expected)
 
     def test_Classifications(self):
         iris = datasets.load_iris()
