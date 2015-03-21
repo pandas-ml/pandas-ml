@@ -148,6 +148,10 @@ class ModelFrame(pd.DataFrame, AbstractModel):
 
         if not data.index.equals(target.index):
             raise ValueError('data and target must have equal index')
+
+        if target.name in data.columns:
+            raise ValueError('data and target must have unique names')
+
         return pd.concat([target, data], axis=1)
 
     def has_data(self):

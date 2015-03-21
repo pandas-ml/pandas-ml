@@ -18,7 +18,7 @@ Bug Fix
 
 - ``target`` kw may be ignored when initializing ``ModelFrame`` with ``np.ndarray`` and ``columns`` kwds.
 - ``linear_model.enet_path`` doesn't accept additional keywords.
-
+- Initializing ``ModelFrame`` with named ``Series`` may have duplicated target columns.
 
 v0.1.1
 ------
