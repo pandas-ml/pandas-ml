@@ -3,6 +3,7 @@
 import datetime
 import warnings
 
+import numpy as np
 import pandas as pd
 import pandas.compat as compat
 
@@ -140,6 +141,25 @@ class TestModelFrame(tm.TestCase):
         self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
         self.assert_index_equal(mdf.columns, pd.Index(['A', 'B', 'C']))
         self.assert_frame_equal(mdf.data, mdf)
+        self.assertEqual(mdf.target_name, '.target')
+
+    def test_frame_init_df_array_series(self):
+        s = pd.Series([1, 2, 3], index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(np.array([[1, 2, 3], [4, 5, 6],
+                                        [7, 8, 9]]), target=s,
+                              index=['a', 'b', 'c'], columns=['A', 'B', 'C'])
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 4))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['.target', 'A', 'B', 'C']))
+
+        expected = pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6],
+                                          [7, 8, 9]]),
+                                index=['a', 'b', 'c'], columns=['A', 'B', 'C'])
+        self.assert_frame_equal(mdf.data, expected)
+        self.assert_series_equal(mdf.target, s)
+        self.assertEqual(mdf.target.name, '.target')
         self.assertEqual(mdf.target_name, '.target')
 
     def test_frame_init_dict_list_series_index(self):

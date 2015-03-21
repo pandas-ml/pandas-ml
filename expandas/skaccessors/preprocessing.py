@@ -6,12 +6,26 @@ import pandas as pd
 from expandas.core.accessor import AccessorMethods, _attach_methods
 
 
+try:
+    import sklearn.preprocessing as pp
+    _keep_col_classes = set([pp.StandardScaler, pp.MinMaxScaler, pp.Normalizer,
+                             pp.Binarizer, pp.LabelEncoder, pp.Imputer])
+
+except ImportError:
+    _keep_col_classes = set()
+
 class PreprocessingMethods(AccessorMethods):
     """
     Accessor to ``sklearn.preprocessing``.
     """
 
     _module_name = 'sklearn.preprocessing'
+
+    def _keep_existing_columns(self, estimator):
+        """
+        Check whether estimator should preserve existing column names
+        """
+        return estimator.__class__ in _keep_col_classes
 
     def add_dummy_feature(self, value=1.0):
         """

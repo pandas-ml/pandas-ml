@@ -8,6 +8,7 @@ import pandas.core.common as com
 import pandas.compat as compat
 from pandas.util.decorators import Appender, cache_readonly
 
+from expandas.core.generic import AbstractModel, _shared_docs
 from expandas.core.series import ModelSeries
 from expandas.core.accessor import AccessorMethods
 import expandas.skaccessors as skaccessors
@@ -15,10 +16,8 @@ import expandas.smaccessors as smaccessors
 import expandas.misc as misc
 
 
-_shared_docs = dict()
 
-
-class ModelFrame(pd.DataFrame):
+class ModelFrame(pd.DataFrame, AbstractModel):
     """
     Data structure subclassing ``pandas.DataFrame`` to define a metadata to
     specify target (response variable) and data (explanatory variable / features).
@@ -91,7 +90,7 @@ class ModelFrame(pd.DataFrame):
         self._log_proba = None
         self._decision = None
 
-        pd.DataFrame.__init__(self, df, *args, **kwargs)
+        pd.DataFrame.__init__(self, df)
 
     def _maybe_convert_data(self, data, target, target_name, *args, **kwargs):
         """
@@ -368,12 +367,6 @@ class ModelFrame(pd.DataFrame):
             warnings.warn(msg.format(self.estimator.__class__.__name__))
         return self._decision
 
-    def _check_attr(self, estimator, method_name):
-        if not hasattr(estimator, method_name):
-            msg = "class {0} doesn't have {1} method"
-            raise ValueError(msg.format(type(estimator), method_name))
-        return getattr(estimator, method_name)
-
     def _get_mapper(self, estimator, method_name):
         if method_name in self._mapper:
             mapper = self._mapper[method_name]
@@ -395,24 +388,6 @@ class ModelFrame(pd.DataFrame):
             result = method(data, *args, **kwargs)
         self.estimator = estimator
         return result
-
-    _shared_docs['estimator_methods'] = """
-        Call estimator's %(funcname)s method.
-
-        Parameters
-        ----------
-        args : arguments passed to %(funcname)s method
-        kwargs : keyword arguments passed to %(funcname)s method
-
-        Returns
-        -------
-        %(returned)s
-        """
-
-    @Appender(_shared_docs['estimator_methods'] %
-              dict(funcname='fit', returned='returned : None or fitted estimator'))
-    def fit(self, estimator, *args, **kwargs):
-        return self._call(estimator, 'fit', *args, **kwargs)
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='predict', returned='returned : predicted result'))
@@ -443,6 +418,22 @@ class ModelFrame(pd.DataFrame):
             warnings.warn(msg.format(estimator.__class__.__name__))
         self._predicted = predicted
         return self._predicted
+
+    def _wrap_transform(self, transformed):
+        """
+        Wrapper for transform methods
+        """
+        if self.pp._keep_existing_columns(self.estimator):
+            columns = self.data.columns
+        else:
+            columns = None
+
+        if self.has_target():
+            return self._constructor(transformed, target=self.target,
+                                     index=self.index, columns=columns)
+        else:
+            return self._constructor(transformed, index=self.index,
+                                     columns=columns)
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='predict_proba', returned='returned : probabilities'))
@@ -486,43 +477,6 @@ class ModelFrame(pd.DataFrame):
     def score(self, estimator, *args, **kwargs):
         score = self._call(estimator, 'score', *args, **kwargs)
         return score
-
-    @Appender(_shared_docs['estimator_methods'] %
-              dict(funcname='transform', returned='returned : transformed result'))
-    def transform(self, estimator, *args, **kwargs):
-        if isinstance(estimator, compat.string_types):
-            return misc.transform_with_patsy(estimator, self, *args, **kwargs)
-        transformed = self._call(estimator, 'transform', *args, **kwargs)
-        return self._wrap_transform(transformed)
-
-    @Appender(_shared_docs['estimator_methods'] %
-              dict(funcname='fit_transform', returned='returned : transformed result'))
-    def fit_transform(self, estimator, *args, **kwargs):
-        transformed = self._call(estimator, 'fit_transform', *args, **kwargs)
-        return self._wrap_transform(transformed)
-
-    def _wrap_transform(self, transformed):
-        """
-        Wrapper for transform methods
-        """
-        if self.has_target():
-            return self._constructor(transformed, target=self.target, index=self.index)
-        else:
-            return self._constructor(transformed, index=self.index)
-
-    @Appender(_shared_docs['estimator_methods'] %
-              dict(funcname='inverse_transform', returned='returned : transformed result'))
-    def inverse_transform(self, estimator, *args, **kwargs):
-        transformed = self._call(estimator, 'inverse_transform', *args, **kwargs)
-        return self._wrap_transform(transformed)
-
-    _shared_docs['skaccessor'] = """
-        Property to access ``sklearn.%(module)s``. See :mod:`expandas.skaccessors.%(module)s`
-        """
-
-    _shared_docs['skaccessor_nolink'] = """
-        Property to access ``sklearn.%(module)s``
-        """
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='cluster'))

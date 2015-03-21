@@ -12,6 +12,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   whatsnew
    modelframe
    sklearn
    patsy
