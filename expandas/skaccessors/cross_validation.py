@@ -24,13 +24,15 @@ class CrossValidationMethods(AccessorMethods):
         target = self._target
         return self._module.StratifiedShuffleSplit(target.values, *args, **kwargs)
 
-    def iterate(self, cv):
+    def iterate(self, cv, reset_index=False):
         """
         Generate ``ModelFrame`` using iterators for cross validation
 
         Parameters
         ----------
         cv : cross validation iterator
+        reset_index : bool
+            logical value whether to reset index, default False
 
         Returns
         -------
@@ -43,35 +45,54 @@ class CrossValidationMethods(AccessorMethods):
         for train_index, test_index in cv:
             train_df = self._df.iloc[train_index, :]
             test_df = self._df.iloc[test_index, :]
+            if reset_index:
+                train_df = train_df.reset_index(drop=True)
+                test_df = test_df.reset_index(drop=True)
             yield train_df, test_df
 
-    def train_test_split(self, *args, **kwargs):
+    def train_test_split(self, reset_index=False, *args, **kwargs):
         """
         Call ``sklearn.cross_validation.train_test_split`` using automatic mapping.
+
+        Parameters
+        ----------
+        reset_index : bool
+            logical value whether to reset index, default False
+        kwargs : keywords passed to ``cross_validation.train_test_split``
+
+        Returns
+        -------
+        train, test : tuple of ``ModelFrame``
         """
         func = self._module.train_test_split
 
+        def _init(klass, data, index, **kwargs):
+            if reset_index:
+                return klass(data, **kwargs)
+            else:
+                return klass(data, index=index, **kwargs)
+
         data = self._data
+        idx = self._df.index
         if self._df.has_target():
             target = self._target
-            tr_d, te_d, tr_l, te_l = func(data, target, *args, **kwargs)
+            tr_d, te_d, tr_l, te_l, tr_i, te_i = func(data, target, idx, *args, **kwargs)
 
             # Create DataFrame here to retain data and target names
-            tr_d = pd.DataFrame(tr_d, columns=data.columns)
-            te_d = pd.DataFrame(te_d, columns=data.columns)
-
-            tr_l = pd.Series(tr_l, name=target.name)
-            te_l = pd.Series(te_l, name=target.name)
+            tr_d = _init(pd.DataFrame, tr_d, tr_i, columns=data.columns)
+            te_d = _init(pd.DataFrame, te_d, te_i, columns=data.columns)
+            tr_l = _init(pd.Series, tr_l, tr_i, name=target.name)
+            te_l = _init(pd.Series, te_l, te_i, name=target.name)
 
             train_df = self._constructor(data=tr_d, target=tr_l)
             test_df = self._constructor(data=te_d, target=te_l)
             return train_df, test_df
         else:
-            tr_d, te_d = func(data, *args, **kwargs)
+            tr_d, te_d, tr_i, te_i = func(data, idx, *args, **kwargs)
 
             # Create DataFrame here to retain data and target names
-            tr_d = pd.DataFrame(tr_d, columns=data.columns)
-            te_d = pd.DataFrame(te_d, columns=data.columns)
+            tr_d = _init(pd.DataFrame, tr_d, tr_i, columns=data.columns)
+            te_d = _init(pd.DataFrame, te_d, te_i, columns=data.columns)
 
             train_df = self._constructor(data=tr_d)
             train_df.target_name = self._df.target_name

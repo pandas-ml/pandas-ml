@@ -11,6 +11,7 @@ Enhancement
 - ``ModelFrame.transform`` can preserve column names for some ``sklearn.preprocessing`` transformation.
 - Added ``ModelSeries.fit``, ``transform``, ``fit_transform`` and ``inverse_transform`` for preprocessing purpose.
 - ``ModelFrame`` can be initialized from ``statsmodels`` datasets.
+- ``ModelFrame.cross_validation.iterate`` and ``ModelFrame.cross_validation.train_test_split`` now keep index of original dataset, and added ``reset_index`` keyword to control this behaviour.
 
 Bug Fix
 ^^^^^^^
