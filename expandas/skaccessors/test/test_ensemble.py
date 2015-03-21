@@ -6,6 +6,7 @@ import pandas.compat as compat
 
 import sklearn.datasets as datasets
 import sklearn.ensemble as ensemble
+import sklearn.metrics as metrics
 
 import expandas as expd
 import expandas.util.testing as tm
@@ -95,6 +96,26 @@ class TestEnsemble(tm.TestCase):
         self.assertTrue(len(axes), 2)
         self.assertTrue(isinstance(axes[0], matplotlib.axes.Axes))
         """
+
+    def test_GradientBoostingRegression(self):
+        boston = datasets.load_boston()
+        df = expd.ModelFrame(boston)
+
+        params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,
+                  'learning_rate': 0.01, 'loss': 'ls', 'random_state': self.random_state}
+        clf1 = ensemble.GradientBoostingRegressor(**params)
+        clf2 = df.ensemble.GradientBoostingRegressor(**params)
+
+        clf1.fit(boston.data, boston.target)
+        df.fit(clf2)
+
+        expected = clf1.predict(boston.data)
+        predicted = df.predict(clf2)
+        self.assertTrue(isinstance(predicted, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(predicted.values, expected)
+
+        self.assertAlmostEqual(df.metrics.mean_squared_error(),
+                               metrics.mean_squared_error(boston.target, expected))
 
 
 if __name__ == '__main__':

@@ -6,6 +6,7 @@ import pandas.compat as compat
 
 import sklearn.datasets as datasets
 import sklearn.linear_model as lm
+import sklearn.preprocessing as pp
 
 import expandas as expd
 import expandas.util.testing as tm
@@ -137,6 +138,91 @@ class TestLinearModel(tm.TestCase):
 
             self.assertTrue(isinstance(result, expd.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_Lasso_Path(self):
+        diabetes = datasets.load_diabetes()
+        X = diabetes.data
+        y = diabetes.target
+        X /= X.std(axis=0)
+
+        df = expd.ModelFrame(diabetes)
+        df.data /= df.data.std(axis=0, ddof=False)
+
+        self.assert_numpy_array_almost_equal(df.data.values, X)
+
+        eps = 5e-3
+        expected = lm.lasso_path(X, y, eps, fit_intercept=False)
+        result = df.lm.lasso_path(eps=eps, fit_intercept=False)
+        self.assert_numpy_array_almost_equal(expected[0], result[0])
+        self.assert_numpy_array_almost_equal(expected[1], result[1])
+        self.assert_numpy_array_almost_equal(expected[2], result[2])
+
+        expected = lm.enet_path(X, y, eps=eps, l1_ratio=0.8, fit_intercept=False)
+        result = df.lm.enet_path(eps=eps, l1_ratio=0.8, fit_intercept=False)
+        self.assert_numpy_array_almost_equal(expected[0], result[0])
+        self.assert_numpy_array_almost_equal(expected[1], result[1])
+        self.assert_numpy_array_almost_equal(expected[2], result[2])
+
+        expected = lm.enet_path(X, y, eps=eps, l1_ratio=0.8, positive=True, fit_intercept=False)
+        result = df.lm.enet_path(eps=eps, l1_ratio=0.8, positive=True, fit_intercept=False)
+        self.assert_numpy_array_almost_equal(expected[0], result[0])
+        self.assert_numpy_array_almost_equal(expected[1], result[1])
+        self.assert_numpy_array_almost_equal(expected[2], result[2])
+
+        expected = lm.lars_path(X, y, method='lasso', verbose=True)
+        result = df.lm.lars_path(method='lasso', verbose=True)
+        self.assert_numpy_array_almost_equal(expected[0], result[0])
+        self.assert_numpy_array_almost_equal(expected[1], result[1])
+        self.assert_numpy_array_almost_equal(expected[2], result[2])
+
+    def test_LassoCV(self):
+        diabetes = datasets.load_diabetes()
+        X = diabetes.data
+        y = diabetes.target
+
+        X = pp.normalize(X)
+
+        df = expd.ModelFrame(diabetes)
+        df.data = df.data.pp.normalize()
+
+        for criterion in ['aic', 'bic']:
+            mod1 = lm.LassoLarsIC(criterion=criterion)
+            mod1.fit(X, y)
+
+            mod2 = df.lm.LassoLarsIC(criterion=criterion)
+            df.fit(mod2)
+            self.assertAlmostEqual(mod1.alpha_, mod2.alpha_)
+
+            expected = mod1.predict(X)
+            predicted = df.predict(mod2)
+            self.assertTrue(isinstance(predicted, expd.ModelSeries))
+            self.assert_numpy_array_almost_equal(predicted.values, expected)
+
+    def test_SGD(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        clf1 = lm.SGDClassifier(alpha=0.001, n_iter=100).fit(iris.data, iris.target)
+        clf2 = df.lm.SGDClassifier(alpha=0.001, n_iter=100)
+        df.fit(clf2)
+
+        expected = clf1.predict(iris.data)
+        predicted = df.predict(clf2)
+        self.assertTrue(isinstance(predicted, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(predicted.values, expected)
+
+    def test_Perceptron(self):
+        iris = datasets.load_iris()
+        df = expd.ModelFrame(iris)
+
+        clf1 = lm.Perceptron(alpha=0.001, n_iter=100).fit(iris.data, iris.target)
+        clf2 = df.lm.Perceptron(alpha=0.001, n_iter=100)
+        df.fit(clf2)
+
+        expected = clf1.predict(iris.data)
+        predicted = df.predict(clf2)
+        self.assertTrue(isinstance(predicted, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(predicted.values, expected)
 
 
 if __name__ == '__main__':
