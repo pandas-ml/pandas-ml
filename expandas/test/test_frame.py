@@ -195,6 +195,29 @@ class TestModelFrame(tm.TestCase):
         self.assertTrue(mdf.target is None)
         self.assertEqual(mdf.target_name, '.target')
 
+    def test_frame_init_df_duplicated(self):
+        # initialization by dataframe and duplicated target
+        df = pd.DataFrame({'A': [1, 2, 3],
+                           'B': [4, 5, 6],
+                           'C': [7, 8, 9]},
+                           columns=['A', 'B', 'C'])
+        s = pd.Series([10, 11, 12], name='A')
+
+        msg = "data and target must have unique names"
+        with self.assertRaisesRegexp(ValueError, msg):
+            mdf = expd.ModelFrame(df, target=s)
+
+        df = expd.ModelFrame({'A': [1, 2, 3],
+                              'B': [4, 5, 6],
+                              'C': [7, 8, 9]},
+                              columns=['A', 'B', 'C'])
+        df.target = pd.Series([10, 11, 12], name='A')
+        expected = expd.ModelFrame({'A': [10, 11, 12],
+                                    'B': [4, 5, 6],
+                                    'C': [7, 8, 9]},
+                                    columns=['A', 'B', 'C'])
+        self.assert_frame_equal(df, expected)
+
     def test_frame_data_none(self):
         msg = "ModelFrame must have either data or target"
         with self.assertRaisesRegexp(ValueError, msg):
