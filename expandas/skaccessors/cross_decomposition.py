@@ -20,10 +20,7 @@ class CrossDecompositionMethods(AccessorMethods):
         data = df.data.values
         if df.has_target():
             target = df.target.values
-            try:
-                result = estimator.fit(data, Y=target, *args, **kwargs)
-            except TypeError:
-                result = estimator.fit(data, *args, **kwargs)
+            result = estimator.fit(data, Y=target, *args, **kwargs)
         else:
             # not try to pass target if it doesn't exists
             # to catch ValueError from estimator

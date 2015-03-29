@@ -51,6 +51,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     _constructor_sliced = ModelSeries
 
     _TARGET_NAME = '.target'
+    _DATA_NAME = '.data'
 
     def __init__(self, data, target=None,
                  *args, **kwargs):
@@ -68,20 +69,8 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         # retrieve target_name
         if isinstance(data, ModelFrame):
             target_name = data.target_name
-        elif isinstance(target, pd.Series):
-            target_name = target.name
-            if target_name is None:
-                target_name = self._TARGET_NAME
-                target = pd.Series(target, name=target_name)
-        elif isinstance(target, pd.DataFrame):
-            if len(target.columns) > 1:
-                target_name = target.columns
-            else:
-                target_name = target.columns[0]
-        else:
-            target_name = self._TARGET_NAME
 
-        data, target = self._maybe_convert_data(data, target, target_name, *args, **kwargs)
+        data, target = self._maybe_convert_data(data, target, *args, **kwargs)
 
         if target is not None and not com.is_list_like(target):
             if target in data.columns:
@@ -92,7 +81,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                 raise ValueError(msg.format(target))
             self._target_name = target_name
         else:
-            df = self._concat_target(data, target)
+            df, target = self._concat_target(data, target)
 
             if isinstance(target, pd.Series):
                 self._target_name = target.name
@@ -105,11 +94,11 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             else:
                 # target may be None
                 self._target_name = self._TARGET_NAME
-                pass
 
         pd.DataFrame.__init__(self, df)
 
-    def _maybe_convert_data(self, data, target, target_name, *args, **kwargs):
+    def _maybe_convert_data(self, data, target, #target_name,
+        *args, **kwargs):
         """
         Internal function to instanciate data and target
 
@@ -124,25 +113,25 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         init_df = isinstance(data, pd.DataFrame)
         init_target = isinstance(target, (pd.Series, pd.DataFrame))
 
+        def _maybe_convert_target(data, target):
+            if data is not None:
+                index = data.index
+            else:
+                index = None
+
+            target = np.array(target)
+            if len(target.shape) == 1:
+                target = pd.Series(target, index=index)
+            else:
+                target = pd.DataFrame(target, index=index)
+            return target
+
         if not init_df and not init_target:
             if data is not None:
                 data = pd.DataFrame(data, *args, **kwargs)
 
             if com.is_list_like(target):
-                target = np.array(target)
-                if len(target.shape) == 1:
-                    if data is not None:
-                        target = pd.Series(target, name=target_name, index=data.index)
-                    else:
-                        target = pd.Series(target, name=target_name)
-                else:
-                    if data is not None:
-                        target = pd.DataFrame(target, index=data.index)
-                    else:
-                        target = pd.DataFrame(target)
-                    if target_name == self._TARGET_NAME:
-                        target_name = ['{0} {1}'.format(self._TARGET_NAME, i) for i in range(len(target.columns))]
-                        target.columns = target_name
+                target = _maybe_convert_target(data, target)
 
         elif not init_df:
             if data is not None:
@@ -151,23 +140,14 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
         elif not init_target:
             if com.is_list_like(target):
-                target = np.array(target)
-                if len(target.shape) == 1:
-                    if data is not None:
-                        target = pd.Series(target, name=target_name, index=data.index)
-                    else:
-                        target = pd.Series(target, name=target_name)
-                else:
-                    if data is not None:
-                        target = pd.DataFrame(target, index=data.index)
-                    else:
-                        target = pd.DataFrame(target)
-                    if target_name is None:
-                        target_name = ['{0} {1}'.format(self._TARGET_NAME, i) for i in range(len(target.columns))]
-                        target.columns = target
+                target = _maybe_convert_target(data, target)
+
         else:
             # no conversion required
             pass
+
+        if isinstance(target, pd.Series) and target.name is None:
+            target = pd.Series(target, name=self._TARGET_NAME)
 
         return data, target
 
@@ -177,10 +157,10 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             raise ValueError(msg.format(self.__class__.__name__))
 
         elif data is None:
-            return target
+            return target, target
 
         elif target is None:
-            return data
+            return data, None
 
         if len(data) != len(target):
             raise ValueError('data and target must have same length')
@@ -188,16 +168,24 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         if not data.index.equals(target.index):
             raise ValueError('data and target must have equal index')
 
+        def _add_meta_columns(df, meta_name):
+            df = df.copy()
+            df.columns = pd.MultiIndex.from_product([meta_name, df.columns])
+            return df
+
         if isinstance(target, pd.DataFrame):
             if len(target.columns.intersection(data.columns)) > 0:
-                raise ValueError('data and target must have unique names')
+                target = _add_meta_columns(target, self._TARGET_NAME)
+                data = _add_meta_columns(data, self._DATA_NAME)
+                # overwrite target_name
+                self._target_name = target.columns
         elif isinstance(target, pd.Series):
             if target.name in data.columns:
                 raise ValueError('data and target must have unique names')
         else:
             raise ValueError('target cannot be converted to ModelSeries or ModelFrame')
 
-        return pd.concat([target, data], axis=1)
+        return pd.concat([target, data], axis=1), target
 
     def has_data(self):
         """
@@ -256,7 +244,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                 raise ValueError(msg.format(self.target_name))
 
         if self.has_target():
-            data = self._concat_target(data, self.target)
+            data, _ = self._concat_target(data, self.target)
         self._update_inplace(data)
 
     @data.deleter
@@ -363,7 +351,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         else:
             _, target = self._maybe_convert_data(self.data, target, self.target_name)
 
-        df = self._concat_target(self.data, target)
+        df, _ = self._concat_target(self.data, target)
         self._update_inplace(df)
 
     @target.deleter

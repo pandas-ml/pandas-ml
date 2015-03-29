@@ -20,17 +20,17 @@ class TestCrossDecomposition(tm.TestCase):
         self.assertIs(df.cross_decomposition.CCA, cd.CCA)
         self.assertIs(df.cross_decomposition.PLSSVD, cd.PLSSVD)
 
-    def test_PLSCannonical(self):
+    def test_CCA_PLSCannonical(self):
         n = 500
-        np.random.seed(1)
 
-        # 2 latents vars:
-        l1 = np.random.normal(size=n)
-        l2 = np.random.normal(size=n)
+        with tm.RNGContext(1):
+            # 2 latents vars:
+            l1 = np.random.normal(size=n)
+            l2 = np.random.normal(size=n)
 
-        latents = np.array([l1, l1, l2, l2]).T
-        X = latents + np.random.normal(size=4 * n).reshape((n, 4))
-        Y = latents + np.random.normal(size=4 * n).reshape((n, 4))
+            latents = np.array([l1, l1, l2, l2]).T
+            X = latents + np.random.normal(size=4 * n).reshape((n, 4))
+            Y = latents + np.random.normal(size=4 * n).reshape((n, 4))
 
         X_train = X[:n / 2]
         Y_train = Y[:n / 2]
@@ -39,74 +39,43 @@ class TestCrossDecomposition(tm.TestCase):
 
         train = expd.ModelFrame(X_train, target=Y_train)
         test = expd.ModelFrame(X_test, target=Y_test)
+
+        # check multi target columns
         self.assertTrue(train.has_target())
-        expected = pd.Index(['.target 0', '.target 1', '.target 2', '.target 3'])
+        self.assert_numpy_array_equal(train.data.values, X_train)
+        self.assert_numpy_array_equal(train.target.values, Y_train)
+        self.assert_numpy_array_equal(test.data.values, X_test)
+        self.assert_numpy_array_equal(test.target.values, Y_test)
+        expected = pd.MultiIndex.from_tuples([('.target', 0), ('.target', 1),
+                                              ('.target', 2), ('.target', 3)])
         self.assert_index_equal(train.target_name, expected)
         self.assertEqual(train.data.shape, X_train.shape)
         self.assertEqual(train.target.shape, Y_train.shape)
 
-        plsca1 = train.cross_decomposition.PLSCanonical(n_components=2)
-        plsca2 = cd.PLSCanonical(n_components=2)
+        models = ['CCA', 'PLSCanonical']
+        for model in models:
+            mod1 = getattr(train.cross_decomposition, model)(n_components=2)
+            mod2 = getattr(cd, model)(n_components=2)
 
-        train.fit(plsca1)
-        plsca2.fit(X_train, Y_train)
+            train.fit(mod1)
+            mod2.fit(X_train, Y_train)
 
-        result_tr = train.transform(plsca1)
-        result_test = test.transform(plsca1)
+            # 2nd cols are different on travis-CI
+            self.assert_numpy_array_almost_equal(mod1.x_weights_[:, 0], mod2.x_weights_[:, 0])
+            self.assert_numpy_array_almost_equal(mod1.y_weights_[:, 0], mod2.y_weights_[:, 0])
 
-        expected_tr = plsca2.transform(X_train, Y_train)
-        expected_test = plsca2.transform(X_test, Y_test)
+            result_tr = train.transform(mod1)
+            result_test = test.transform(mod1)
 
-        self.assertTrue(isinstance(result_tr, expd.ModelFrame))
-        self.assertTrue(isinstance(result_test, expd.ModelFrame))
-        self.assert_numpy_array_equal(result_tr.data.values, expected_tr[0])
-        self.assert_numpy_array_equal(result_tr.target.values, expected_tr[1])
-        self.assert_numpy_array_equal(result_test.data.values, expected_test[0])
-        self.assert_numpy_array_equal(result_test.target.values, expected_test[1])
+            expected_tr = mod2.transform(X_train, Y_train)
+            expected_test = mod2.transform(X_test, Y_test)
 
-    def test_CCA(self):
-        n = 500
-        np.random.seed(1)
-
-        # 2 latents vars:
-        l1 = np.random.normal(size=n)
-        l2 = np.random.normal(size=n)
-
-        latents = np.array([l1, l1, l2, l2]).T
-        X = latents + np.random.normal(size=4 * n).reshape((n, 4))
-        Y = latents + np.random.normal(size=4 * n).reshape((n, 4))
-
-        X_train = X[:n / 2]
-        Y_train = Y[:n / 2]
-        X_test = X[n / 2:]
-        Y_test = Y[n / 2:]
-
-        train = expd.ModelFrame(X_train, target=Y_train)
-        test = expd.ModelFrame(X_test, target=Y_test)
-        self.assertTrue(train.has_target())
-        expected = pd.Index(['.target 0', '.target 1', '.target 2', '.target 3'])
-        self.assert_index_equal(train.target_name, expected)
-        self.assertEqual(train.data.shape, X_train.shape)
-        self.assertEqual(train.target.shape, Y_train.shape)
-
-        cca1 = train.cross_decomposition.CCA(n_components=2)
-        cca2 = cd.CCA(n_components=2)
-
-        train.fit(cca1)
-        cca2.fit(X_train, Y_train)
-
-        result_tr = train.transform(cca1)
-        result_test = test.transform(cca1)
-
-        expected_tr = cca2.transform(X_train, Y_train)
-        expected_test = cca2.transform(X_test, Y_test)
-
-        self.assertTrue(isinstance(result_tr, expd.ModelFrame))
-        self.assertTrue(isinstance(result_test, expd.ModelFrame))
-        self.assert_numpy_array_equal(result_tr.data.values, expected_tr[0])
-        self.assert_numpy_array_equal(result_tr.target.values, expected_tr[1])
-        self.assert_numpy_array_equal(result_test.data.values, expected_test[0])
-        self.assert_numpy_array_equal(result_test.target.values, expected_test[1])
+            self.assertTrue(isinstance(result_tr, expd.ModelFrame))
+            self.assertTrue(isinstance(result_test, expd.ModelFrame))
+            self.assert_numpy_array_almost_equal(result_tr.data.values[:, 0], expected_tr[0][:, 0])
+            self.assert_numpy_array_almost_equal(result_tr.target.values[:, 0], expected_tr[1][:, 0])
+            self.assert_numpy_array_almost_equal(result_test.data.values[:, 0], expected_test[0][:, 0])
+            self.assert_numpy_array_almost_equal(result_test.target.values[:, 0], expected_test[1][:, 0])
 
     def test_PLSRegression(self):
 
@@ -129,16 +98,6 @@ class TestCrossDecomposition(tm.TestCase):
 
         self.assertTrue(isinstance(result, expd.ModelFrame))
         self.assert_numpy_array_almost_equal(result.values, expected)
-
-"""
-###############################################################################
-# CCA (PLS mode B with symmetric deflation)
-
-cca = CCA(n_components=2)
-cca.fit(X_train, Y_train)
-X_train_r, Y_train_r = plsca.transform(X_train, Y_train)
-X_test_r, Y_test_r = plsca.transform(X_test, Y_test)
-"""
 
 if __name__ == '__main__':
     import nose

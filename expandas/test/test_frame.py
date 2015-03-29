@@ -754,6 +754,26 @@ class TestModelFrameMultiTarges(tm.TestCase):
         self.assert_index_equal(mdf.target_name, pd.Index(['x1', 'x2', 'x3']))
         self.assertTrue(mdf.has_multi_targets())
 
+    def test_frame_init_df_duplicated_columns(self):
+        # initialization by dataframe and dataframe which have same columns
+        df = pd.DataFrame({'A': [1, 2, 3],
+                           'B': [4, 5, 6],
+                           'C': [7, 8, 9]})
+        target = pd.DataFrame({'A': [10, 11, 12],
+                               'B': [13, 14, 15]})
+
+        mdf = expd.ModelFrame(df, target=target)
+
+        cols = pd.MultiIndex.from_tuples([('.target', 'A'), ('.target', 'B'),
+                                          ('.data', 'A'), ('.data', 'B'), ('.data', 'C')])
+        expected = pd.DataFrame({('.target', 'A'): [10, 11, 12],
+                                 ('.target', 'B'): [13, 14, 15],
+                                 ('.data', 'A'): [1, 2, 3],
+                                 ('.data', 'B'): [4, 5, 6],
+                                 ('.data', 'C'): [7, 8, 9]},
+                                columns=cols)
+        self.assert_frame_equal(mdf, expected)
+
 
 if __name__ == '__main__':
     import nose
