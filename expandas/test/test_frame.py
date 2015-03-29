@@ -604,6 +604,136 @@ class TestModelFrame(tm.TestCase):
         self.assertEqual(sliced.target_name, 'A')
 
 
+class TestModelFrameMultiTarges(tm.TestCase):
+
+    def test_frame_instance(self):
+
+        df = expd.ModelFrame(datasets.load_digits())
+        self.assertTrue(isinstance(df, expd.ModelFrame))
+
+        train_df, test_df = df.cross_validation.train_test_split()
+
+        self.assertTrue(isinstance(train_df, expd.ModelFrame))
+        self.assertTrue(isinstance(test_df, expd.ModelFrame))
+        self.assertTrue(isinstance(train_df.iloc[:, 2:3], expd.ModelFrame))
+
+    def test_frame_init_df_df(self):
+        # initialization by dataframe and dataframe
+        df = pd.DataFrame({'A': [1, 2, 3],
+                           'B': [4, 5, 6],
+                           'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['A', 'B', 'C'])
+        target = pd.DataFrame({'t1': [10, 11, 12],
+                               't2': [13, 14, 15]},
+                               index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(df, target=target)
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 5))
+        expected =  pd.DataFrame({'t1': [10, 11, 12],
+                                  't2': [13, 14, 15],
+                                  'A': [1, 2, 3],
+                                  'B': [4, 5, 6],
+                                  'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['t1', 't2', 'A', 'B', 'C'])
+        self.assert_frame_equal(mdf, expected)
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['t1', 't2', 'A', 'B', 'C']))
+        self.assert_frame_equal(mdf.data, df)
+        self.assert_frame_equal(mdf.target, target)
+        self.assert_index_equal(mdf.target.columns, pd.Index(['t1', 't2']))
+        self.assert_index_equal(mdf.target_name, pd.Index(['t1', 't2']))
+        self.assertTrue(mdf.has_multi_targets())
+
+        target = pd.DataFrame({'t1': [10, 11, 12], 't2': [13, 14, 15]})
+        with self.assertRaisesRegexp(ValueError, 'data and target must have equal index'):
+            mdf = expd.ModelFrame(df, target=target)
+
+        # single column DataFrame will results in single target column
+        target = pd.DataFrame({'t1': [10, 11, 12]}, index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(df, target=target)
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 4))
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['t1', 'A', 'B', 'C']))
+        self.assert_frame_equal(mdf.data, df)
+
+        target = pd.Series([10, 11, 12], name='t1', index=['a', 'b', 'c'])
+        self.assert_series_equal(mdf.target, target)
+        self.assertEqual(mdf.target_name, 't1')
+
+    def test_frame_init_df_target_setter(self):
+        # initialization by dataframe and dataframe
+        df = pd.DataFrame({'A': [1, 2, 3],
+                           'B': [4, 5, 6],
+                           'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['A', 'B', 'C'])
+        mdf = expd.ModelFrame(df)
+        self.assertFalse(mdf.has_target())
+        target = pd.DataFrame({'t1': [10, 11, 12],
+                               't2': [13, 14, 15]},
+                               index=['a', 'b', 'c'])
+        mdf.target = target
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 5))
+        expected =  pd.DataFrame({'t1': [10, 11, 12],
+                                  't2': [13, 14, 15],
+                                  'A': [1, 2, 3],
+                                  'B': [4, 5, 6],
+                                  'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['t1', 't2', 'A', 'B', 'C'])
+        self.assert_frame_equal(mdf, expected)
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['t1', 't2', 'A', 'B', 'C']))
+        self.assert_frame_equal(mdf.data, df)
+        self.assert_frame_equal(mdf.target, target)
+        self.assert_index_equal(mdf.target.columns, pd.Index(['t1', 't2']))
+        self.assert_index_equal(mdf.target_name, pd.Index(['t1', 't2']))
+        self.assertTrue(mdf.has_multi_targets())
+
+        target = pd.DataFrame({'x1': [20, 21, 22],
+                               'x2': [23, 24, 25]},
+                               index=['a', 'b', 'c'])
+
+        with tm.assert_produces_warning(UserWarning):
+            # target is renamed to existing target ['t1', 't2']
+            mdf.target = target
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 5))
+        expected =  pd.DataFrame({'t1': [20, 21, 22],
+                                  't2': [23, 24, 25],
+                                  'A': [1, 2, 3],
+                                  'B': [4, 5, 6],
+                                  'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['t1', 't2', 'A', 'B', 'C'])
+        self.assert_frame_equal(mdf, expected)
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['t1', 't2', 'A', 'B', 'C']))
+        self.assert_frame_equal(mdf.data, df)
+        expected = pd.DataFrame({'t1': [20, 21, 22],
+                                 't2': [23, 24, 25]},
+                                 index=['a', 'b', 'c'])
+        self.assert_frame_equal(mdf.target, expected)
+        self.assert_index_equal(mdf.target.columns, pd.Index(['t1', 't2']))
+        self.assert_index_equal(mdf.target_name, pd.Index(['t1', 't2']))
+        self.assertTrue(mdf.has_multi_targets())
+
+        target = pd.DataFrame({'x1': [20, 21, 22],
+                               'x2': [23, 24, 25],
+                               'x3': [25, 26, 27]},
+                               index=['a', 'b', 'c'])
+
+        with self.assertRaisesRegexp(ValueError, 'target and target_name are unmatched'):
+            mdf.target = target
+
+
 if __name__ == '__main__':
     import nose
     nose.runmodule(argv=[__file__, '-vvs', '-x', '--pdb', '--pdb-failure'],

@@ -68,6 +68,11 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             if target_name is None:
                 target_name = self._TARGET_NAME
                 target = pd.Series(target, name=target_name)
+        elif isinstance(target, pd.DataFrame):
+            if len(target.columns) > 1:
+                target_name = target.columns
+            else:
+                target_name = target.columns[0]
         else:
             target_name = self._TARGET_NAME
 
@@ -99,7 +104,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         """
 
         init_df = isinstance(data, pd.DataFrame)
-        init_target = isinstance(target, pd.Series)
+        init_target = isinstance(target, (pd.Series, pd.DataFrame))
 
         if not init_df and not init_target:
             if data is not None:
@@ -142,8 +147,14 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         if not data.index.equals(target.index):
             raise ValueError('data and target must have equal index')
 
-        if target.name in data.columns:
-            raise ValueError('data and target must have unique names')
+        if isinstance(target, pd.DataFrame):
+            if len(target.columns.intersection(data.columns)) > 0:
+                raise ValueError('data and target must have unique names')
+        elif isinstance(target, pd.Series):
+            if target.name in data.columns:
+                raise ValueError('data and target must have unique names')
+        else:
+            raise ValueError('target cannot be converted to ModelSeries or ModelFrame')
 
         return pd.concat([target, data], axis=1)
 
@@ -159,7 +170,13 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @property
     def _data_columns(self):
-        return pd.Index([c for c in self.columns if c != self.target_name])
+        # Index.difference results in sorted difference set
+        if self.has_multi_targets():
+            return self.columns[~self.columns.isin(self.target_name)]
+        else:
+            # This doesn't work for DatetimeIndex
+            # return self.columns[~(self.columns == self.target_name)]
+            return pd.Index([c for c in self.columns if c != self.target_name])
 
     @property
     def data(self):
@@ -212,7 +229,19 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         -------
         has_target : bool
         """
+        if self.has_multi_targets():
+            return len(self.target_name.intersection(self.columns)) > 0
         return self.target_name in self.columns
+
+    def has_multi_targets(self):
+        """
+        Return whether ``ModelFrame`` has multiple target columns
+
+        Returns
+        -------
+        has_multi_targets : bool
+        """
+        return isinstance(self.target_name, pd.Index)
 
     @property
     def target_name(self):
@@ -252,8 +281,12 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         if not self.has_target():
             # allow to update target_name only when target attibute doesn't exist
             if isinstance(target, pd.Series):
+                # Series.name may be blank
                 if target.name is not None:
                     self.target_name = target.name
+            elif isinstance(target, pd.DataFrame):
+                # DataFrame.columns should have values
+                self.target_name = target.columns
 
         if not com.is_list_like(target):
             if target in self.columns:
@@ -268,8 +301,16 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                 msg = "Passed data is being renamed to '{0}'".format(self.target_name)
                 warnings.warn(msg)
                 target = pd.Series(target, name=self.target_name)
+        elif isinstance(target, pd.DataFrame):
+            if not target.columns.equals(self.target_name):
+                if len(target.columns) == len(self.target_name):
+                    msg = "Passed data is being renamed to '{0}'".format(self.target_name)
+                    warnings.warn(msg)
+                    target = target.copy()
+                    target.columns = self.target_name
+                else:
+                    raise ValueError('target and target_name are unmatched')
         else:
-
             _, target = self._maybe_convert_data(self.data, target, self.target_name)
 
         df = self._concat_target(self.data, target)
