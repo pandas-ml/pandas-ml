@@ -701,7 +701,8 @@ class TestModelFrameMultiTarges(tm.TestCase):
                                index=['a', 'b', 'c'])
 
         with tm.assert_produces_warning(UserWarning):
-            # target is renamed to existing target ['t1', 't2']
+            # when the target has the same length as the target_name,
+            # is renamed to existing target ['t1', 't2']
             mdf.target = target
 
         self.assertTrue(isinstance(mdf, expd.ModelFrame))
@@ -730,8 +731,29 @@ class TestModelFrameMultiTarges(tm.TestCase):
                                'x3': [25, 26, 27]},
                                index=['a', 'b', 'c'])
 
-        with self.assertRaisesRegexp(ValueError, 'target and target_name are unmatched'):
+        with tm.assert_produces_warning(UserWarning):
+            # when the target has the different length as the target_name,
+            # target is being replaced
             mdf.target = target
+
+        self.assertTrue(isinstance(mdf, expd.ModelFrame))
+        self.assertEqual(mdf.shape, (3, 6))
+        expected =  pd.DataFrame({'x1': [20, 21, 22],
+                                  'x2': [23, 24, 25],
+                                  'x3': [25, 26, 27],
+                                  'A': [1, 2, 3],
+                                  'B': [4, 5, 6],
+                                  'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['x1', 'x2', 'x3', 'A', 'B', 'C'])
+        self.assert_frame_equal(mdf, expected)
+        self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
+        self.assert_index_equal(mdf.columns, pd.Index(['x1', 'x2', 'x3', 'A', 'B', 'C']))
+        self.assert_frame_equal(mdf.data, df)
+        self.assert_frame_equal(mdf.target, target)
+        self.assert_index_equal(mdf.target.columns, pd.Index(['x1', 'x2', 'x3']))
+        self.assert_index_equal(mdf.target_name, pd.Index(['x1', 'x2', 'x3']))
+        self.assertTrue(mdf.has_multi_targets())
 
 
 if __name__ == '__main__':

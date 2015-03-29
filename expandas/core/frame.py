@@ -205,9 +205,14 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
         data, _ = self._maybe_convert_data(data, self.target, self.target_name)
 
-        if self.target_name in data.columns:
-            msg = "Passed data has the same column name as the target '{0}'"
-            raise ValueError(msg.format(self.target_name))
+        if self.has_multi_targets():
+            if len(self.target_name.intersection(data.columns)) > 0:
+                msg = "Passed data has the same column name as the target '{0}'"
+                raise ValueError(msg.format(self.target_name))
+        else:
+            if self.target_name in data.columns:
+                msg = "Passed data has the same column name as the target '{0}'"
+                raise ValueError(msg.format(self.target_name))
 
         if self.has_target():
             data = self._concat_target(data, self.target)
@@ -278,6 +283,9 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             del self.target
             return
 
+        # must be retrieved here, before target_name is being updated
+        # data = self.data
+
         if not self.has_target():
             # allow to update target_name only when target attibute doesn't exist
             if isinstance(target, pd.Series):
@@ -309,7 +317,11 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                     target = target.copy()
                     target.columns = self.target_name
                 else:
-                    raise ValueError('target and target_name are unmatched')
+                    msg = 'target and target_name are unmatched, target_name will be updated'
+                    warnings.warn(msg)
+                    data = self.data # hack
+                    self.target_name = target.columns
+                    self.data = data
         else:
             _, target = self._maybe_convert_data(self.data, target, self.target_name)
 

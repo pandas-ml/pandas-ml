@@ -332,6 +332,34 @@ class TestPreprocessing(tm.TestCase):
         self.assert_numpy_array_equal(inversed.values.flatten(), arr)
         self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
 
+    def test_LabelBinarizer(self):
+        arr = np.array(['X', 'Y', 'Z', 'X'])
+        s = expd.ModelSeries(arr)
+
+        lb = s.preprocessing.LabelBinarizer()
+        s.fit(lb)
+
+        binarized = s.transform(lb)
+        self.assertTrue(isinstance(binarized, expd.ModelFrame))
+
+        expected = pd.DataFrame({0: [1, 0, 0, 1], 1: [0, 1, 0, 0], 2: [0, 0, 1, 0]})
+        self.assert_frame_equal(binarized, expected)
+
+        df = expd.ModelFrame(datasets.load_iris())
+        df.target.fit(lb)
+        binarized = df.target.transform(lb)
+
+        expected = pd.DataFrame({0: [1] * 50 + [0] * 100,
+                                 1: [0] * 50 + [1] * 50 + [0] * 50,
+                                 2: [0] * 100 + [1] * 50})
+        self.assert_frame_equal(binarized, expected)
+
+        df = expd.ModelFrame(datasets.load_iris())
+        df.target.fit(lb)
+        df.target = df.target.transform(lb)
+        self.assertEqual(df.shape, (150, 7))
+        self.assert_frame_equal(df.target, expected)
+
 
 if __name__ == '__main__':
     import nose
