@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+
+import warnings
+
+import numpy as np
+import pandas as pd
+
+from expandas.core.accessor import AccessorMethods
+
+
+class CrossDecompositionMethods(AccessorMethods):
+    """
+    Accessor to ``sklearn.cross_decomposition``.
+    """
+
+    _module_name = 'sklearn.cross_decomposition'
+
+    @classmethod
+    def _fit(cls, df, estimator, *args, **kwargs):
+        data = df.data.values
+        if df.has_target():
+            target = df.target.values
+            try:
+                result = estimator.fit(data, Y=target, *args, **kwargs)
+            except TypeError:
+                result = estimator.fit(data, *args, **kwargs)
+        else:
+            # not try to pass target if it doesn't exists
+            # to catch ValueError from estimator
+            result = estimator.fit(data, *args, **kwargs)
+        return result
+
+    @classmethod
+    def _transform(cls, df, estimator, *args, **kwargs):
+        data = df.data.values
+        if df.has_target():
+            target = df.target.values
+            try:
+                result = estimator.transform(data, Y=target, *args, **kwargs)
+                result = df._constructor(result[0], target=result[1])
+            except TypeError:
+                result = estimator.transform(data, *args, **kwargs)
+                result = df._constructor(result)
+        else:
+            # not try to pass target if it doesn't exists
+            # to catch ValueError from estimator
+            result = estimator.transform(data, *args, **kwargs)
+            result = df._constructor(result)
+        return result
+
+    @classmethod
+    def _predict(cls, df, estimator, *args, **kwargs):
+        data = df.data.values
+        result = estimator.predict(data, *args, **kwargs)
+        result = df._constructor(result)
+        return result

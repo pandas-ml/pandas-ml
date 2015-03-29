@@ -4,6 +4,7 @@ from expandas.skaccessors.base import _maybe_sklearn_data
 
 from expandas.skaccessors.cluster import ClusterMethods
 from expandas.skaccessors.covariance import CovarianceMethods
+from expandas.skaccessors.cross_decomposition import CrossDecompositionMethods
 from expandas.skaccessors.cross_validation import CrossValidationMethods
 from expandas.skaccessors.decomposition import DecompositionMethods
 from expandas.skaccessors.ensemble import EnsembleMethods

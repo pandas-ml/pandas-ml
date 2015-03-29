@@ -36,8 +36,13 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     _internal_names_set = set(_internal_names)
     _metadata = ['_target_name']
 
-    _mapper = dict(fit=dict(),
-                   predict={'GaussianProcess': skaccessors.GaussianProcessMethods._predict})
+    _mapper = dict(fit={'PLSCanonical': skaccessors.CrossDecompositionMethods._fit,
+                        'CCA': skaccessors.CrossDecompositionMethods._fit,
+                        'PLSRegression': skaccessors.CrossDecompositionMethods._fit},
+                   transform={'PLSCanonical': skaccessors.CrossDecompositionMethods._transform,
+                              'CCA': skaccessors.CrossDecompositionMethods._transform},
+                   predict={'GaussianProcess': skaccessors.GaussianProcessMethods._predict,
+                            'PLSRegression': skaccessors.CrossDecompositionMethods._predict})
 
     @property
     def _constructor(self):
@@ -85,10 +90,23 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             else:
                 msg = "Specified target '{0}' is not included in data"
                 raise ValueError(msg.format(target))
+            self._target_name = target_name
         else:
             df = self._concat_target(data, target)
 
-        self._target_name = target_name
+            if isinstance(target, pd.Series):
+                self._target_name = target.name
+
+            elif isinstance(target, pd.DataFrame):
+                if len(target.columns) > 1:
+                    self._target_name = target.columns
+                else:
+                    self._target_name = target.columns[0]
+            else:
+                # target may be None
+                self._target_name = self._TARGET_NAME
+                pass
+
         pd.DataFrame.__init__(self, df)
 
     def _maybe_convert_data(self, data, target, target_name, *args, **kwargs):
@@ -111,23 +129,46 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                 data = pd.DataFrame(data, *args, **kwargs)
 
             if com.is_list_like(target):
-                if data is not None:
-                    target = pd.Series(target, name=target_name, index=data.index)
+                target = np.array(target)
+                if len(target.shape) == 1:
+                    if data is not None:
+                        target = pd.Series(target, name=target_name, index=data.index)
+                    else:
+                        target = pd.Series(target, name=target_name)
                 else:
-                    target = pd.Series(target, name=target_name)
+                    if data is not None:
+                        target = pd.DataFrame(target, index=data.index)
+                    else:
+                        target = pd.DataFrame(target)
+                    if target_name == self._TARGET_NAME:
+                        target_name = ['{0} {1}'.format(self._TARGET_NAME, i) for i in range(len(target.columns))]
+                        target.columns = target_name
+
         elif not init_df:
             if data is not None:
                 index = kwargs.pop('index', target.index)
                 data = pd.DataFrame(data, index=index, *args, **kwargs)
+
         elif not init_target:
             if com.is_list_like(target):
-                if data is not None:
-                    target = pd.Series(target, name=target_name, index=data.index)
+                target = np.array(target)
+                if len(target.shape) == 1:
+                    if data is not None:
+                        target = pd.Series(target, name=target_name, index=data.index)
+                    else:
+                        target = pd.Series(target, name=target_name)
                 else:
-                    target = pd.Series(target, name=target_name)
+                    if data is not None:
+                        target = pd.DataFrame(target, index=data.index)
+                    else:
+                        target = pd.DataFrame(target)
+                    if target_name is None:
+                        target_name = ['{0} {1}'.format(self._TARGET_NAME, i) for i in range(len(target.columns))]
+                        target.columns = target
         else:
             # no conversion required
             pass
+
         return data, target
 
     def _concat_target(self, data, target):
@@ -283,9 +324,6 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             del self.target
             return
 
-        # must be retrieved here, before target_name is being updated
-        # data = self.data
-
         if not self.has_target():
             # allow to update target_name only when target attibute doesn't exist
             if isinstance(target, pd.Series):
@@ -390,7 +428,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                                      index=self.index, columns=columns)
         else:
             return self._constructor(transformed, index=self.index,
-                                     columns=columns)
+                                    columns=columns)
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='predict_proba', returned='returned : probabilities'))

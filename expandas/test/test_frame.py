@@ -731,10 +731,9 @@ class TestModelFrameMultiTarges(tm.TestCase):
                                'x3': [25, 26, 27]},
                                index=['a', 'b', 'c'])
 
-        with tm.assert_produces_warning(UserWarning):
-            # when the target has the different length as the target_name,
-            # target is being replaced
-            mdf.target = target
+        # when the target has the different length as the target_name,
+        # target is being replaced
+        mdf.target = target
 
         self.assertTrue(isinstance(mdf, expd.ModelFrame))
         self.assertEqual(mdf.shape, (3, 6))
