@@ -105,8 +105,8 @@ class TestClassificationMetrics(tm.TestCase):
         self.assert_numpy_array_equal(result.values, expected)
 
     def test_f1_score(self):
-        result = self.df.metrics.f1_score()
-        expected = metrics.f1_score(self.target, self.pred)
+        result = self.df.metrics.f1_score(average='weighted')
+        expected = metrics.f1_score(self.target, self.pred, average='weighted')
         self.assertEqual(result, expected)
 
         result = self.df.metrics.f1_score(average=None)
@@ -115,8 +115,8 @@ class TestClassificationMetrics(tm.TestCase):
         self.assert_numpy_array_almost_equal(result.values, expected)
 
     def test_fbeta_score(self):
-        result = self.df.metrics.fbeta_score(beta=0.5)
-        expected = metrics.fbeta_score(self.target, self.pred, beta=0.5)
+        result = self.df.metrics.fbeta_score(beta=0.5, average='weighted')
+        expected = metrics.fbeta_score(self.target, self.pred, beta=0.5, average='weighted')
         self.assertEqual(result, expected)
 
         result = self.df.metrics.fbeta_score(beta=0.5, average='macro')
@@ -178,8 +178,8 @@ class TestClassificationMetrics(tm.TestCase):
         self.assert_index_equal(result.columns, expected)
 
     def test_precision_score(self):
-        result = self.df.metrics.precision_score()
-        expected = metrics.precision_score(self.target, self.pred)
+        result = self.df.metrics.precision_score(average='weighted')
+        expected = metrics.precision_score(self.target, self.pred, average='weighted')
         self.assertEqual(result, expected)
 
         result = self.df.metrics.precision_score(average=None)
@@ -188,8 +188,8 @@ class TestClassificationMetrics(tm.TestCase):
         self.assert_numpy_array_almost_equal(result.values, expected)
 
     def test_recall_score(self):
-        result = self.df.metrics.recall_score()
-        expected = metrics.recall_score(self.target, self.pred)
+        result = self.df.metrics.recall_score(average='weighted')
+        expected = metrics.recall_score(self.target, self.pred, average='weighted')
         self.assertEqual(result, expected)
 
         result = self.df.metrics.recall_score(average=None)
@@ -240,8 +240,9 @@ class TestClassificationMetrics2Classes(TestClassificationMetrics):
         self.labels = np.array([1, -1])
 
     def test_average_precision_score(self):
-        result = self.df.metrics.average_precision_score()
-        expected = metrics.average_precision_score(self.target, self.decision)
+        result = self.df.metrics.average_precision_score(average='weighted')
+        expected = metrics.average_precision_score(self.target, self.decision,
+                                                   average='weighted')
         self.assertEqual(result, expected)
         curve, _, _ = self.df.metrics.precision_recall_curve()
         self.assertEqual(result, curve.mean())
@@ -278,8 +279,8 @@ class TestClassificationMetrics2Classes(TestClassificationMetrics):
         self.assertEqual(result, expected)
 
     def test_roc_auc_score(self):
-        result = self.df.metrics.roc_auc_score()
-        expected = metrics.roc_auc_score(self.target, self.decision)
+        result = self.df.metrics.roc_auc_score(average='weighted')
+        expected = metrics.roc_auc_score(self.target, self.decision, average='weighted')
         self.assertEqual(result, expected)
 
         result = self.df.metrics.roc_auc_score(average=None)

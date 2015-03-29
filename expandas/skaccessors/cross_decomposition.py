@@ -14,6 +14,9 @@ class CrossDecompositionMethods(AccessorMethods):
     """
 
     _module_name = 'sklearn.cross_decomposition'
+    _method_mapper = dict(fit={'PLSCanonical': '_fit', 'CCA': '_fit', 'PLSRegression': '_fit'},
+                          transform={'PLSCanonical': '_transform', 'CCA': '_transform'},
+                          predict={'PLSRegression': '_predict'})
 
     @classmethod
     def _fit(cls, df, estimator, *args, **kwargs):

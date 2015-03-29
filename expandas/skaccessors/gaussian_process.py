@@ -13,6 +13,7 @@ class GaussianProcessMethods(AccessorMethods):
     """
 
     _module_name = 'sklearn.gaussian_process'
+    _method_mapper = dict(predict={'GaussianProcess': '_predict'})
 
     @property
     def correlation_models(self):
