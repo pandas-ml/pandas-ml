@@ -52,10 +52,8 @@ class ModelSeries(pd.Series, ModelTransformer):
 
     @Appender(pd.Series.to_frame.__doc__)
     def to_frame(self, name=None):
+        # ported from pandas 0.16
         from expandas.core.frame import ModelFrame
-
-        if name is None:
-            name = self.name
 
         if name is None:
             df = ModelFrame(self)

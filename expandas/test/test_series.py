@@ -25,6 +25,29 @@ class TestModelSeries(tm.TestCase):
         self.assertEqual(len(s), 2)
         self.assertTrue(isinstance(s, expd.ModelSeries))
 
+    def test_series_to_frame(self):
+        s = expd.ModelSeries([1, 2, 3, 4, 5])
+        self.assertTrue(isinstance(s, expd.ModelSeries))
+
+        df = s.to_frame()
+        self.assertTrue(isinstance(df, expd.ModelFrame))
+        self.assert_index_equal(df.columns, pd.Index([0]))
+
+        df = s.to_frame(name='x')
+        self.assertTrue(isinstance(df, expd.ModelFrame))
+        self.assert_index_equal(df.columns, pd.Index(['x']))
+
+        s = expd.ModelSeries([1, 2, 3, 4, 5], name='name')
+        self.assertTrue(isinstance(s, expd.ModelSeries))
+
+        df = s.to_frame()
+        self.assertTrue(isinstance(df, expd.ModelFrame))
+        self.assert_index_equal(df.columns, pd.Index(['name']))
+
+        df = s.to_frame(name='x')
+        self.assertTrue(isinstance(df, expd.ModelFrame))
+        self.assert_index_equal(df.columns, pd.Index(['x']))
+
     def test_preprocessing_normalize(self):
         s = expd.ModelSeries([1, 2, 3, 4, 5], index=['A', 'B', 'C', 'D', 'E'])
         self.assertTrue(isinstance(s, expd.ModelSeries))
