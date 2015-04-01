@@ -76,7 +76,8 @@ class CrossValidationMethods(AccessorMethods):
         idx = self._df.index
         if self._df.has_target():
             target = self._target
-            tr_d, te_d, tr_l, te_l, tr_i, te_i = func(data, target, idx, *args, **kwargs)
+            tr_d, te_d, tr_l, te_l, tr_i, te_i = func(data.values, target.values, idx.values,
+                                                      *args, **kwargs)
 
             # Create DataFrame here to retain data and target names
             tr_d = _init(pd.DataFrame, tr_d, tr_i, columns=data.columns)
@@ -88,7 +89,7 @@ class CrossValidationMethods(AccessorMethods):
             test_df = self._constructor(data=te_d, target=te_l)
             return train_df, test_df
         else:
-            tr_d, te_d, tr_i, te_i = func(data, idx, *args, **kwargs)
+            tr_d, te_d, tr_i, te_i = func(data.values, idx.values, *args, **kwargs)
 
             # Create DataFrame here to retain data and target names
             tr_d = _init(pd.DataFrame, tr_d, tr_i, columns=data.columns)
@@ -108,7 +109,7 @@ class CrossValidationMethods(AccessorMethods):
         - ``y``: ``ModelFrame.target``
         """
         func = self._module.cross_val_score
-        return func(estimator, X=self._data, y=self._target, *args, **kwargs)
+        return func(estimator, X=self._data.values, y=self._target.values, *args, **kwargs)
 
     def permutation_test_score(self, estimator, *args, **kwargs):
         """
@@ -118,7 +119,7 @@ class CrossValidationMethods(AccessorMethods):
         - ``y``: ``ModelFrame.target``
         """
         func = self._module.permutation_test_score
-        score, pscores, pvalue = func(estimator, X=self._data, y=self._target,
+        score, pscores, pvalue = func(estimator, X=self._data.values, y=self._target.values,
                                       *args, **kwargs)
         return score, pscores, pvalue
 

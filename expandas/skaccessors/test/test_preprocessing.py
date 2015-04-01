@@ -74,14 +74,14 @@ class TestPreprocessing(tm.TestCase):
         s = df['sepal length (cm)']
         self.assertTrue(isinstance(s, expd.ModelSeries))
         result = s.preprocessing.binarize()
-        expected = pp.binarize(iris.data[:, 0])
+        expected = pp.binarize(iris.data[:, 0])[0]
 
         self.assertTrue(isinstance(result, expd.ModelSeries))
         self.assert_numpy_array_almost_equal(result.values, expected)
         self.assertEqual(result.name, 'sepal length (cm)')
 
         result = s.preprocessing.binarize(threshold=6)
-        expected = pp.binarize(iris.data[:, 0], threshold=6)
+        expected = pp.binarize(iris.data[:, 0], threshold=6)[0]
 
         self.assertTrue(isinstance(result, expd.ModelSeries))
         self.assert_numpy_array_almost_equal(result.values, expected)

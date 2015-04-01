@@ -36,8 +36,9 @@ class TestSVM(tm.TestCase):
 
         models = ['SVR', 'NuSVR']
         for model in models:
-            mod1 = getattr(df.svm, model)(random_state=self.random_state)
-            mod2 = getattr(svm, model)(random_state=self.random_state)
+            print(model)
+            mod1 = getattr(df.svm, model)()
+            mod2 = getattr(svm, model)()
 
             df.fit(mod1)
             mod2.fit(iris.data, iris.target)

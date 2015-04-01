@@ -570,6 +570,39 @@ class TestModelFrame(tm.TestCase):
 
         warnings.simplefilter("default")
 
+    def test_frame_metadata(self):
+        df = pd.DataFrame({'A': [1, 2, 3],
+                           'B': [4, 5, 6],
+                           'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['A', 'B', 'C'])
+        s = pd.Series([1, 2, 3], index=['a', 'b', 'c'])
+        mdf = expd.ModelFrame(df, target=s)
+
+        self.assertEqual(mdf.target_name, '.target')
+        sliced = mdf.iloc[1:2, ]
+        self.assertTrue(isinstance(sliced, expd.ModelFrame))
+        self.assertTrue(sliced.has_target())
+        self.assertEqual(sliced.target_name, '.target')
+
+        df = pd.DataFrame({'A': [1, 2, 3],
+                           'B': [4, 5, 6],
+                           'C': [7, 8, 9]},
+                           index=['a', 'b', 'c'],
+                           columns=['A', 'B', 'C'])
+        mdf = expd.ModelFrame(df, target='A')
+
+        self.assertEqual(mdf.target_name, 'A')
+        sliced = mdf.loc[['a', 'b'], :]
+        self.assertTrue(isinstance(sliced, expd.ModelFrame))
+        self.assertTrue(sliced.has_target())
+        self.assertEqual(sliced.target_name, 'A')
+
+        sliced = mdf.iloc[[1, 2], :]
+        self.assertTrue(isinstance(sliced, expd.ModelFrame))
+        self.assertTrue(sliced.has_target())
+        self.assertEqual(sliced.target_name, 'A')
+
 
 if __name__ == '__main__':
     import nose

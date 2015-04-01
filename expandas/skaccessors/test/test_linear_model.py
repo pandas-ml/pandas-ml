@@ -78,10 +78,11 @@ class TestLinearModel(tm.TestCase):
 
         result = df.linear_model.lasso_path(return_models=True)
         expected = lm.lasso_path(diabetes.data, diabetes.target, return_models=True)
-
-        self.assertTrue(isinstance(result, list))
-        self.assertTrue(isinstance(result[0], lm.ElasticNet))
         self.assertEqual(len(result), len(expected))
+        self.assertTrue(isinstance(result, tuple))
+        self.assert_numpy_array_equal(result[0], result[0])
+        self.assert_numpy_array_equal(result[1], result[1])
+        self.assert_numpy_array_equal(result[2], result[2])
 
     def test_lasso_stability_path(self):
         diabetes = datasets.load_diabetes()
@@ -202,8 +203,9 @@ class TestLinearModel(tm.TestCase):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
 
-        clf1 = lm.SGDClassifier(alpha=0.001, n_iter=100).fit(iris.data, iris.target)
-        clf2 = df.lm.SGDClassifier(alpha=0.001, n_iter=100)
+        clf1 = lm.SGDClassifier(alpha=0.001, n_iter=100, random_state=self.random_state)
+        clf1.fit(iris.data, iris.target)
+        clf2 = df.lm.SGDClassifier(alpha=0.001, n_iter=100, random_state=self.random_state)
         df.fit(clf2)
 
         expected = clf1.predict(iris.data)
