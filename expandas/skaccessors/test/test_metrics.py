@@ -135,8 +135,9 @@ class TestClassificationMetrics(tm.TestCase):
         self.assertEqual(result, expected)
 
     def test_hinge_loss(self):
-        with self.assertRaisesRegexp(ValueError, 'Multi-class hinge loss not supported'):
-            result = self.df.metrics.hinge_loss()
+        result = self.df.metrics.hinge_loss()
+        expected = metrics.hinge_loss(self.target, self.decision)
+        self.assertEqual(result, expected)
 
     def test_jaccard_similarity_score(self):
         result = self.df.metrics.jaccard_similarity_score()
@@ -250,12 +251,6 @@ class TestClassificationMetrics2Classes(TestClassificationMetrics):
         expected = metrics.average_precision_score(self.target, self.decision, average=None)
         self.assertTrue(isinstance(result, expd.ModelSeries))
         self.assert_numpy_array_almost_equal(result.values, expected)
-        print(expected)
-
-    def test_hinge_loss(self):
-        result = self.df.metrics.hinge_loss()
-        expected = metrics.hinge_loss(self.target, self.decision)
-        self.assertEqual(result, expected)
 
     def test_log_loss(self):
         result = self.df.metrics.log_loss()

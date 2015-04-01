@@ -145,7 +145,7 @@ class TestCrossValidation(tm.TestCase):
         df = expd.ModelFrame(digits)
         clf = svm.SVC(kernel=str('linear'), C=1)
         result = df.cross_validation.cross_val_score(clf, cv=5)
-        expected = cv.cross_val_score(clf, digits.data, y=digits.target, cv=5)
+        expected = cv.cross_val_score(clf, X=digits.data, y=digits.target, cv=5)
         self.assert_numpy_array_almost_equal(result, expected)
 
     def test_permutation_test_score(self):
