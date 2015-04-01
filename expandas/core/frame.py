@@ -32,9 +32,9 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     """
 
     _internal_caches = ['_estimator', '_predicted', '_proba', '_log_proba', '_decision']
-    _internal_names = (pd.core.generic.NDFrame._internal_names +
-                       ['_target_name'] + _internal_caches)
+    _internal_names = (pd.core.generic.NDFrame._internal_names + _internal_caches)
     _internal_names_set = set(_internal_names)
+    _metadata = ['_target_name']
 
     _mapper = dict(fit=dict(),
                    predict={'GaussianProcess': skaccessors.GaussianProcessMethods._predict})
