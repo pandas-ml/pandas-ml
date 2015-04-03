@@ -88,6 +88,47 @@ class TestGaussianProcess(tm.TestCase):
 
         self.assert_numpy_array_almost_equal(y_result, y_expected)
 
+    def test_Gaussian2D(self):
+
+        from scipy import stats
+
+        # Standard normal distribution functions
+        phi = stats.distributions.norm().pdf
+        PHI = stats.distributions.norm().cdf
+        PHIinv = stats.distributions.norm().ppf
+
+        # A few constants
+        lim = 8
+
+        def g(x):
+            """The function to predict (classification will then consist in predicting
+            whether g(x) <= 0 or not)"""
+            return 5. - x[:, 1] - .5 * x[:, 0] ** 2.
+
+        # Design of experiments
+        X = np.array([[-4.61611719, -6.00099547],
+                      [4.10469096, 5.32782448],
+                      [0.00000000, -0.50000000],
+                      [-6.17289014, -4.6984743],
+                      [1.3109306, -6.93271427],
+                      [-5.03823144, 3.10584743],
+                      [-2.87600388, 6.74310541],
+                      [5.21301203, 4.26386883]])
+        y = g(X)
+
+        df = expd.ModelFrame(X, target=y)
+        gpm1 = df.gaussian_process.GaussianProcess(theta0=5e-1)
+        df.fit(gpm1)
+        result, result_MSE = df.predict(gpm1, eval_MSE=True)
+
+        gpm2 = gp.GaussianProcess(theta0=5e-1)
+        gpm2.fit(X, y)
+        expected, expected_MSE = gpm2.predict(X, eval_MSE=True)
+
+        self.assert_numpy_array_almost_equal(result.values, expected)
+        self.assert_numpy_array_almost_equal(result_MSE.values, expected_MSE)
+
+
 if __name__ == '__main__':
     import nose
     nose.runmodule(argv=[__file__, '-vvs', '-x', '--pdb', '--pdb-failure'],
