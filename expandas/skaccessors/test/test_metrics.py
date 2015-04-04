@@ -107,7 +107,7 @@ class TestClassificationMetrics(tm.TestCase):
     def test_f1_score(self):
         result = self.df.metrics.f1_score(average='weighted')
         expected = metrics.f1_score(self.target, self.pred, average='weighted')
-        self.assertEqual(result, expected)
+        self.assertAlmostEqual(result, expected)
 
         result = self.df.metrics.f1_score(average=None)
         expected = metrics.f1_score(self.target, self.pred, average=None)
@@ -331,6 +331,99 @@ class TestClassificationMetrics3Classes(TestClassificationMetrics):
         result = self.df.metrics.log_loss()
         expected = metrics.log_loss(self.target, self.proba)
         self.assertEqual(result, expected)
+
+    def test_average_precision_score(self):
+        with self.assertRaisesRegexp(ValueError, 'multiclass format is not supported'):
+            result = self.df.metrics.average_precision_score()
+
+
+class TestAClassificationMetrics3ClassesMultiTargets(TestClassificationMetrics):
+
+    def setUp(self):
+        import sklearn.svm as svm
+        import sklearn.preprocessing as pp
+        from sklearn.multiclass import OneVsRestClassifier
+
+        # 2 class
+        iris = datasets.load_iris()
+        self.data = iris.data
+        self.target = pp.LabelBinarizer().fit_transform(iris.target)
+        self.df = expd.ModelFrame(self.data, target=self.target)
+        self.assertEqual(self.df.shape, (150, 7))
+
+        estimator1 = OneVsRestClassifier(svm.SVC(probability=True,
+            random_state=self.random_state))
+        self.df.fit(estimator1)
+        self.df.predict(estimator1)
+        self.assertTrue(isinstance(self.df.predicted, expd.ModelFrame))
+
+        estimator2 = OneVsRestClassifier(svm.SVC(probability=True,
+            random_state=self.random_state))
+        estimator2.fit(self.data, self.target)
+        self.pred = estimator2.predict(self.data)
+        self.proba = estimator2.predict_proba(self.data)
+        self.decision = estimator2.decision_function(self.data)
+
+        # argument for classification reports
+        self.labels = np.array([2, 1, 0])
+
+    def test_average_precision_score(self):
+        result = self.df.metrics.average_precision_score(average='weighted')
+        expected = metrics.average_precision_score(self.target, self.decision,
+                                                   average='weighted')
+        self.assertAlmostEqual(result, expected)
+        # curve, _, _ = self.df.metrics.precision_recall_curve()
+        # self.assertEqual(result, curve.mean())
+
+        result = self.df.metrics.average_precision_score(average=None)
+
+        expected = metrics.average_precision_score(self.target, self.decision, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_confusion_matrix(self):
+        with self.assertRaisesRegexp(ValueError, 'multilabel-indicator is not supported'):
+            result = self.df.metrics.confusion_matrix()
+
+    def test_hinge_loss(self):
+        return
+
+    def test_log_loss(self):
+        result = self.df.metrics.log_loss()
+        expected = metrics.log_loss(self.target, self.proba)
+        self.assertEqual(result, expected)
+
+    def test_matthews_corrcoef(self):
+        with self.assertRaisesRegexp(ValueError, 'multilabel-indicator is not supported'):
+            result = self.df.metrics.matthews_corrcoef()
+
+    def test_precision_recall_curve(self):
+        results = self.df.metrics.precision_recall_curve()
+        for key, result in compat.iteritems(results):
+            expected = metrics.precision_recall_curve(self.target[:, key], self.decision[:, key],
+                                         pos_label=key)
+            self.assert_numpy_array_almost_equal(result[0], expected[0])
+            self.assert_numpy_array_almost_equal(result[1], expected[1])
+            self.assert_numpy_array_almost_equal(result[2], expected[2])
+
+    def test_roc_auc_score(self):
+        result = self.df.metrics.roc_auc_score(average='weighted')
+        expected = metrics.roc_auc_score(self.target, self.decision, average='weighted')
+        self.assertEqual(result, expected)
+
+        result = self.df.metrics.roc_auc_score(average=None)
+        expected = metrics.roc_auc_score(self.target, self.decision, average=None)
+        self.assertTrue(isinstance(result, expd.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_roc_curve(self):
+        results = self.df.metrics.roc_curve()
+        for key, result in compat.iteritems(results):
+            expected = metrics.roc_curve(self.target[:, key], self.decision[:, key],
+                                         pos_label=key)
+            self.assert_numpy_array_almost_equal(result[0], expected[0])
+            self.assert_numpy_array_almost_equal(result[1], expected[1])
+            self.assert_numpy_array_almost_equal(result[2], expected[2])
 
 
 class TestClassificationMetricsExamples(tm.TestCase):
