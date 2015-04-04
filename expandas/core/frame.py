@@ -389,11 +389,11 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         """
         Wrapper for predict methods
         """
-        try:
+
+        if util._is_1d_varray(predicted):
             predicted = self._constructor_sliced(predicted, index=self.index)
-        except ValueError:
-            msg = "Unable to instantiate ModelSeries for '{0}'"
-            warnings.warn(msg.format(estimator.__class__.__name__))
+        else:
+            predicted = self._constructor(predicted, index=self.index)
         self._predicted = predicted
         return self._predicted
 

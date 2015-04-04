@@ -136,11 +136,17 @@ class MetricsMethods(AccessorMethods):
             return c1, c2, threshold
 
         results = {}
-        for i, (name, col) in enumerate(decision.iteritems()):
-            # results can have different length
-            c1, c2, threshold = func(self._target.values, col.values,
-                                     pos_label=i, *args, **kwargs)
-            results[name] = c1, c2, threshold
+        if self._df.has_multi_targets():
+            for i, ((name, col), t) in enumerate(zip(decision.iteritems(), self._target.values.T)):
+                # results can have different length
+                c1, c2, threshold = func(t, col.values, pos_label=i, *args, **kwargs)
+                results[name] = c1, c2, threshold
+        else:
+            for i, (name, col) in enumerate(decision.iteritems()):
+                # results can have different length
+                c1, c2, threshold = func(self._target.values, col.values,
+                                         pos_label=i, *args, **kwargs)
+                results[name] = c1, c2, threshold
         return results
 
     def precision_recall_fscore_support(self, *args, **kwargs):
