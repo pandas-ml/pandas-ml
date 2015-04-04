@@ -4,6 +4,7 @@ import importlib
 
 import numpy as np
 import pandas as pd
+import pandas.compat as compat
 from pandas.util.decorators import Appender, cache_readonly
 
 
@@ -13,6 +14,7 @@ class AccessorMethods(object):
     """
 
     _module_name = None
+    _method_mapper = None
 
     def __init__(self, df, module_name=None, attrs=None):
         self._df = df
@@ -65,6 +67,17 @@ class AccessorMethods(object):
     @property
     def _constructor_sliced(self):
         return self._df._constructor_sliced
+
+    @classmethod
+    def _update_method_mapper(cls, mapper):
+        """Attach cls._method_mapper to passed mapper"""
+        if cls._method_mapper is None:
+            return mapper
+        for key, class_dict in compat.iteritems(cls._method_mapper):
+            # mapping method_name to actual class method
+            class_dict = {k: getattr(cls, m) for k, m in compat.iteritems(class_dict)}
+            mapper[key] = dict(mapper[key], **class_dict)
+        return mapper
 
 
 def _attach_methods(cls, wrap_func, methods):

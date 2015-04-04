@@ -36,13 +36,10 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     _internal_names_set = set(_internal_names)
     _metadata = ['_target_name']
 
-    _mapper = dict(fit={'PLSCanonical': skaccessors.CrossDecompositionMethods._fit,
-                        'CCA': skaccessors.CrossDecompositionMethods._fit,
-                        'PLSRegression': skaccessors.CrossDecompositionMethods._fit},
-                   transform={'PLSCanonical': skaccessors.CrossDecompositionMethods._transform,
-                              'CCA': skaccessors.CrossDecompositionMethods._transform},
-                   predict={'GaussianProcess': skaccessors.GaussianProcessMethods._predict,
-                            'PLSRegression': skaccessors.CrossDecompositionMethods._predict})
+    _method_mapper = dict(fit={}, transform={}, predict={})
+    for cls in [skaccessors.CrossDecompositionMethods,
+                skaccessors.GaussianProcessMethods]:
+        _method_mapper = cls._update_method_mapper(_method_mapper)
 
     @property
     def _constructor(self):
@@ -113,11 +110,9 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         init_df = isinstance(data, pd.DataFrame)
         init_target = isinstance(target, (pd.Series, pd.DataFrame))
 
-        def _maybe_convert_target(data, target):
+        def _maybe_convert_target(data, target, index=None):
             if data is not None:
                 index = data.index
-            else:
-                index = None
 
             target = np.array(target)
             if len(target.shape) == 1:
@@ -362,9 +357,9 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             msg = '{0} must have either data or target'
             raise ValueError(msg.format(self.__class__.__name__))
 
-    def _get_mapper(self, estimator, method_name):
-        if method_name in self._mapper:
-            mapper = self._mapper[method_name]
+    def _get_method_mapper(self, estimator, method_name):
+        if method_name in self._method_mapper:
+            mapper = self._method_mapper[method_name]
         return mapper.get(estimator.__class__.__name__, None)
 
     def _call(self, estimator, method_name, *args, **kwargs):
@@ -654,7 +649,11 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _multiclass(self):
-        return skaccessors.MultiClassMethods(self)
+        from distutils.version import LooseVersion
+        import sklearn
+        if str(sklearn.__version__) < LooseVersion('0.16.0'):
+            warnings.warn('sklern.multiclass may not be loaded properly')
+        return AccessorMethods(self, module_name='sklearn.multiclass')
 
     @property
     @Appender(_shared_docs['skaccessor_nolink'] % dict(module='naive_bayes'))

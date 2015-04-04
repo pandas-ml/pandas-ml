@@ -17,7 +17,6 @@ from expandas.skaccessors.learning_curve import LearningCurveMethods
 from expandas.skaccessors.linear_model import LinearModelMethods
 from expandas.skaccessors.manifold import ManifoldMethods
 from expandas.skaccessors.metrics import MetricsMethods
-from expandas.skaccessors.multiclass import MultiClassMethods
 from expandas.skaccessors.neighbors import NeighborsMethods
 from expandas.skaccessors.pipeline import PipelineMethods
 from expandas.skaccessors.preprocessing import PreprocessingMethods

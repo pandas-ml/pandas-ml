@@ -46,14 +46,14 @@ class ModelTransformer(object):
         %(returned)s
         """
 
-    def _get_mapper(self, estimator, method):
+    def _get_method_mapper(self, estimator, method):
         # overridden in ModelFrame
         return None
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='fit', returned='returned : None or fitted estimator'))
     def fit(self, estimator, *args, **kwargs):
-        mapped = self._get_mapper(estimator, 'fit')
+        mapped = self._get_method_mapper(estimator, 'fit')
         if mapped is not None:
             result = mapped(self, estimator, *args, **kwargs)
             # save estimator when succeeded
@@ -67,7 +67,7 @@ class ModelTransformer(object):
         if isinstance(estimator, compat.string_types):
             return misc.transform_with_patsy(estimator, self, *args, **kwargs)
 
-        mapped = self._get_mapper(estimator, 'transform')
+        mapped = self._get_method_mapper(estimator, 'transform')
         if mapped is not None:
             result = mapped(self, estimator, *args, **kwargs)
             # save estimator when succeeded
@@ -183,7 +183,7 @@ class ModelPredictor(ModelTransformer):
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='predict', returned='returned : predicted result'))
     def predict(self, estimator, *args, **kwargs):
-        mapped = self._get_mapper(estimator, 'predict')
+        mapped = self._get_method_mapper(estimator, 'predict')
         if mapped is not None:
             result = mapped(self, estimator, *args, **kwargs)
             # save estimator when succeeded

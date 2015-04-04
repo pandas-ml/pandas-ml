@@ -113,8 +113,8 @@ class TestCluster(tm.TestCase):
         iris = datasets.load_iris()
         df = expd.ModelFrame(iris)
 
-        result = df.cluster.dbscan(random_state=self.random_state)
-        expected = cluster.dbscan(iris.data, random_state=self.random_state)
+        result = df.cluster.dbscan()
+        expected = cluster.dbscan(iris.data)
 
         self.assertEqual(len(result), 2)
         self.assert_numpy_array_almost_equal(result[0], expected[0])
