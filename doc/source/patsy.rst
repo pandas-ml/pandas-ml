@@ -6,10 +6,10 @@ This section describes data transformation using ``patsy``. ``ModelFrame.transfo
 
 .. code-block:: python
 
-   >>> import expandas as expd
+   >>> import pandas_ml as pdml
 
    # create modelframe which doesn't have target
-   >>> df = expd.ModelFrame({'X': [1, 2, 3], 'Y': [2, 3, 4],
+   >>> df = pdml.ModelFrame({'X': [1, 2, 3], 'Y': [2, 3, 4],
    ...                       'Z': [3, 4, 5]}, index=['a', 'b', 'c'])
 
    >>> df
@@ -56,7 +56,7 @@ Also, you can use formula which doesn't have left side.
 .. code-block:: python
 
    # create modelframe which has target
-   >>> df2 = expd.ModelFrame({'X': [1, 2, 3], 'Y': [2, 3, 4],'Z': [3, 4, 5]},
+   >>> df2 = pdml.ModelFrame({'X': [1, 2, 3], 'Y': [2, 3, 4],'Z': [3, 4, 5]},
    ...                       target =[7, 8, 9], index=['a', 'b', 'c'])
 
    >>> df2
@@ -89,7 +89,7 @@ Also, you can use formula which doesn't have left side.
 
 Below example is performing deviation coding via patsy formula.
 
-   >>> df3 = expd.ModelFrame({'X': [1, 2, 3, 4, 5], 'Y': [1, 3, 2, 2, 1],
+   >>> df3 = pdml.ModelFrame({'X': [1, 2, 3, 4, 5], 'Y': [1, 3, 2, 2, 1],
    ...                        'Z': [1, 1, 1, 2, 2]}, target='Z',
    ...                        index=['a', 'b', 'c', 'd', 'e'])
 

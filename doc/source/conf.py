@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# expandas documentation build configuration file, created by
+# pandas-ml documentation build configuration file, created by
 # sphinx-quickstart on Sun Feb 22 14:58:37 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'expandas'
+project = u'pandas_ml'
 copyright = u'2015, sinhrks'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -179,7 +179,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'expandasdoc'
+htmlhelp_basename = 'pandas_mldoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -199,7 +199,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'expandas.tex', u'expandas Documentation',
+  ('index', 'pandas_ml.tex', u'pandas-ml Documentation',
    u'sinhrks', 'manual'),
 ]
 
@@ -229,7 +229,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'expandas', u'expandas Documentation',
+    ('index', 'pandas_ml', u'pandas-ml Documentation',
      [u'sinhrks'], 1)
 ]
 
@@ -243,8 +243,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'expandas', u'expandas Documentation',
-   u'sinhrks', 'expandas', 'One line description of project.',
+  ('index', 'pandas_ml', u'pandas-ml Documentation',
+   u'sinhrks', 'pandas_ml', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -268,5 +268,5 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 
 fpath = os.path.dirname(__file__)
 gen_path = os.path.join(fpath, 'generated')
-app_path = os.path.join(os.path.dirname(os.path.dirname(fpath)), 'expandas')
+app_path = os.path.join(os.path.dirname(os.path.dirname(fpath)), 'pandas_ml')
 os.system('sphinx-apidoc -f -E -o {0} {1}'.format(gen_path, app_path))

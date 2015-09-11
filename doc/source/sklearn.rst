@@ -2,7 +2,7 @@
 Use scikit-learn
 ================
 
-This section describes how to use ``scikit-learn`` functionalities via ``expandas``.
+This section describes how to use ``scikit-learn`` functionalities via ``pandas-ml``.
 
 Basics
 ------
@@ -11,10 +11,10 @@ You can create ``ModelFrame`` instance from ``scikit-learn`` datasets directly.
 
 .. code-block:: python
 
-   >>> import expandas as expd
+   >>> import pandas_ml as pdml
    >>> import sklearn.datasets as datasets
 
-   >>> df = expd.ModelFrame(datasets.load_iris())
+   >>> df = pdml.ModelFrame(datasets.load_iris())
    >>> df.head()
       .target  sepal length (cm)  sepal width (cm)  petal length (cm)  \
    0        0                5.1               3.5                1.4
@@ -153,7 +153,7 @@ Following example shows to perform PCA, then revert principal components back to
    4        0 -2.728593 -0.333925 -0.096230 -0.063129
 
    >>> type(transformed)
-   <class 'expandas.core.frame.ModelFrame'>
+   <class 'pandas_ml.core.frame.ModelFrame'>
 
    >>> transformed.inverse_transform(estimator)
         .target    0    1    2    3
@@ -351,7 +351,7 @@ You can perform grid search using ``ModelFrame.fit``.
    ...                     'C': [1, 10, 100]},
    ...                    {'kernel': ['linear'], 'C': [1, 10, 100]}]
 
-   >>> df = expd.ModelFrame(datasets.load_digits())
+   >>> df = pdml.ModelFrame(datasets.load_digits())
    >>> cv = df.grid_search.GridSearchCV(df.svm.SVC(C=1), tuned_parameters,
    ...                                  cv=5, scoring='precision')
 

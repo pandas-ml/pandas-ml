@@ -1,16 +1,16 @@
-expandas
-========
+pandas-ml
+=========
 
 .. image:: https://pypip.in/version/expandas/badge.svg
     :target: https://pypi.python.org/pypi/expandas/
     :alt: Latest Version
 
-.. image:: https://readthedocs.org/projects/expandas/badge/?version=latest
-    :target: http://expandas.readthedocs.org/en/latest/
+.. image:: https://readthedocs.org/projects/pandas-ml/badge/?version=latest
+    :target: http://pandas-ml.readthedocs.org/en/latest/
     :alt: Latest Docs
 
-.. image:: https://travis-ci.org/sinhrks/expandas.svg?branch=master
-    :target: https://travis-ci.org/sinhrks/expandas
+.. image:: https://travis-ci.org/sinhrks/pandas-ml.svg?branch=master
+    :target: https://travis-ci.org/sinhrks/pandas-ml
 
 Overview
 ~~~~~~~~
@@ -20,20 +20,20 @@ Expand pandas functionalities to be easier to use other statistics/ML packages, 
 Documentation
 ~~~~~~~~~~~~~
 
-http://expandas.readthedocs.org/en/stable/
+http://pandas-ml.readthedocs.org/en/stable/
 
 Example
 ~~~~~~~
 
 .. code-block:: python
 
-    >>> import expandas as expd
+    >>> import pandas_ml as pdml
     >>> import sklearn.datasets as datasets
 
     # create ModelFrame instance from sklearn.datasets
-    >>> df = expd.ModelFrame(datasets.load_digits())
+    >>> df = pdml.ModelFrame(datasets.load_digits())
     >>> type(df)
-    <class 'expandas.core.frame.ModelFrame'>
+    <class 'pandas_ml.core.frame.ModelFrame'>
 
     # binarize data (features), not touching target
     >>> df.data = df.data.preprocessing.binarize()
