@@ -5,7 +5,7 @@ import codecs
 import os
 from setuptools import setup, find_packages
 
-PACKAGE = 'expandas'
+PACKAGE = 'pandas_ml'
 README = 'README.rst'
 REQUIREMENTS = 'requirements.txt'
 
@@ -35,7 +35,7 @@ setup(name=PACKAGE,
       long_description=read(README),
       author='sinhrks',
       author_email='sinhrks@gmail.com',
-      url='http://expandas.readthedocs.org/en/stable',
+      url='http://pandas-ml.readthedocs.org/en/stable',
       license = 'BSD',
       packages=find_packages(),
       install_requires=list(read(REQUIREMENTS).splitlines())

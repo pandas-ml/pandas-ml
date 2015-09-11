@@ -11,9 +11,9 @@ You can create ``ModelFrame`` as the same manner as ``pandas.DataFrame``. The be
 
 .. code-block:: python
 
-   >>> import expandas as expd
+   >>> import pandas_ml as pdml
 
-   >>> df = expd.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
+   >>> df = pdml.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
    ...                       'C': [3, 4, 5]}, index=['a', 'b', 'c'])
    >>> df
       A  B  C
@@ -22,7 +22,7 @@ You can create ``ModelFrame`` as the same manner as ``pandas.DataFrame``. The be
    c  3  4  5
 
    >>> type(df)
-   <class 'expandas.core.frame.ModelFrame'>
+   <class 'pandas_ml.core.frame.ModelFrame'>
 
 
 You can check whether the created ``ModelFrame`` has target values using ``ModelFrame.has_target()`` function.
@@ -36,7 +36,7 @@ Target values can be specifyied via ``target`` keyword. You can simply pass a co
 
 .. code-block:: python
 
-   >>> df2 = expd.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
+   >>> df2 = pdml.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
    ...                        'C': [3, 4, 5]}, target='A')
    >>> df2
       A  B  C
@@ -54,7 +54,7 @@ Also, you can pass any list-likes to be handled as a target. In this case, targe
 
 .. code-block:: python
 
-   >>> df3 = expd.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
+   >>> df3 = pdml.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
    ...                        'C': [3, 4, 5]}, target=[4, 5, 6])
    >>> df3
       .target  A  B  C
@@ -73,7 +73,7 @@ Also, you can pass ``pandas.DataFrame`` and ``pandas.Series`` as data and target
 .. code-block:: python
 
    >>> import pandas as pd
-   df4 = expd.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
+   df4 = pdml.ModelFrame({'A': [1, 2, 3], 'B': [2, 3, 4],
    ...                    'C': [3, 4, 5]}, target=pd.Series([4, 5, 6]))
    >>> df4
       .target  A  B  C
@@ -111,7 +111,7 @@ You can access to each property as the same as ``pandas.DataFrame``. Sliced resu
    Name: A, dtype: int64
 
    >>> type(sliced)
-   <class 'expandas.core.series.ModelSeries'>
+   <class 'pandas_ml.core.series.ModelSeries'>
 
    >>> subset = df[['A', 'B']]
    >>> subset
@@ -121,7 +121,7 @@ You can access to each property as the same as ``pandas.DataFrame``. Sliced resu
    c  3  4
 
    >>> type(subset)
-   <class 'expandas.core.frame.ModelFrame'>
+   <class 'pandas_ml.core.frame.ModelFrame'>
 
 ``ModelFrame`` has a special properties ``data`` to access data (features) and ``target`` to access target.
 
