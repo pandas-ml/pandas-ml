@@ -1,8 +1,8 @@
 pandas-ml
 =========
 
-.. image:: https://pypip.in/version/expandas/badge.svg
-    :target: https://pypi.python.org/pypi/expandas/
+.. image:: https://pypip.in/version/pandas_ml/badge.svg
+    :target: https://pypi.python.org/pypi/pandas_ml/
     :alt: Latest Version
 
 .. image:: https://readthedocs.org/projects/pandas-ml/badge/?version=latest
@@ -16,6 +16,14 @@ Overview
 ~~~~~~~~
 
 Expand pandas functionalities to be easier to use other statistics/ML packages, mainly forcusing on scikit-learn.
+
+Installation
+~~~~~~~~~~~~
+
+.. code-block::
+
+    $ pip install pandas_ml
+
 
 Documentation
 ~~~~~~~~~~~~~
