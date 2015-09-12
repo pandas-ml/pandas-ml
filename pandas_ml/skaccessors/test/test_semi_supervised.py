@@ -7,20 +7,20 @@ import pandas.compat as compat
 import sklearn.datasets as datasets
 import sklearn.semi_supervised as ss
 
-import pandas_ml as expd
+import pandas_ml as pdml
 import pandas_ml.util.testing as tm
 
 
 class TestSemiSupervised(tm.TestCase):
 
     def test_objectmapper(self):
-        df = expd.ModelFrame([])
+        df = pdml.ModelFrame([])
         self.assertIs(df.semi_supervised.LabelPropagation, ss.LabelPropagation)
         self.assertIs(df.semi_supervised.LabelSpreading, ss.LabelSpreading)
 
     def test_Classifications(self):
         iris = datasets.load_iris()
-        df = expd.ModelFrame(iris)
+        df = pdml.ModelFrame(iris)
 
         models = ['LabelPropagation', 'LabelSpreading']
         for model in models:
@@ -33,7 +33,7 @@ class TestSemiSupervised(tm.TestCase):
             result = df.predict(mod1)
             expected = mod2.predict(iris.data)
 
-            self.assertTrue(isinstance(result, expd.ModelSeries))
+            self.assertTrue(isinstance(result, pdml.ModelSeries))
             self.assert_numpy_array_almost_equal(result.values, expected)
 
 
