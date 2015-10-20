@@ -16,7 +16,6 @@ class TestSklearnBase(tm.TestCase):
         iris = datasets.load_iris()
         df = pdml.ModelFrame(iris)
         self.assertEqual(df.shape, (150, 5))
-        print(df.shape)
 
         msg = "'target' can't be specified for sklearn.datasets"
         with self.assertRaisesRegexp(ValueError, msg):

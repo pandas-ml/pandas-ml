@@ -13,8 +13,17 @@ try:
 except ImportError:
 
     # define dummy
-    BaseEstimator = object
-    ClassifierMixin = object
-    ClusterMixin = object
-    RegressorMixin = object
-    TransformerMixin = object
+    class BaseEstimator(object):
+        pass
+
+    class ClassifierMixin(object):
+        pass
+
+    class ClusterMixin(object):
+        pass
+
+    class RegressorMixin(object):
+        pass
+
+    class TransformerMixin(object):
+        pass

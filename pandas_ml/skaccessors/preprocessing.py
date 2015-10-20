@@ -58,13 +58,22 @@ def _wrap_func(func, func_name):
     def f(self, *args, **kwargs):
         from pandas_ml.core.frame import ModelFrame
         if isinstance(self._df, ModelFrame):
-            data = self._data
-            result = func(data.values, *args, **kwargs)
-            result = self._constructor(result, index=data.index,
-                                       columns=data.columns)
+            values = self._data.values
+
+            if pd.core.common.is_integer_dtype(values):
+                # integer raises an error in normalize
+                values = values.astype(np.float)
+
+            result = func(values, *args, **kwargs)
+            result = self._constructor(result, index=self._data.index,
+                                       columns=self._data.columns)
         else:
             # ModelSeries
             values = np.atleast_2d(self._df.values)
+
+            if pd.core.common.is_integer_dtype(values):
+                values = values.astype(np.float)
+
             result = func(values, *args, **kwargs)
             result = self._constructor(result[0], index=self._df.index,
                                        name=self._df.name)

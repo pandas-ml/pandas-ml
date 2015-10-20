@@ -3,17 +3,19 @@ python:
   - "2.7"
   - "3.3" 
   - "3.4"
+  - "3.5"
 
 install: 
   - sudo pip install conda
   - sudo conda init
-  # - sudo conda update conda --yes
   - deps='pip numpy scipy matplotlib scikit-learn pandas patsy statsmodels nose'
   - conda create -p $HOME/py --yes $deps "python=$TRAVIS_PYTHON_VERSION"
   - export PATH=$HOME/py/bin:$PATH
+  - python -m pip install python-coveralls coverage
   - "pip install -r requirements.txt"
 
-script: nosetests
+script:
+  - nosetests --with-coverage
 
 after_success:
   - coveralls

@@ -1,21 +1,20 @@
 pandas-ml
 =========
 
-.. image:: https://pypip.in/version/pandas_ml/badge.svg
+.. image:: https://img.shields.io/pypi/v/pandas_ml.svg
     :target: https://pypi.python.org/pypi/pandas_ml/
-    :alt: Latest Version
-
 .. image:: https://readthedocs.org/projects/pandas-ml/badge/?version=latest
     :target: http://pandas-ml.readthedocs.org/en/latest/
     :alt: Latest Docs
-
 .. image:: https://travis-ci.org/sinhrks/pandas-ml.svg?branch=master
     :target: https://travis-ci.org/sinhrks/pandas-ml
+.. image:: https://coveralls.io/repos/sinhrks/pandas-ml/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/sinhrks/pandas-ml?branch=master
 
 Overview
 ~~~~~~~~
 
-Expand pandas functionalities to be easier to use other statistics/ML packages, mainly forcusing on scikit-learn.
+pandas and scikit-learn integration.
 
 Installation
 ~~~~~~~~~~~~

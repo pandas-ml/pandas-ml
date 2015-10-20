@@ -203,8 +203,46 @@ class TestPreprocessing(tm.TestCase):
             self.assert_numpy_array_almost_equal(result.data.values, expected)
             self.assert_index_equal(result.columns, df.columns)
 
-    def test_transform_1d_frame(self):
+    def test_transform_1d_frame_int(self):
         arr = np.array([1, 2, 3, 1, 2, 3, 1, 2, 3])
+        idx = pd.Index('a b c d e f g h i'.split(' '))
+        df = pdml.ModelFrame(arr, index=idx, columns=['X'])
+        self.assertEqual(len(df.columns), 1)
+
+        if pd.compat.PY3:
+            models = ['Binarizer', 'Imputer', 'StandardScaler']
+            # MinMaxScalar raises TypeError in ufunc
+        else:
+            models = ['Binarizer', 'Imputer', 'StandardScaler', 'MinMaxScaler']
+
+        for model in models:
+            mod1 = getattr(df.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            df.fit(mod1)
+            mod2.fit(arr)
+
+            result = df.transform(mod1)
+            expected = mod2.transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, pdml.ModelFrame))
+            self.assert_numpy_array_almost_equal(result.values.flatten(), expected)
+            self.assert_index_equal(result.index, idx)
+            self.assert_index_equal(result.columns, pd.Index(['X']))
+
+            mod1 = getattr(df.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            result = df.fit_transform(mod1)
+            expected = mod2.fit_transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, pdml.ModelFrame))
+            self.assert_numpy_array_almost_equal(result.values.flatten(), expected)
+            self.assert_index_equal(result.index, idx)
+            self.assert_index_equal(result.columns, pd.Index(['X']))
+
+    def test_transform_1d_frame_float(self):
+        arr = np.array([1, 2, 3, 1, 2, 3, 1, 2, 3], dtype=np.float)
         idx = pd.Index('a b c d e f g h i'.split(' '))
         df = pdml.ModelFrame(arr, index=idx, columns=['X'])
         self.assertEqual(len(df.columns), 1)
@@ -236,8 +274,40 @@ class TestPreprocessing(tm.TestCase):
             self.assert_index_equal(result.index, idx)
             self.assert_index_equal(result.columns, pd.Index(['X']))
 
-    def test_transform_series(self):
+    def test_transform_series_int(self):
         arr = np.array([1, 2, 3, 1, 2, 3, 1, 2, 3])
+        s = pdml.ModelSeries(arr, index='a b c d e f g h i'.split(' '))
+
+        if pd.compat.PY3:
+            models = ['Binarizer', 'Imputer', 'StandardScaler']
+            # MinMaxScalar raises TypeError in ufunc
+        else:
+            models = ['Binarizer', 'Imputer', 'StandardScaler', 'MinMaxScaler']
+
+        for model in models:
+            mod1 = getattr(s.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            s.fit(mod1)
+            mod2.fit(arr)
+
+            result = s.transform(mod1)
+            expected = mod2.transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, pdml.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            mod1 = getattr(s.preprocessing, model)()
+            mod2 = getattr(pp, model)()
+
+            result = s.fit_transform(mod1)
+            expected = mod2.fit_transform(arr).flatten()
+
+            self.assertTrue(isinstance(result, pdml.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+    def test_transform_series_float(self):
+        arr = np.array([1, 2, 3, 1, 2, 3, 1, 2, 3], dtype=np.float)
         s = pdml.ModelSeries(arr, index='a b c d e f g h i'.split(' '))
 
         models = ['Binarizer', 'Imputer', 'StandardScaler', 'MinMaxScaler']
