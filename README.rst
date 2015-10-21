@@ -14,7 +14,8 @@ pandas-ml
 Overview
 ~~~~~~~~
 
-pandas and scikit-learn integration.
+`pandas <http://pandas.pydata.org/>`_, `scikit-learn <http://scikit-learn.org/>`_
+and `xgboost <http://xgboost.readthedocs.org/en/latest/index.html>`_ integration.
 
 Installation
 ~~~~~~~~~~~~
@@ -93,3 +94,4 @@ Supported Packages
 
 - ``scikit-learn``
 - ``patsy``
+- ``xgboost``

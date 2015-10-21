@@ -15,6 +15,7 @@ Contents:
    whatsnew
    modelframe
    sklearn
+   xgboost
    patsy
 
 
@@ -25,3 +26,4 @@ API:
 
    generated/pandas-ml.core
    generated/pandas-ml.skaccessors
+   generated/pandas-ml.xgboost
