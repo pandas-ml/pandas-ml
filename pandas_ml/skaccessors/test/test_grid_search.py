@@ -26,16 +26,16 @@ class TestGridSearch(tm.TestCase):
                             {'kernel': ['linear'], 'C': [1, 10, 100]}]
 
         df = pdml.ModelFrame(datasets.load_digits())
-        cv = df.grid_search.GridSearchCV(df.svm.SVC(C=1), tuned_parameters, cv=5, scoring='precision')
+        cv = df.grid_search.GridSearchCV(df.svm.SVC(C=1), tuned_parameters, cv=5) # , scoring='precision')
 
         with tm.RNGContext(1):
             df.fit(cv)
 
         result = df.grid_search.describe(cv)
-        expected = pd.DataFrame({'mean': [0.974108, 0.951416, 0.975372, 0.962534,  0.975372,
-                                          0.964695, 0.951811, 0.951811, 0.951811],
-                                 'std': [0.01313946, 0.02000999, 0.01128049, 0.0202183, 0.01128049,
-                                         0.0166863, 0.01840967, 0.01840967, 0.01840967],
+        expected = pd.DataFrame({'mean': [0.97161937, 0.9476906, 0.97273233, 0.95937674, 0.97273233,
+                                          0.96271564, 0.94936004, 0.94936004, 0.94936004],
+                                 'std': [0.01546977, 0.0221161, 0.01406514, 0.02295168, 0.01406514,
+                                         0.01779749, 0.01911084, 0.01911084, 0.01911084],
                                  'C': [1, 1, 10, 10, 100, 100, 1, 10, 100],
                                  'gamma': [0.001, 0.0001, 0.001, 0.0001, 0.001, 0.0001,
                                            np.nan, np.nan, np.nan],

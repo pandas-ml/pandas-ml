@@ -52,7 +52,7 @@ class TestModelSeries(tm.TestCase):
         s = pdml.ModelSeries([1, 2, 3, 4, 5], index=['A', 'B', 'C', 'D', 'E'])
         self.assertTrue(isinstance(s, pdml.ModelSeries))
         result = s.preprocessing.normalize()
-        expected = pp.normalize(np.atleast_2d(s.values))[0, :]
+        expected = pp.normalize(np.atleast_2d(s.values.astype(np.float)))[0, :]
 
         self.assertTrue(isinstance(result, pdml.ModelSeries))
         self.assert_numpy_array_almost_equal(result.values, expected)
