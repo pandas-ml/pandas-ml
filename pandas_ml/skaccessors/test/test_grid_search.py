@@ -26,7 +26,7 @@ class TestGridSearch(tm.TestCase):
                             {'kernel': ['linear'], 'C': [1, 10, 100]}]
 
         df = pdml.ModelFrame(datasets.load_digits())
-        cv = df.grid_search.GridSearchCV(df.svm.SVC(C=1), tuned_parameters, cv=5) # , scoring='precision')
+        cv = df.grid_search.GridSearchCV(df.svm.SVC(C=1), tuned_parameters, cv=5)
 
         with tm.RNGContext(1):
             df.fit(cv)

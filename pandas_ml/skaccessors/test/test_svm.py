@@ -30,13 +30,39 @@ class TestSVM(tm.TestCase):
         expected = svm.l1_min_c(iris.data, iris.target)
         self.assertAlmostEqual(result, expected)
 
-    def test_Regressions(self):
+    def test_Regressions_curve(self):
+        # http://scikit-learn.org/stable/auto_examples/plot_kernel_ridge_regression.html
+        X = 5 * np.random.rand(1000, 1)
+        y = np.sin(X).ravel()
+
+        # Add noise to targets
+        y[::5] += 3 * (0.5 - np.random.rand(X.shape[0]/5))
+
+        df = pdml.ModelFrame(data=X, target=y)
+
+        models = ['SVR', 'NuSVR']
+        for model in models:
+            mod1 = getattr(df.svm, model)()
+            mod2 = getattr(svm, model)()
+
+            df.fit(mod1)
+            mod2.fit(X, y)
+
+            result = df.predict(mod1)
+            expected = mod2.predict(X)
+
+            self.assertTrue(isinstance(result, pdml.ModelSeries))
+            self.assert_numpy_array_almost_equal(result.values, expected)
+
+            self.assertTrue(isinstance(df.predicted, pdml.ModelSeries))
+            self.assert_numpy_array_almost_equal(df.predicted.values, expected)
+
+    def test_Regressions_iris(self):
         iris = datasets.load_iris()
         df = pdml.ModelFrame(iris)
 
         models = ['SVR', 'NuSVR']
         for model in models:
-            print(model)
             mod1 = getattr(df.svm, model)()
             mod2 = getattr(svm, model)()
 
