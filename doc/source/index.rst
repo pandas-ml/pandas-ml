@@ -24,6 +24,6 @@ API:
 .. toctree::
    :maxdepth: 2
 
-   generated/pandas-ml.core
-   generated/pandas-ml.skaccessors
-   generated/pandas-ml.xgboost
+   generated/pandas_ml.core
+   generated/pandas_ml.skaccessors
+   generated/pandas_ml.xgboost
