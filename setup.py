@@ -30,8 +30,7 @@ write_version_py(filename=version_file)
 
 setup(name=PACKAGE,
       version=VERSION,
-      description='Expand pandas functionalities to be easier to use other '
-                  'statistics/ML packages, mainly forcusing on scikit-learn.',
+      description='pandas, scikit-learn and xgboost integration',
       long_description=read(README),
       author='sinhrks',
       author_email='sinhrks@gmail.com',

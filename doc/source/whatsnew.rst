@@ -2,6 +2,14 @@
 What's new
 ==========
 
+v0.3.0
+------
+
+Enhancement
+^^^^^^^^^^^
+
+- Support ``xgboost`` via ``ModelFrame.xgboost`` accessor.
+
 v0.2.0
 ------
 
