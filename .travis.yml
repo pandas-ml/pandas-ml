@@ -5,18 +5,18 @@ python:
   - "3.4"
   - "3.5"
 
+addons:
+  apt:
+    packages:
+    - graphviz
+
 install: 
-  - sudo pip install conda
-  - sudo conda init
-  - deps='pip numpy scipy matplotlib scikit-learn pandas patsy statsmodels nose'
-  - conda create -p $HOME/py --yes $deps "python=$TRAVIS_PYTHON_VERSION"
-  - export PATH=$HOME/py/bin:$PATH
-  - python -m pip install python-coveralls coverage
-  - "pip install -r requirements.txt"
+  - bash scripts/build_travis.sh
 
 script:
-  - nosetests --with-coverage
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - source activate myenv
+  - python -m nose --with-coverage
 
 after_success:
   - coveralls
-

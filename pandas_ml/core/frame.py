@@ -13,6 +13,7 @@ from pandas_ml.core.series import ModelSeries
 from pandas_ml.core.accessor import AccessorMethods
 import pandas_ml.skaccessors as skaccessors
 import pandas_ml.smaccessors as smaccessors
+import pandas_ml.xgboost as xgboost
 import pandas_ml.misc as misc
 import pandas_ml.util as util
 
@@ -749,6 +750,21 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     @cache_readonly
     def _tree(self):
         return AccessorMethods(self, module_name='sklearn.tree')
+
+    @property
+    def xgb(self):
+        """Property to access ``xgboost.sklearn`` API"""
+        return self._xgboost
+
+    @property
+    def xgboost(self):
+        """Property to access ``xgboost.sklearn`` API"""
+        return self._xgboost
+
+    @cache_readonly
+    def _xgboost(self):
+        return xgboost.XGBoostMethods(self)
+
 
     @Appender(pd.core.generic.NDFrame.groupby.__doc__)
     def groupby(self, by=None, axis=0, level=None, as_index=True, sort=True,
