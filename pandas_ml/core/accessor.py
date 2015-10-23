@@ -8,7 +8,7 @@ import pandas.compat as compat
 from pandas.util.decorators import Appender, cache_readonly
 
 
-class AccessorMethods(object):
+class _AccessorMethods(object):
     """
     Accessor to related functionalities.
     """

@@ -3,10 +3,10 @@
 import numpy as np
 import pandas as pd
 
-from pandas_ml.core.accessor import AccessorMethods, _attach_methods, _wrap_data_target_func
+from pandas_ml.core.accessor import _AccessorMethods, _attach_methods, _wrap_data_target_func
 
 
-class FeatureSelectionMethods(AccessorMethods):
+class FeatureSelectionMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.feature_selection``.
     """

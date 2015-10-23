@@ -68,7 +68,7 @@ class ModelTransformer(object):
             # transform using patsy
             return misc.transform_with_patsy(estimator, self, *args, **kwargs)
 
-        # whether to delegate AccessorMethods.transform
+        # whether to delegate _AccessorMethods.transform
         mapped = self._get_method_mapper(estimator, 'transform')
         if mapped is not None:
             result = mapped(self, estimator, *args, **kwargs)
