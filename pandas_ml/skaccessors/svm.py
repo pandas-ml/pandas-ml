@@ -3,10 +3,10 @@
 import numpy as np
 import pandas as pd
 
-from pandas_ml.core.accessor import AccessorMethods, _attach_methods
+from pandas_ml.core.accessor import _AccessorMethods, _attach_methods
 
 
-class SVMMethods(AccessorMethods):
+class SVMMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.svm``.
     """

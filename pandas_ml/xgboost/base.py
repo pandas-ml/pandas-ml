@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from pandas_ml.core.accessor import AccessorMethods
+from pandas_ml.core.accessor import _AccessorMethods
 
 
 def _to_dmatrix(data):
@@ -11,7 +11,7 @@ def _to_dmatrix(data):
     return dm
 
 
-class XGBoostMethods(AccessorMethods):
+class XGBoostMethods(_AccessorMethods):
     """Accessor to ``xgboost``."""
 
     # cannot attach classes automatically, because the module doesn't have __all__

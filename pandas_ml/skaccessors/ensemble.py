@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from pandas_ml.core.accessor import AccessorMethods
+from pandas_ml.core.accessor import _AccessorMethods
 
 
-class EnsembleMethods(AccessorMethods):
+class EnsembleMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.ensemble``.
     """
@@ -21,7 +21,7 @@ class EnsembleMethods(AccessorMethods):
         return PartialDependenceMethods(self._df)
 
 
-class PartialDependenceMethods(AccessorMethods):
+class PartialDependenceMethods(_AccessorMethods):
     # _module_name = 'sklearn.ensemble.partial_dependence'
     # 'sklearn.ensemble.partial_dependence' has no attribute '__all__'
 

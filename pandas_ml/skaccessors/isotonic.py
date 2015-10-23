@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from pandas_ml.core.accessor import AccessorMethods
+from pandas_ml.core.accessor import _AccessorMethods
 
 
-class IsotonicMethods(AccessorMethods):
+class IsotonicMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.isotonic``.
     """

@@ -10,7 +10,7 @@ from pandas.util.decorators import Appender, cache_readonly
 
 from pandas_ml.core.generic import ModelPredictor, _shared_docs
 from pandas_ml.core.series import ModelSeries
-from pandas_ml.core.accessor import AccessorMethods
+from pandas_ml.core.accessor import _AccessorMethods
 import pandas_ml.skaccessors as skaccessors
 import pandas_ml.smaccessors as smaccessors
 import pandas_ml.xgboost as xgboost
@@ -509,7 +509,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     @cache_readonly
     def _cross_decomposition(self):
         attrs = ['PLSRegression', 'PLSCanonical', 'CCA', 'PLSSVD']
-        return AccessorMethods(self, module_name='sklearn.cross_decomposition',
+        return _AccessorMethods(self, module_name='sklearn.cross_decomposition',
                                attrs=attrs)
 
     @property
@@ -543,7 +543,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     @cache_readonly
     def _dummy(self):
         attrs = ['DummyClassifier', 'DummyRegressor']
-        return AccessorMethods(self, module_name='sklearn.dummy', attrs=attrs)
+        return _AccessorMethods(self, module_name='sklearn.dummy', attrs=attrs)
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='ensemble'))
@@ -607,7 +607,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     @cache_readonly
     def _kernel_approximation(self):
         attrs = ['AdditiveChi2Sampler', 'Nystroem', 'RBFSampler', 'SkewedChi2Sampler']
-        return AccessorMethods(self, module_name='sklearn.kernel_approximation',
+        return _AccessorMethods(self, module_name='sklearn.kernel_approximation',
                                attrs=attrs)
 
     @property
@@ -617,7 +617,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _lda(self):
-        return AccessorMethods(self, module_name='sklearn.lda')
+        return _AccessorMethods(self, module_name='sklearn.lda')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='learning_curve'))
@@ -667,7 +667,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _mixture(self):
-        return AccessorMethods(self, module_name='sklearn.mixture')
+        return _AccessorMethods(self, module_name='sklearn.mixture')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='multiclass'))
@@ -680,7 +680,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         import sklearn
         if str(sklearn.__version__) < LooseVersion('0.16.0'):
             warnings.warn('sklern.multiclass may not be loaded properly')
-        return AccessorMethods(self, module_name='sklearn.multiclass')
+        return _AccessorMethods(self, module_name='sklearn.multiclass')
 
     @property
     @Appender(_shared_docs['skaccessor_nolink'] % dict(module='naive_bayes'))
@@ -689,7 +689,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _naive_bayes(self):
-        return AccessorMethods(self, module_name='sklearn.naive_bayes')
+        return _AccessorMethods(self, module_name='sklearn.naive_bayes')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='neighbors'))
@@ -707,7 +707,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _neural_network(self):
-        return AccessorMethods(self, module_name='sklearn.neural_network')
+        return _AccessorMethods(self, module_name='sklearn.neural_network')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='pipeline'))
@@ -739,7 +739,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _qda(self):
-        return AccessorMethods(self, module_name='sklearn.qda')
+        return _AccessorMethods(self, module_name='sklearn.qda')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='random_projection'))
@@ -748,7 +748,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _random_projection(self):
-        return AccessorMethods(self, module_name='sklearn.random_projection')
+        return _AccessorMethods(self, module_name='sklearn.random_projection')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='semi_supervised'))
@@ -757,7 +757,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _semi_supervised(self):
-        return AccessorMethods(self, module_name='sklearn.semi_supervised')
+        return _AccessorMethods(self, module_name='sklearn.semi_supervised')
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='svm'))
@@ -775,7 +775,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
     @cache_readonly
     def _tree(self):
-        return AccessorMethods(self, module_name='sklearn.tree')
+        return _AccessorMethods(self, module_name='sklearn.tree')
 
     @property
     def xgb(self):

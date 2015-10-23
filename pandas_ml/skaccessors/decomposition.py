@@ -3,10 +3,10 @@
 import numpy as np
 import pandas as pd
 
-from pandas_ml.core.accessor import AccessorMethods
+from pandas_ml.core.accessor import _AccessorMethods
 
 
-class DecompositionMethods(AccessorMethods):
+class DecompositionMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.decomposition``.
     """

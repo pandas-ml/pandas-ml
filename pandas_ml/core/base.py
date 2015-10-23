@@ -4,26 +4,26 @@ try:
 
     import sklearn.base as base
 
-    BaseEstimator = base.BaseEstimator
-    ClassifierMixin = base.ClassifierMixin
-    ClusterMixin = base.ClusterMixin
-    RegressorMixin = base.RegressorMixin
-    TransformerMixin = base.TransformerMixin
+    _BaseEstimator = base.BaseEstimator
+    _ClassifierMixin = base.ClassifierMixin
+    _ClusterMixin = base.ClusterMixin
+    _RegressorMixin = base.RegressorMixin
+    _TransformerMixin = base.TransformerMixin
 
 except ImportError:
 
     # define dummy
-    class BaseEstimator(object):
+    class _BaseEstimator(object):
         pass
 
-    class ClassifierMixin(object):
+    class _ClassifierMixin(object):
         pass
 
-    class ClusterMixin(object):
+    class _ClusterMixin(object):
         pass
 
-    class RegressorMixin(object):
+    class _RegressorMixin(object):
         pass
 
-    class TransformerMixin(object):
+    class _TransformerMixin(object):
         pass

@@ -3,10 +3,10 @@
 import numpy as np
 import pandas as pd
 
-from pandas_ml.core.accessor import AccessorMethods, _attach_methods
+from pandas_ml.core.accessor import _AccessorMethods, _attach_methods
 
 
-class PipelineMethods(AccessorMethods):
+class PipelineMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.pipeline``.
     """

@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from pandas_ml.core.accessor import AccessorMethods, _attach_methods, _wrap_data_func
+from pandas_ml.core.accessor import _AccessorMethods, _attach_methods, _wrap_data_func
 
 
-class ClusterMethods(AccessorMethods):
+class ClusterMethods(_AccessorMethods):
     """Accessor to ``sklearn.cluster``."""
 
     _module_name = 'sklearn.cluster'
@@ -81,7 +81,7 @@ class ClusterMethods(AccessorMethods):
 
     @cache_readonly
     def _bicluster(self):
-        return AccessorMethods(self._df, module_name='sklearn.cluster.bicluster')
+        return _AccessorMethods(self._df, module_name='sklearn.cluster.bicluster')
 
 
 _cluster_methods = ['estimate_bandwidth', 'ward_tree']

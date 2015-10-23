@@ -4,7 +4,7 @@ import pandas as pd
 from pandas.util.decorators import Appender, cache_readonly
 import pandas.compat as compat
 
-from pandas_ml.core.base import BaseEstimator
+from pandas_ml.core.base import _BaseEstimator
 from pandas_ml.core.generic import ModelPredictor, _shared_docs
 from pandas_ml.core.frame import ModelFrame
 from pandas_ml.core.series import ModelSeries
@@ -89,7 +89,7 @@ class ModelFrameGroupBy(pd.core.groupby.DataFrameGroupBy, ModelPredictor):
         return results
 
 
-class GroupedEstimator(BaseEstimator):
+class GroupedEstimator(_BaseEstimator):
     """
     Create grouped estimators based on passed estimator
     """

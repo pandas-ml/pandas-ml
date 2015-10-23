@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from pandas_ml.core.accessor import AccessorMethods, _attach_methods
+from pandas_ml.core.accessor import _AccessorMethods, _attach_methods
 
 
 try:
@@ -14,7 +14,7 @@ try:
 except ImportError:
     _keep_col_classes = set()
 
-class PreprocessingMethods(AccessorMethods):
+class PreprocessingMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.preprocessing``.
     """

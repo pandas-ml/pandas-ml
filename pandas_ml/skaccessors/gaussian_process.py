@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from pandas.util.decorators import cache_readonly
 
-from pandas_ml.core.accessor import AccessorMethods, _attach_methods, _wrap_data_func
+from pandas_ml.core.accessor import _AccessorMethods, _attach_methods, _wrap_data_func
 
 
-class GaussianProcessMethods(AccessorMethods):
+class GaussianProcessMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.gaussian_process``.
     """
@@ -23,7 +23,7 @@ class GaussianProcessMethods(AccessorMethods):
         attrs = ['absolute_exponential', 'squared_exponential',
                  'generalized_exponential', 'pure_nugget',
                  'cubic', 'linear']
-        return AccessorMethods(self._df, module_name=module_name, attrs=attrs)
+        return _AccessorMethods(self._df, module_name=module_name, attrs=attrs)
 
     @property
     def regression_models(self):
@@ -53,7 +53,7 @@ class GaussianProcessMethods(AccessorMethods):
             return y
 
 
-class RegressionModelsMethods(AccessorMethods):
+class RegressionModelsMethods(_AccessorMethods):
     _module_name = 'sklearn.gaussian_process.regression_models'
 
 

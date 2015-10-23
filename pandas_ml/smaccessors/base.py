@@ -36,7 +36,7 @@ def _maybe_statsmodels_data(data, target):
     return data, target
 
 
-class StatsModelsRegressor(base.BaseEstimator, base.RegressorMixin):
+class StatsModelsRegressor(base._BaseEstimator, base._RegressorMixin):
 
     def __init__(self, statsmodel=None, **parameters):
         self.statsmodel = statsmodel
