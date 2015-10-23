@@ -398,14 +398,40 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
         self._predicted = predicted
         return self._predicted
 
-    def _wrap_transform(self, transformed):
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='transform', returned='returned : transformed result'))
+    def transform(self, estimator, *args, **kwargs):
+        transformed = super(ModelFrame, self).transform(estimator, *args, **kwargs)
+
+        if not isinstance(estimator, compat.string_types):
+            # set inverse columns
+            estimator._pdml_original_columns = self.data.columns
+        return transformed
+
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='fit_transform', returned='returned : transformed result'))
+    def fit_transform(self, estimator, *args, **kwargs):
+        transformed = super(ModelFrame, self).fit_transform(estimator, *args, **kwargs)
+
+        if not isinstance(estimator, compat.string_types):
+            # set inverse columns
+            estimator._pdml_original_columns = self.data.columns
+        return transformed
+
+    @Appender(_shared_docs['estimator_methods'] %
+              dict(funcname='inverse_transform', returned='returned : transformed result'))
+    def inverse_transform(self, estimator, *args, **kwargs):
+        transformed = self._call(estimator, 'inverse_transform', *args, **kwargs)
+        original_columns = getattr(estimator, '_pdml_original_columns', None)
+        transformed = self._wrap_transform(transformed, columns=original_columns)
+        return transformed
+
+    def _wrap_transform(self, transformed, columns=None):
         """
         Wrapper for transform methods
         """
         if self.pp._keep_existing_columns(self.estimator):
             columns = self.data.columns
-        else:
-            columns = None
 
         if self.has_target():
             return self._constructor(transformed, target=self.target,
