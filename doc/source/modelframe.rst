@@ -25,7 +25,7 @@ You can create ``ModelFrame`` as the same manner as ``pandas.DataFrame``. The be
    <class 'pandas_ml.core.frame.ModelFrame'>
 
 
-You can check whether the created ``ModelFrame`` has target values using ``ModelFrame.has_target()`` function.
+You can check whether the created ``ModelFrame`` has target values using ``ModelFrame.has_target()`` method.
 
 .. code-block:: python
 
@@ -93,7 +93,9 @@ Also, you can pass ``pandas.DataFrame`` and ``pandas.Series`` as data and target
 Data Manipulation
 -----------------
 
-You can access to each property as the same as ``pandas.DataFrame``. Sliced results will be ``ModelSeries`` (simple wrapper for ``pandas.Series`` to support some data manipulation) or ``ModelFrame``
+You can maniluplate ``ModelFrame`` like ``pandas.DataFrame``. Because ``ModelFrame`` inherits ``pandas.DataFrame``, all the ``pandas`` methods / functions can be applied to ``ModelFrame``.
+
+Sliced results will be ``ModelSeries`` (simple wrapper for ``pandas.Series`` to support some data manipulation) or ``ModelFrame``
 
 .. code-block:: python
 
@@ -149,7 +151,7 @@ You can access to each property as the same as ``pandas.DataFrame``. Sliced resu
    Name: A, dtype: int64
 
 
-You can update data and target via properties, in addition to standard ``pandas.DataFrame`` ways.
+You can update data and target via properties. Also, columns / value assignment are supported as the same as ``pandas.DataFrame``.
 
 .. code-block:: python
 
@@ -174,7 +176,7 @@ You can update data and target via properties, in addition to standard ``pandas.
    1  9  0  5
    2  9  0  6
 
-You can change target column specifying ``target_name`` property. Specifying a column which doesn't exist in ``ModelFrame`` results in target column to be data column.
+You can change target column specifying ``target_name`` property.
 
 .. code-block:: python
 
@@ -182,6 +184,13 @@ You can change target column specifying ``target_name`` property. Specifying a c
    'A'
 
    >>> df2.target_name = 'X'
+   >>> df2.target_name
+   'X'
+
+If the specified column doesn't exist in ``ModelFrame``, it should reset target to ``None``. Current target will be regarded as data.
+
+.. code-block:: python
+
    >>> df2.target_name
    'X'
 
