@@ -183,6 +183,7 @@ class TestDecomposition(tm.TestCase):
             self.assertTrue(isinstance(result, pdml.ModelFrame))
             self.assert_series_equal(df.target, result.target)
             self.assert_numpy_array_almost_equal(result.data.values, expected)
+            self.assert_index_equal(result.columns, df.columns)
 
 
 if __name__ == '__main__':

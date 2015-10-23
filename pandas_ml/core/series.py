@@ -24,7 +24,7 @@ class ModelSeries(pd.Series, ModelTransformer):
         result = method(data, *args, **kwargs)
         return result
 
-    def _wrap_transform(self, transformed):
+    def _wrap_transform(self, transformed, columns=None):
         """
         Wrapper for transform methods
         """

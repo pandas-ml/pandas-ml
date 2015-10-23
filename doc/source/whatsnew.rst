@@ -2,6 +2,14 @@
 What's new
 ==========
 
+v0.3.1
+------
+
+Enhancement
+^^^^^^^^^^^
+
+- ``inverse_transform`` now reverts original ``ModelFrame.columns`` information.
+
 v0.3.0
 ------
 

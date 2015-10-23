@@ -65,8 +65,10 @@ class ModelTransformer(object):
               dict(funcname='transform', returned='returned : transformed result'))
     def transform(self, estimator, *args, **kwargs):
         if isinstance(estimator, compat.string_types):
+            # transform using patsy
             return misc.transform_with_patsy(estimator, self, *args, **kwargs)
 
+        # whether to delegate AccessorMethods.transform
         mapped = self._get_method_mapper(estimator, 'transform')
         if mapped is not None:
             result = mapped(self, estimator, *args, **kwargs)
@@ -87,7 +89,8 @@ class ModelTransformer(object):
               dict(funcname='inverse_transform', returned='returned : transformed result'))
     def inverse_transform(self, estimator, *args, **kwargs):
         transformed = self._call(estimator, 'inverse_transform', *args, **kwargs)
-        return self._wrap_transform(transformed)
+        transformed = self._wrap_transform(transformed)
+        return transformed
 
     def _wrap_transform(self, transformed):
         raise NotImplementedError

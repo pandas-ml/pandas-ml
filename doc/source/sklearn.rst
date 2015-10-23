@@ -136,7 +136,7 @@ Thus, you can instanciate each estimator via ``ModelFrame`` accessors. Once crea
 
 .. note:: If you access to a property before calling ``ModelFrame`` methods, ``ModelFrame`` automatically calls corresponding method of the latest estimator and return the result.
 
-Following example shows to perform PCA, then revert principal components back to original space.
+Following example shows to perform PCA, then revert principal components back to original space. ``inverse_transform`` should revert the original columns.
 
 .. code-block:: python
 
@@ -156,23 +156,21 @@ Following example shows to perform PCA, then revert principal components back to
    <class 'pandas_ml.core.frame.ModelFrame'>
 
    >>> transformed.inverse_transform(estimator)
-        .target    0    1    2    3
-   0          0  5.1  3.5  1.4  0.2
-   1          0  4.9  3.0  1.4  0.2
-   2          0  4.7  3.2  1.3  0.2
-   3          0  4.6  3.1  1.5  0.2
-   4          0  5.0  3.6  1.4  0.2
-   ..       ...  ...  ...  ...  ...
-   145        2  6.7  3.0  5.2  2.3
-   146        2  6.3  2.5  5.0  1.9
-   147        2  6.5  3.0  5.2  2.0
-   148        2  6.2  3.4  5.4  2.3
-   149        2  5.9  3.0  5.1  1.8
+        .target  sepal length  sepal width  petal length  petal width
+   0          0           5.1          3.5           1.4          0.2
+   1          0           4.9          3.0           1.4          0.2
+   2          0           4.7          3.2           1.3          0.2
+   3          0           4.6          3.1           1.5          0.2
+   4          0           5.0          3.6           1.4          0.2
+   ..       ...           ...          ...           ...          ...
+   145        2           6.7          3.0           5.2          2.3
+   146        2           6.3          2.5           5.0          1.9
+   147        2           6.5          3.0           5.2          2.0
+   148        2           6.2          3.4           5.4          2.3
+   149        2           5.9          3.0           5.1          1.8
 
    [150 rows x 5 columns]
 
-
-.. note:: ``columns`` information will be lost once transformed to principal components.
 
 If ``ModelFrame`` both has ``target`` and ``predicted`` values, the model evaluation can be performed using functions available in ``ModelFrame.metrics``.
 
