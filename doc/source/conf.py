@@ -266,6 +266,8 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 
 # -- Build API doc ----------------------------------------------------------
 
+numpydoc_show_class_members = False
+
 fpath = os.path.dirname(__file__)
 gen_path = os.path.join(fpath, 'generated')
 app_path = os.path.join(os.path.dirname(os.path.dirname(fpath)), 'pandas_ml')

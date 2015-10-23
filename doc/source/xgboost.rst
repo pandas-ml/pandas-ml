@@ -1,8 +1,8 @@
 
-Use xgboost
+Use XGBoost
 ===========
 
-This section describes how to use ``xgboost`` functionalities via ``pandas-ml``.
+This section describes how to use ``XGBoost`` functionalities via ``pandas-ml``.
 
 Use ``scikit-learn`` digits dataset as sample data.
 
@@ -22,7 +22,7 @@ Use ``scikit-learn`` digits dataset as sample data.
 
    [5 rows x 65 columns]
 
-As an estimator, ``XGBClassifier`` and ``XGBRegressor`` are available via ``xgboost`` accessor.
+As an estimator, ``XGBClassifier`` and ``XGBRegressor`` are available via ``xgboost`` accessor. See `XGBoost Scikit-learn API <http://xgboost.readthedocs.org/en/latest/python/python_api.html#module-xgboost.sklearn>`_ for details.
 
 .. code-block:: python
 
@@ -74,11 +74,15 @@ You can use these estimators like ``scikit-learn`` estimators.
 
    [10 rows x 10 columns]
 
+Also, plotting functions are available via ``xgboost`` accessor.
+
+.. code-block:: python
+
    >>> train_df.xgboost.plot_importance()
    # importance plot will be displayed
 
 
-``xgboost`` estimators can be passed to other ``scikit-learn`` APIs.
+``XGBoost`` estimators can be passed to other ``scikit-learn`` APIs.
 Following example shows to perform a grid search.
 
 .. code-block:: python
