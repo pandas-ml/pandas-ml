@@ -20,6 +20,31 @@ class TestCrossDecomposition(tm.TestCase):
         self.assertIs(df.cross_decomposition.CCA, cd.CCA)
         self.assertIs(df.cross_decomposition.PLSSVD, cd.PLSSVD)
 
+    def test_CCA(self):
+        X = [[0., 0., 1.], [1.,0.,0.], [2.,2.,2.], [3.,5.,4.]]
+        Y = [[0.1, -0.2], [0.9, 1.1], [6.2, 5.9], [11.9, 12.3]]
+        df = pdml.ModelFrame(X, target=Y)
+
+        mod1 = df.cross_decomposition.CCA(n_components=1)
+        mod2 = cd.CCA(n_components=1)
+
+        df.fit(mod1)
+        mod2.fit(X, Y)
+
+        # 2nd cols are different on travis-CI
+        self.assert_numpy_array_almost_equal(mod1.x_weights_[:, 0], mod2.x_weights_[:, 0])
+        self.assert_numpy_array_almost_equal(mod1.y_weights_[:, 0], mod2.y_weights_[:, 0])
+
+        result = df.transform(mod1)
+        print(result)
+        expected = mod2.transform(X, Y)
+
+        self.assertTrue(isinstance(result, pdml.ModelFrame))
+        self.assert_numpy_array_almost_equal(result.data.values.reshape(4),
+                                             expected[0].reshape(4))
+        self.assert_numpy_array_almost_equal(result.target.values.reshape(4),
+                                             expected[1].reshape(4))
+
     def test_CCA_PLSCannonical(self):
         n = 500
 

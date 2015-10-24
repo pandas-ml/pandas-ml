@@ -55,6 +55,7 @@ class TestGaussianProcess(tm.TestCase):
         self.assert_numpy_array_almost_equal(result, expected)
 
     def test_GaussianProcess(self):
+        # http://scikit-learn.org/stable/modules/gaussian_process.html
         X = np.atleast_2d([1., 3., 5., 6., 7., 8.]).T
         y = np.sin(X).ravel()
         df = pdml.ModelFrame(X, target=y)
@@ -89,7 +90,7 @@ class TestGaussianProcess(tm.TestCase):
         self.assert_numpy_array_almost_equal(y_result, y_expected)
 
     def test_Gaussian2D(self):
-
+        # http://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gp_probabilistic_classification_after_regression.html
         from scipy import stats
 
         # Standard normal distribution functions
