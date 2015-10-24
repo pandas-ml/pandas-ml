@@ -42,14 +42,12 @@ You can create ``ModelFrame`` instance from ``scikit-learn`` datasets directly.
 
 Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` module. Some accessors has its abbreviated versions.
 
-.. note:: Currently, ``ModelFrame`` can handle target which consists from a single column. Modules which uses multiple target columns cannot be handled automatically, and marked with `(WIP)`.
-
 ================================  ==========================================
 ``scikit-learn``                  ``ModelFrame`` accessor
 ================================  ==========================================
 ``sklearn.cluster``               ``ModelFrame.cluster``
 ``sklearn.covariance``            ``ModelFrame.covariance``
-``sklearn.cross_decomposition``   ``ModelFrame.cross_decomposition`` (WIP)
+``sklearn.cross_decomposition``   ``ModelFrame.cross_decomposition``
 ``sklearn.cross_validation``      ``ModelFrame.cross_validation``, ``crv``
 ``sklearn.datasets``              (not accesible from accessor)
 ``sklearn.decomposition``         ``ModelFrame.decomposition``
@@ -57,7 +55,7 @@ Following table shows ``scikit-learn`` module and corresponding ``ModelFrame`` m
 ``sklearn.ensemble``              ``ModelFrame.ensemble``
 ``sklearn.feature_extraction``    ``ModelFrame.feature_extraction``
 ``sklearn.feature_selection``     ``ModelFrame.feature_selection``
-``sklearn.gaussian_process``      ``ModelFrame.gaussian_process``  (WIP)
+``sklearn.gaussian_process``      ``ModelFrame.gaussian_process``
 ``sklearn.grid_search``           ``ModelFrame.grid_search``
 ``sklearn.isotonic``              ``ModelFrame.isotonic``
 ``sklearn.kernel_approximation``  ``ModelFrame.kernel_approximation``
