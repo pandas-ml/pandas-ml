@@ -10,6 +10,11 @@ Enhancement
 
 - ``inverse_transform`` now reverts original ``ModelFrame.columns`` information.
 
+Bug Fix
+^^^^^^^
+
+- Assigning ``Series`` to ``ModelFrame.data`` property raises ``TypeError``
+
 v0.3.0
 ------
 

@@ -227,6 +227,13 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
             if data.has_target():
                 msg = 'Cannot update with {0} which has target attribute'
                 raise ValueError(msg.format(self.__class__.__name__))
+        elif isinstance(data, pd.Series):
+            data = data.to_frame()
+        elif isinstance(data, pd.DataFrame):
+            pass
+        else:
+            msg = 'data must be ModelFrame, ModelSeries, DataFrame or Series, {0} passed'
+            raise TypeError(msg.format(data.__class__.__name__))
 
         data, _ = self._maybe_convert_data(data, self.target, self.target_name)
 

@@ -327,6 +327,34 @@ class TestModelFrame(tm.TestCase):
         self.assertEqual(mdf.target.name, '.target')
         self.assertEqual(mdf.target_name, '.target')
 
+    def test_frame_data_proparty_series(self):
+        df = pdml.ModelFrame({'A': [1, 2, 3],
+                              'B': [4, 5, 6]},
+                             target=[7, 8, 9],
+                             index=['a', 'b', 'c'])
+        df.data = df['A']
+        exp = pdml.ModelFrame({'A': [1, 2, 3]},
+                              target=[7, 8, 9],
+                              index=['a', 'b', 'c'])
+        self.assert_frame_equal(df, exp)
+
+        df = pdml.ModelFrame({'A': [1, 2, 3],
+                              'B': [4, 5, 6]},
+                             target=[7, 8, 9],
+                             index=['a', 'b', 'c'])
+        df.data = pd.Series([1, 2, 3], name='x', index=['a', 'b', 'c'])
+        exp = pdml.ModelFrame({'x': [1, 2, 3]},
+                              target=[7, 8, 9],
+                              index=['a', 'b', 'c'])
+        self.assert_frame_equal(df, exp)
+
+        df = pdml.ModelFrame({'A': [1, 2, 3],
+                              'B': [4, 5, 6]},
+                             target=[7, 8, 9],
+                             index=['a', 'b', 'c'])
+        with tm.assertRaises(TypeError):
+            df.data = [1, 2, 3]
+
     def test_frame_target_proparty(self):
         df = pd.DataFrame({'A': [1, 2, 3],
                            'B': [4, 5, 6],
