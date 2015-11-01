@@ -387,7 +387,9 @@ class TestModelFrame(tm.TestCase):
             self.assert_index_equal(mdf.index, pd.Index(['a', 'b', 'c']))
             self.assert_index_equal(mdf.columns, pd.Index(['.target', 'A', 'B', 'C']))
             self.assert_frame_equal(mdf.data, df)
-            self.assert_series_equal(mdf.target, new, check_names=False)
+
+            exp_target = pd.Series(new, name='.target')
+            self.assert_series_equal(mdf.target, exp_target)
             self.assertEqual(mdf.target.name, '.target')
             self.assertEqual(mdf.target_name, '.target')
 

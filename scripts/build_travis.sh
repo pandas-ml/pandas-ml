@@ -12,9 +12,9 @@ conda update -q conda
 #Useful for debugging any issues with conda
 conda info -a
 
-conda create -n myenv "python=$TRAVIS_PYTHON_VERSION"
+conda create -n myenv "python=$PYTHON"
 source activate myenv
-conda install numpy scipy matplotlib scikit-learn pandas patsy statsmodels nose
+conda install numpy scipy matplotlib "scikit-learn=$SKLEARN" "pandas=$PANDAS" patsy statsmodels nose
 
 python -m pip install python-coveralls coverage
 python -m pip install graphviz

@@ -1,9 +1,11 @@
 language: python
-python:
-  - "2.7"
-  - "3.3" 
-  - "3.4"
-  - "3.5"
+
+env:
+  - PYTHON=2.7 PANDAS=0.16.0 SKLEARN=0.16.1
+  - PYTHON=2.7 PANDAS=0.17.0 SKLEARN=0.16.1
+  - PYTHON=3.4 PANDAS=0.16.0 SKLEARN=0.16.1
+  - PYTHON=3.4 PANDAS=0.17.0 SKLEARN=0.16.1
+  - PYTHON=3.5 PANDAS=0.17.0 SKLEARN=0.16.1
 
 addons:
   apt:
