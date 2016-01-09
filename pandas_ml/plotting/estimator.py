@@ -11,7 +11,8 @@ class _BasePlotter(object):
         self.data = data
         self.estimator = estimator
 
-        self.n_components = len(self.data.data)
+        assert isinstance(self.data, pd.DataFrame)
+        self.n_components = self.data.data.shape[1]
 
         # used to reduce dimensionality
         from sklearn.decomposition import PCA

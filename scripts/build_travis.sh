@@ -14,7 +14,7 @@ conda info -a
 
 conda create -n myenv "python=$PYTHON"
 source activate myenv
-conda install numpy scipy matplotlib "scikit-learn=$SKLEARN" "pandas=$PANDAS" patsy statsmodels nose
+conda install numpy scipy matplotlib "scikit-learn=$SKLEARN" "pandas=$PANDAS" patsy statsmodels seaborn nose
 
 python -m pip install python-coveralls coverage
 python -m pip install graphviz

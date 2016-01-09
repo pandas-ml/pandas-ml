@@ -41,6 +41,7 @@ class _AccessorMethods(object):
                         setattr(self, mobj, getattr(self._module, mobj))
                     except AttributeError:
                         pass
+
             except NotImplementedError:
                 pass
 

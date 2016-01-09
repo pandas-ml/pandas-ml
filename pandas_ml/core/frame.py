@@ -13,6 +13,7 @@ from pandas_ml.core.series import ModelSeries
 from pandas_ml.core.accessor import _AccessorMethods
 import pandas_ml.skaccessors as skaccessors
 import pandas_ml.smaccessors as smaccessors
+import pandas_ml.seaborn as seaborn
 import pandas_ml.xgboost as xgboost
 import pandas_ml.misc as misc
 import pandas_ml.util as util
@@ -797,6 +798,20 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     @cache_readonly
     def _tree(self):
         return _AccessorMethods(self, module_name='sklearn.tree')
+
+    @property
+    def sns(self):
+        """Property to access ``seaborn`` API"""
+        return self._seaborn
+
+    @property
+    def seaborn(self):
+        """Property to access ``seaborn`` API"""
+        return self._seaborn
+
+    @cache_readonly
+    def _seaborn(self):
+        return seaborn.SeabornMethods(self)
 
     @property
     def xgb(self):

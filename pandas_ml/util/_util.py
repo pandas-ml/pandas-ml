@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 def _is_1d_varray(arr):
     """
     Check whether the array has single dimension like (x, ) or (x, 1)
