@@ -30,9 +30,16 @@ class _AccessorMethods(object):
 
         if attrs is None:
             try:
+                attrs = self._module_attrs
+            except AttributeError:
+                pass
+        if attrs is None:
+            try:
                 attrs = self._module.__all__
             except AttributeError:
-                return
+                pass
+        if attrs is None:
+            return
 
         for mobj in attrs:
             try:

@@ -15,22 +15,41 @@ class SeabornMethods(_AccessorMethods):
     """Accessor to ``sklearn.cluster``."""
 
     _module_name = 'seaborn'
+    _module_attrs = ['palplot', 'set', 'axes_style', 'plotting_context',
+                     'set_context', 'set_color_codes', 'reset_defaults',
+                     'reset_orig', 'set_palette', 'color_palette',
+                     'husl_palette', 'hls_palette', 'cubehelix_palette',
+                     'dark_palette', 'light_palette', 'diverging_palette',
+                     'blend_palette', 'xkcd_palette', 'crayon_palette',
+                     'mpl_palette', 'choose_colorbrewer_palette',
+                     'choose_cubehelix_palette', 'choose_light_palette',
+                     'choose_dark_palette', 'choose_diverging_palette',
+                     'despine', 'desaturate', 'saturate', 'set_hls_values',
+                     'ci_to_errsize','axlabel']
 
     def _maybe_target_name(self, value, key):
         if value is None:
-            if self._df.has_multi_targets():
+            if not self._df.has_target():
+                msg = ("{key} can't be ommitted when ModelFrame doesn't have "
+                       "target column")
+                raise ValueError(msg.format(key=key))
+            elif self._df.has_multi_targets():
                 msg = ("{key} can't be ommitted when ModelFrame has multiple "
-                       "target multiple target columns")
-                raise ValueError(msg.format(key))
+                       "target columns")
+                raise ValueError(msg.format(key=key))
             value = self._df.target_name
         return value
 
     def _maybe_target_series(self, value, key):
         if value is None:
-            if self._df.has_multi_targets():
+            if not self._df.has_target():
+                msg = ("{key} can't be ommitted when ModelFrame doesn't have "
+                       "target column")
+                raise ValueError(msg.format(key=key))
+            elif self._df.has_multi_targets():
                 msg = ("{key} can't be ommitted when ModelFrame has multiple "
-                       "target multiple target columns")
-                raise ValueError(msg.format(key))
+                       "target columns")
+                raise ValueError(msg.format(key=key))
             value = self._df.target
 
         elif not pd.core.common.is_list_like(value):
@@ -68,6 +87,19 @@ class SeabornMethods(_AccessorMethods):
         """
         a = self._maybe_target_series(a, key='a')
         return self._module.rugplot(a, *args, **kwargs)
+
+    def kdeplot(self, data=None, data2=None, *args, **kwargs):
+        """
+        Call ``seaborn.kdeplot`` using automatic mapping.
+
+        - ``data``: ``ModelFrame.target``
+        """
+        data = self._maybe_target_series(data, key='data')
+
+        if data2 is not None:
+            if not pd.core.common.is_list_like(data2):
+                data2 = self._df[data2]
+        return self._module.kdeplot(data, data2=data2, *args, **kwargs)
 
     # Regression plots
 
@@ -163,7 +195,6 @@ def _wrap_categorical_plot(func, func_name):
 
         elif x is None and y is not None:
             x = self._maybe_target_name(x, key='x')
-        print(y)
         return func(x, y, data=self._df, *args, **kwargs)
 
     f.__doc__ = (
@@ -198,5 +229,5 @@ _categorical_plots = ['factorplot', 'boxplot', 'violinplot', 'stripplot',
                       'pointplot', 'barplot']
 _attach_methods(SeabornMethods, _wrap_categorical_plot, _categorical_plots)
 
-_data_plots = ['pairplot', 'kdeplot']
+_data_plots = ['pairplot']
 _attach_methods(SeabornMethods, _wrap_data_plot, _data_plots)
