@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 import sklearn.decomposition as decomposition
 import sklearn.pipeline as pipeline
-import sklearn.svm as svm
 
 import pandas_ml as pdml
 import pandas_ml.util.testing as tm

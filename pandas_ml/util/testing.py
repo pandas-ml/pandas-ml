@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import pandas.util.testing as tm
-from pandas.util.testing import *
+from pandas.util.testing import (assertRaises, assertRaisesRegexp,  # noqa
+                                 assert_produces_warning,           # noqa
+                                 close, RNGContext)                 # noqa
 import pandas.tools.plotting as plotting
 
 

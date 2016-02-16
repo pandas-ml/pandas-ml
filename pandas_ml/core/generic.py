@@ -3,7 +3,7 @@
 import warnings
 
 import pandas.compat as compat
-from pandas.util.decorators import Appender, cache_readonly
+from pandas.util.decorators import Appender
 
 import pandas_ml.misc as misc
 
@@ -116,7 +116,7 @@ class ModelPredictor(ModelTransformer):
 
     @estimator.setter
     def estimator(self, value):
-        if not hasattr(self, '_estimator') or not self._estimator is value:
+        if not hasattr(self, '_estimator') or self._estimator is not value:
             self._estimator = value
             self._predicted = None
             self._proba = None

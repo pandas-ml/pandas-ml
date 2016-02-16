@@ -14,6 +14,7 @@ try:
 except ImportError:
     _keep_col_classes = set()
 
+
 class PreprocessingMethods(_AccessorMethods):
     """
     Accessor to ``sklearn.preprocessing``.
@@ -53,6 +54,7 @@ class PreprocessingMethods(_AccessorMethods):
 
 
 _preprocessing_methods = ['binarize', 'normalize', 'scale']
+
 
 def _wrap_func(func, func_name):
     def f(self, *args, **kwargs):

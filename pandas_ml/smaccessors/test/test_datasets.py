@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import numpy as np
 import pandas as pd
-import pandas.compat as compat
-
 import statsmodels.api as sm
 
 import pandas_ml as pdml
@@ -61,7 +58,7 @@ class TestStatsModelsDatasets(tm.TestCase):
         data = getattr(sm.datasets.elnino, self.load_method)()
         msg = "Unable to read statsmodels Dataset without exog"
         with self.assertRaisesRegexp(ValueError, msg):
-            df = pdml.ModelFrame(data)
+            pdml.ModelFrame(data)
 
     def test_engel(self):
         data = getattr(sm.datasets.engel, self.load_method)()
@@ -88,7 +85,7 @@ class TestStatsModelsDatasets(tm.TestCase):
         data = getattr(sm.datasets.macrodata, self.load_method)()
         msg = "Unable to read statsmodels Dataset without exog"
         with self.assertRaisesRegexp(ValueError, msg):
-            df = pdml.ModelFrame(data)
+            pdml.ModelFrame(data)
 
     def test_modechoice(self):
         data = getattr(sm.datasets.modechoice, self.load_method)()
@@ -101,7 +98,7 @@ class TestStatsModelsDatasets(tm.TestCase):
         data = getattr(sm.datasets.nile, self.load_method)()
         msg = "Unable to read statsmodels Dataset without exog"
         with self.assertRaisesRegexp(ValueError, msg):
-            df = pdml.ModelFrame(data)
+            pdml.ModelFrame(data)
 
     def test_randhie(self):
         data = getattr(sm.datasets.randhie, self.load_method)()
@@ -135,7 +132,7 @@ class TestStatsModelsDatasets(tm.TestCase):
         data = getattr(sm.datasets.star98, self.load_method)()
         msg = 'Data must be 1-dimensional'
         with self.assertRaisesRegexp(Exception, msg):
-            df = pdml.ModelFrame(data)
+            pdml.ModelFrame(data)
 
     def test_strikes(self):
         data = getattr(sm.datasets.strikes, self.load_method)()
@@ -148,7 +145,7 @@ class TestStatsModelsDatasets(tm.TestCase):
         data = getattr(sm.datasets.sunspots, self.load_method)()
         msg = "Unable to read statsmodels Dataset without exog"
         with self.assertRaisesRegexp(ValueError, msg):
-            df = pdml.ModelFrame(data)
+            pdml.ModelFrame(data)
 
     def test_fair(self):
         data = getattr(sm.datasets.fair, self.load_method)()
@@ -175,7 +172,7 @@ class TestStatsModelsDatasets(tm.TestCase):
         data = getattr(sm.datasets.co2, self.load_method)()
         msg = "Unable to read statsmodels Dataset without exog"
         with self.assertRaisesRegexp(ValueError, msg):
-            df = pdml.ModelFrame(data)
+            pdml.ModelFrame(data)
 
 
 class TestStatsModelsDatasets_LoadPandas(TestStatsModelsDatasets):
@@ -186,7 +183,7 @@ class TestStatsModelsDatasets_LoadPandas(TestStatsModelsDatasets):
         data = sm.datasets.star98.load_pandas()
         msg = 'cannot copy sequence with size 2 to array axis with dimension 303'
         with self.assertRaisesRegexp(Exception, msg):
-            df = pdml.ModelFrame(data)
+            pdml.ModelFrame(data)
 
 
 if __name__ == '__main__':

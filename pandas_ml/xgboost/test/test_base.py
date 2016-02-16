@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import pandas.compat as compat
 
 import sklearn.datasets as datasets
 import xgboost as xgb
@@ -43,7 +42,7 @@ class TestXGBoost(tm.TestCase):
         y = np.sin(X).ravel()
 
         # Add noise to targets
-        y[::5] += 3 * (0.5 - np.random.rand(X.shape[0]/5))
+        y[::5] += 3 * (0.5 - np.random.rand(X.shape[0] / 5))
 
         df = pdml.ModelFrame(data=X, target=y)
 
@@ -79,10 +78,9 @@ class TestXGBoost(tm.TestCase):
                                  'std': [0.03244061, 0.03259985, 0.02764891, 0.0266436],
                                  'max_depth': [3, 3, 4, 4],
                                  'n_estimators': [50, 100, 50, 100]},
-                                 columns=['mean', 'std', 'max_depth', 'n_estimators'])
+                                columns=['mean', 'std', 'max_depth', 'n_estimators'])
         self.assertTrue(isinstance(result, pdml.ModelFrame))
         self.assert_frame_equal(result, expected)
-
 
     def test_plotting(self):
 

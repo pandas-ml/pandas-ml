@@ -2,12 +2,6 @@
 
 import pandas as pd
 
-#!/usr/bin/env python
-
-import numpy as np
-import pandas as pd
-from pandas.util.decorators import cache_readonly
-
 from pandas_ml.core.accessor import _AccessorMethods, _attach_methods
 
 
@@ -25,7 +19,7 @@ class SeabornMethods(_AccessorMethods):
                      'choose_cubehelix_palette', 'choose_light_palette',
                      'choose_dark_palette', 'choose_diverging_palette',
                      'despine', 'desaturate', 'saturate', 'set_hls_values',
-                     'ci_to_errsize','axlabel']
+                     'ci_to_errsize', 'axlabel']
 
     def _maybe_target_name(self, value, key):
         if value is None:
@@ -60,7 +54,7 @@ class SeabornMethods(_AccessorMethods):
 
     def FacetGrid(self, row=None, col=None, *args, **kwargs):
         return self._module.FacetGrid(data=self._df, row=row, col=col,
-                                     *args, **kwargs)
+                                      *args, **kwargs)
 
     def PairGrid(self, *args, **kwargs):
         return self._module.PairGrid(data=self._df, *args, **kwargs)
@@ -165,7 +159,6 @@ class SeabornMethods(_AccessorMethods):
         return self._module.tsplot(data=self._df, *args, **kwargs)
 
 
-
 def _wrap_xy_plot(func, func_name):
     """
     Wrapper for plotting with x, y, data
@@ -207,6 +200,7 @@ def _wrap_categorical_plot(func, func_name):
         """ % func_name)
     return f
 
+
 def _wrap_data_plot(func, func_name):
     """
     Wrapper for plotting with data
@@ -221,6 +215,7 @@ def _wrap_data_plot(func, func_name):
         - ``data``: ``ModelFrame``
         """ % func_name)
     return f
+
 
 _xy_plots = ['jointplot', 'lmplot', 'regplot', 'residplot']
 _attach_methods(SeabornMethods, _wrap_xy_plot, _xy_plots)

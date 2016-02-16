@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 import sklearn.cluster as cluster
 import sklearn.preprocessing as pp
@@ -96,7 +93,7 @@ class TestCluster(tm.TestCase):
 
         centers = [[1, 1], [-1, -1], [1, -1]]
         X, labels_true = make_blobs(n_samples=300, centers=centers,
-                                    cluster_std=0.5,random_state=0)
+                                    cluster_std=0.5, random_state=0)
 
         df = pdml.ModelFrame(data=X, target=labels_true)
         af = df.cluster.AffinityPropagation(preference=-50)

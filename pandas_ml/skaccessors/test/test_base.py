@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 
 import pandas_ml as pdml
@@ -19,7 +15,7 @@ class TestSklearnBase(tm.TestCase):
 
         msg = "'target' can't be specified for sklearn.datasets"
         with self.assertRaisesRegexp(ValueError, msg):
-            mdf = pdml.ModelFrame(iris, target='X')
+            pdml.ModelFrame(iris, target='X')
 
 
 if __name__ == '__main__':

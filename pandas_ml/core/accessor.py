@@ -2,10 +2,7 @@
 
 import importlib
 
-import numpy as np
-import pandas as pd
 import pandas.compat as compat
-from pandas.util.decorators import Appender, cache_readonly
 
 
 class _AccessorMethods(object):

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
 from pandas.util.decorators import cache_readonly
 
 from pandas_ml.core.accessor import _AccessorMethods, _attach_methods, _wrap_data_func
@@ -86,5 +84,3 @@ class ClusterMethods(_AccessorMethods):
 
 _cluster_methods = ['estimate_bandwidth', 'ward_tree']
 _attach_methods(ClusterMethods, _wrap_data_func, _cluster_methods)
-
-

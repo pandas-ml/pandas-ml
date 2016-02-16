@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-from pandas_ml.core import ModelFrame, ModelSeries
-from pandas_ml.tools import info
-from pandas_ml.version import version as __version__
+from pandas_ml.core import ModelFrame, ModelSeries       # noqa
+from pandas_ml.tools import info                         # noqa
+from pandas_ml.version import version as __version__     # noqa

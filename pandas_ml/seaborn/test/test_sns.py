@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pandas as pd
-
 import sklearn.datasets as datasets
 
 import pandas_ml as pdml
@@ -10,9 +8,10 @@ import pandas_ml.util.testing as tm
 
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+# must be imported after use('Agg')
+import matplotlib.pyplot as plt  # noqa
 
-import seaborn as sns
+import seaborn as sns            # noqa
 
 
 class SeabornCase(tm.PlottingTestCase):
@@ -22,7 +21,9 @@ class SeabornCase(tm.PlottingTestCase):
 
         self.diabetes = pdml.ModelFrame(datasets.load_diabetes())
         # convert columns to str
-        self.diabetes.columns = ['col{0}'.format(c) if isinstance(c, int) else c for c in self.diabetes.columns]
+        self.diabetes.columns = ['col{0}'.format(c) if isinstance(c, int)
+                                 else c for c in self.diabetes.columns]
+
 
 class TestSeabornAttrs(SeabornCase):
 
@@ -49,12 +50,16 @@ class TestSeabornAttrs(SeabornCase):
         self.assertIs(df.sns.xkcd_palette, sns.xkcd_palette)
         self.assertIs(df.sns.crayon_palette, sns.crayon_palette)
         self.assertIs(df.sns.mpl_palette, sns.mpl_palette)
-        self.assertIs(df.sns.choose_colorbrewer_palette, sns.choose_colorbrewer_palette)
-        self.assertIs(df.sns.choose_cubehelix_palette, sns.choose_cubehelix_palette)
-        self.assertIs(df.sns.choose_light_palette, sns.choose_light_palette)
+        self.assertIs(df.sns.choose_colorbrewer_palette,
+                      sns.choose_colorbrewer_palette)
+        self.assertIs(df.sns.choose_cubehelix_palette,
+                      sns.choose_cubehelix_palette)
+        self.assertIs(df.sns.choose_light_palette,
+                      sns.choose_light_palette)
 
         self.assertIs(df.sns.choose_dark_palette, sns.choose_dark_palette)
-        self.assertIs(df.sns.choose_diverging_palette, sns.choose_diverging_palette)
+        self.assertIs(df.sns.choose_diverging_palette,
+                      sns.choose_diverging_palette)
         self.assertIs(df.sns.despine, sns.despine)
         self.assertIs(df.sns.desaturate, sns.desaturate)
         self.assertIs(df.sns.saturate, sns.saturate)
@@ -83,14 +88,15 @@ class TestSeabornDistribution(SeabornCase):
         df = self.iris
 
         pg = df.sns.pairplot()
-        self._check_axes_shape(pg.axes, axes_num=25, layout=(5, 5), figsize=None)
+        self._check_axes_shape(pg.axes, axes_num=25,
+                               layout=(5, 5), figsize=None)
         for i in range(5):
             self.assertEqual(pg.axes[i][0].get_ylabel(), df.columns[i])
             self.assertEqual(pg.axes[-1][i].get_xlabel(), df.columns[i])
         tm.close()
 
     def test_distplot(self):
-        return # ToDo: only fails on Travis
+        return          # ToDo: only fails on Travis
 
         df = self.iris
 
@@ -176,7 +182,7 @@ class TestSeabornDistribution(SeabornCase):
         self.assertEqual(ax.get_xlabel(), 'b')
         self.assertEqual(ax.get_ylabel(), 'c')
 
-        ax = df.sns.rugplot('c', vertical=True, ax=ax);
+        ax = df.sns.rugplot('c', vertical=True, ax=ax)
         self.assertIsInstance(ax, matplotlib.axes.Axes)
         self.assertEqual(ax.get_xlabel(), 'b')
         self.assertEqual(ax.get_ylabel(), 'c')
@@ -223,6 +229,7 @@ class TestSeabornRegression(SeabornCase):
 
     def test_coefplot(self):
         pass
+
 
 class TestSeabornCategorical(SeabornCase):
 
@@ -317,7 +324,7 @@ class TestSeabornCategorical(SeabornCase):
         self.assertEqual(ax.get_ylabel(), 'count')
         tm.close()
 
-        return # ToDo: only fails on Travis
+        return      # ToDo: only fails on Travis
 
         ax = df.sns.countplot(df.columns[1])
         self.assertIsInstance(ax, matplotlib.axes.Axes)
@@ -386,7 +393,6 @@ class TestSeabornCategorical(SeabornCase):
 
         jg = df.sns.JointGrid(x=df.columns[1], y=df.columns[1])
         self.assertIsInstance(jg, sns.JointGrid)
-
 
 
 if __name__ == '__main__':

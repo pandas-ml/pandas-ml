@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import pandas as pd
-
 from pandas_ml.core.accessor import _AccessorMethods
 
 
@@ -126,4 +124,3 @@ class XGBoostMethods(_AccessorMethods):
             raise ValueError('estimator must be XGBRegressor or XGBClassifier')
         return xgb.plot_tree(self._df.estimator.booster(),
                              num_trees=num_trees, rankdir=rankdir, **kwargs)
-

@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-
 import sklearn.datasets as datasets
 
 import pandas_ml as pdml

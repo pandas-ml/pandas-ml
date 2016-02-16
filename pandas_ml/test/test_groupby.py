@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import datetime
-import warnings
-
 import numpy as np
 import pandas as pd
 
@@ -18,7 +15,7 @@ class TestModelFrameGroupBy(tm.TestCase):
         df = pd.DataFrame({'A': [1, 2, 1, 2],
                            'B': [4, 5, 6, 7],
                            'C': [7, 8, 9, 10]},
-                           columns=['A', 'B', 'C'])
+                          columns=['A', 'B', 'C'])
         s = pd.Series([1, 2, 3, 4])
 
         mdf = pdml.ModelFrame(df, target=s)
@@ -132,7 +129,6 @@ class TestModelSeriesGroupBy(tm.TestCase):
         expected = pd.Series([1, 2, 1], index=[0, 1, 2], name='X')
         self.assert_series_equal(gs, expected)
         self.assertEqual(gs.name, 'X')
-
 
 
 if __name__ == '__main__':

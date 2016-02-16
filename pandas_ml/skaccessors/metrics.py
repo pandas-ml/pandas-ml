@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-
 from pandas_ml.core.accessor import (_AccessorMethods, _attach_methods,
-                                    _wrap_target_pred_func,
-                                    _wrap_target_pred_noargs)
+                                     _wrap_target_pred_func,
+                                     _wrap_target_pred_noargs)
 import pandas_ml.util as util
 
 
@@ -33,14 +30,13 @@ class MetricsMethods(_AccessorMethods):
         -------
         float : AUC
         """
-        func = self._module.auc
         if kind == 'roc':
             return self.roc_auc_score(**kwargs)
         elif kind == 'precision_recall_curve':
             return self.average_precision_score(**kwargs)
         else:
             msg = "Invalid kind: {0}, kind must be either 'roc' or 'precision_recall_curve'"
-            raise ValueError(msf.format(kind))
+            raise ValueError(msg.format(kind))
 
     def average_precision_score(self, *args, **kwargs):
         """

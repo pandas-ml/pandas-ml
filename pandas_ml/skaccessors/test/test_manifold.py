@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 import sklearn.manifold as manifold
 
@@ -58,8 +55,8 @@ class TestManifold(tm.TestCase):
 
         models = ['Isomap']
         for model in models:
-            mod1 = getattr(df.manifold, model)() # random_state=self.random_state)
-            mod2 = getattr(manifold, model)() #random_state=self.random_state)
+            mod1 = getattr(df.manifold, model)()
+            mod2 = getattr(manifold, model)()
 
             df.fit(mod1)
             mod2.fit(iris.data)
