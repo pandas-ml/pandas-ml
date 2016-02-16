@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 import sklearn.lda as lda
 

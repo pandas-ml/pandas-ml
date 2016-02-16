@@ -2,9 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import pandas.compat as compat
-
-import sklearn.datasets as datasets
 import sklearn.cross_decomposition as cd
 
 import pandas_ml as pdml
@@ -21,7 +18,7 @@ class TestCrossDecomposition(tm.TestCase):
         self.assertIs(df.cross_decomposition.PLSSVD, cd.PLSSVD)
 
     def test_CCA(self):
-        X = [[0., 0., 1.], [1.,0.,0.], [2.,2.,2.], [3.,5.,4.]]
+        X = [[0., 0., 1.], [1., 0., 0.], [2., 2., 2.], [3., 5., 4.]]
         Y = [[0.1, -0.2], [0.9, 1.1], [6.2, 5.9], [11.9, 12.3]]
         df = pdml.ModelFrame(X, target=Y)
 

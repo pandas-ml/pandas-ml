@@ -24,6 +24,7 @@ script:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - source activate myenv
   - python -m nose --with-coverage
+  - flake8 --ignore E501 pandas_ml
 
 after_success:
   - coveralls

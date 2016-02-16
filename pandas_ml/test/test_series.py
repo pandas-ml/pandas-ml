@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 
-import datetime
-import warnings
-
 import numpy as np
 import pandas as pd
-import pandas.compat as compat
 
-import sklearn.datasets as datasets
-import sklearn.svm as svm
 import sklearn.preprocessing as pp
 
 import pandas_ml as pdml

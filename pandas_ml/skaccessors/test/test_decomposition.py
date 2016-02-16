@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 import sklearn.decomposition as decomposition
 
@@ -34,7 +30,8 @@ class TestDecomposition(tm.TestCase):
         df = pdml.ModelFrame(iris)
 
         result = df.decomposition.fastica(random_state=self.random_state)
-        expected = decomposition.fastica(iris.data, random_state=self.random_state)
+        expected = decomposition.fastica(iris.data,
+                                         random_state=self.random_state)
 
         self.assertEqual(len(result), 3)
         self.assertTrue(isinstance(result[0], pdml.ModelFrame))
@@ -48,7 +45,8 @@ class TestDecomposition(tm.TestCase):
         self.assert_index_equal(result[2].index, df.index)
         self.assert_numpy_array_almost_equal(result[2].values, expected[2])
 
-        result = df.decomposition.fastica(return_X_mean=True, random_state=self.random_state)
+        result = df.decomposition.fastica(return_X_mean=True,
+                                          random_state=self.random_state)
         expected = decomposition.fastica(iris.data, return_X_mean=True,
                                          random_state=self.random_state)
 
@@ -123,40 +121,71 @@ class TestDecomposition(tm.TestCase):
         self.assert_index_equal(result.index, df.data.index)
         self.assert_numpy_array_almost_equal(result.values, expected)
 
-    def test_Decompositions(self):
+    def test_Decompositions_PCA(self):
         iris = datasets.load_iris()
         df = pdml.ModelFrame(iris)
 
-        models = ['PCA', 'KernelPCA']
-        for model in models:
-            mod1 = getattr(df.decomposition, model)()
-            mod2 = getattr(decomposition, model)()
+        mod1 = df.decomposition.PCA()
+        mod2 = decomposition.PCA()
 
-            df.fit(mod1)
-            mod2.fit(iris.data, iris.target)
+        df.fit(mod1)
+        mod2.fit(iris.data, iris.target)
 
-            result = df.transform(mod1)
-            expected = mod2.transform(iris.data)
+        result = df.transform(mod1)
+        expected = mod2.transform(iris.data)
 
-            self.assertTrue(isinstance(result, pdml.ModelFrame))
-            self.assert_series_equal(df.target, result.target)
-            self.assert_numpy_array_almost_equal(result.data.values, expected)
+        self.assertTrue(isinstance(result, pdml.ModelFrame))
+        self.assert_series_equal(df.target, result.target)
+        self.assert_numpy_array_almost_equal(result.data.values,
+                                             expected)
 
-    def test_fit_transform(self):
+    def test_fit_transform_PCA(self):
         iris = datasets.load_iris()
         df = pdml.ModelFrame(iris)
 
-        models = ['PCA', 'KernelPCA']
-        for model in models:
-            mod1 = getattr(df.decomposition, model)()
-            mod2 = getattr(decomposition, model)()
+        mod1 = df.decomposition.PCA()
+        mod2 = decomposition.PCA()
 
-            result = df.fit_transform(mod1)
-            expected = mod2.fit_transform(iris.data, iris.target)
+        result = df.fit_transform(mod1)
+        expected = mod2.fit_transform(iris.data, iris.target)
 
-            self.assertTrue(isinstance(result, pdml.ModelFrame))
-            self.assert_series_equal(df.target, result.target)
-            self.assert_numpy_array_almost_equal(result.data.values, expected)
+        self.assertTrue(isinstance(result, pdml.ModelFrame))
+        self.assert_series_equal(df.target, result.target)
+        self.assert_numpy_array_almost_equal(result.data.values,
+                                             expected)
+
+    def test_Decompositions_KernelPCA(self):
+        iris = datasets.load_iris()
+        df = pdml.ModelFrame(iris)
+
+        mod1 = df.decomposition.KernelPCA()
+        mod2 = decomposition.KernelPCA()
+
+        df.fit(mod1)
+        mod2.fit(iris.data, iris.target)
+
+        result = df.transform(mod1)
+        expected = mod2.transform(iris.data)
+
+        self.assertTrue(isinstance(result, pdml.ModelFrame))
+        self.assert_series_equal(df.target, result.target)
+        self.assert_numpy_array_almost_equal(result.data.values[:, :40],
+                                             expected[:, :40])
+
+    def test_fit_transform_KernelPCA(self):
+        iris = datasets.load_iris()
+        df = pdml.ModelFrame(iris)
+
+        mod1 = df.decomposition.KernelPCA()
+        mod2 = decomposition.KernelPCA()
+
+        result = df.fit_transform(mod1)
+        expected = mod2.fit_transform(iris.data, iris.target)
+
+        self.assertTrue(isinstance(result, pdml.ModelFrame))
+        self.assert_series_equal(df.target, result.target)
+        self.assert_numpy_array_almost_equal(result.data.values,
+                                             expected)
 
     def test_inverse_transform(self):
         iris = datasets.load_iris()

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
+
 from pandas.util.decorators import cache_readonly
 
 from pandas_ml.core.accessor import _AccessorMethods
@@ -37,6 +36,4 @@ class FeatureExtractionMethods(_AccessorMethods):
         attrs = ['CountVectorizer', 'HashingVectorizer',
                  'TfidfTransformer', 'TfidfVectorizer']
         return _AccessorMethods(self._df, module_name='sklearn.feature_extraction.text',
-                               attrs=attrs)
-
-
+                                attrs=attrs)

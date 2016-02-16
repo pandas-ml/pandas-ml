@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-from pandas.util.decorators import cache_readonly
 
 
 class _BasePlotter(object):
@@ -83,6 +82,7 @@ class _BasePlotter(object):
 
         return pd.tools.plotting._subplots(naxes=naxes, layout=layout)
 
+
 class ClassifierPlotter(_BasePlotter):
 
     def plot(self):
@@ -112,8 +112,8 @@ class ClassifierPlotter(_BasePlotter):
         flatten = axes.flatten()
 
         for k, ax in zip(range(n_classes), flatten):
-            imshow_handle = ax.imshow(probas[:, k].reshape((100, 100)),
-                                      extent=(xmin, xmax, ymin, ymax), origin='lower')
+            ax.imshow(probas[:, k].reshape((100, 100)),
+                      extent=(xmin, xmax, ymin, ymax), origin='lower')
             idx = (target == k)
             if idx.any():
                 ax.scatter(x[idx], y[idx], marker='o', c='k')
@@ -144,8 +144,8 @@ class ClassifierPlotter(_BasePlotter):
         flatten = axes.flatten()
 
         for k, ax in zip(range(n_classes), flatten):
-            imshow_handle = ax.imshow(decision.reshape((100, 100)),
-                                      extent=(xmin, xmax, ymin, ymax), origin='lower')
+            ax.imshow(decision.reshape((100, 100)),
+                      extent=(xmin, xmax, ymin, ymax), origin='lower')
             idx = (target == k)
             if idx.any():
                 ax.scatter(x[idx], y[idx], marker='o', c='k')
@@ -173,7 +173,7 @@ class RegressorPlotter(_BasePlotter):
         fig, ax = self._subplots(1)
 
         xx = np.linspace(x.min(), x.max(), 100)
-        ax.scatter(x, self.data.target,  color='black')
+        ax.scatter(x, self.data.target, color='black')
 
         pred = self.estimator.predict(xx.reshape(len(xx), 1))
         ax.plot(xx, pred, color='blue')
@@ -182,7 +182,7 @@ class RegressorPlotter(_BasePlotter):
     def _plot_3d(self):
         x, y = self._get_xy_values()
 
-        from mpl_toolkits.mplot3d import Axes3D
+        from mpl_toolkits.mplot3d import Axes3D     # noqa
         fig = self.plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 

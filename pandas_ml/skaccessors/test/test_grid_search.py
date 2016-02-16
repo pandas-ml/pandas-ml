@@ -2,8 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 import sklearn.grid_search as gs
 
@@ -40,7 +38,7 @@ class TestGridSearch(tm.TestCase):
                                  'gamma': [0.001, 0.0001, 0.001, 0.0001, 0.001, 0.0001,
                                            np.nan, np.nan, np.nan],
                                  'kernel': ['rbf'] * 6 + ['linear'] * 3},
-                                 columns=['mean', 'std', 'C', 'gamma', 'kernel'])
+                                columns=['mean', 'std', 'C', 'gamma', 'kernel'])
         self.assertTrue(isinstance(result, pdml.ModelFrame))
         self.assert_frame_equal(result, expected)
 

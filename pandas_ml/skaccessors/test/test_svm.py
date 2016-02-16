@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
 import sklearn.datasets as datasets
 import sklearn.svm as svm
 
@@ -36,7 +33,7 @@ class TestSVM(tm.TestCase):
         y = np.sin(X).ravel()
 
         # Add noise to targets
-        y[::5] += 3 * (0.5 - np.random.rand(X.shape[0]/5))
+        y[::5] += 3 * (0.5 - np.random.rand(X.shape[0] / 5))
 
         df = pdml.ModelFrame(data=X, target=y)
 

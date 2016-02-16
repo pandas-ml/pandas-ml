@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
 
 from pandas_ml.core.accessor import _AccessorMethods
 
@@ -21,7 +19,7 @@ class ManifoldMethods(_AccessorMethods):
         """
         func = self._module.locally_linear_embedding
         y, squared_error = func(self._data.values, n_neighbors,
-                                n_components,  *args, **kwargs)
+                                n_components, *args, **kwargs)
         y = self._constructor(y, index=self._df.index)
         return y, squared_error
 

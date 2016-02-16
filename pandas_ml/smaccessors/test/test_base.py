@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pandas as pd
-
 import sklearn.datasets as datasets
 import statsmodels.api as sm
 
-import pandas_ml as pdml
 import pandas_ml.smaccessors.base as base
 import pandas_ml.util.testing as tm
 
@@ -42,13 +39,11 @@ class TestBaseRegressor(tm.TestCase):
         expected = fitted2.predict(diabetes.data)
         self.assert_numpy_array_almost_equal(result, expected)
 
-
     def test_precict(self):
         diabetes = datasets.load_diabetes()
         estimator = base.StatsModelsRegressor(sm.OLS)
         with self.assertRaisesRegexp(ValueError, 'StatsModelsRegressor is not fitted to data'):
-            result = estimator.predict(diabetes.data)
-
+            estimator.predict(diabetes.data)
 
     def test_Regressions(self):
         diabetes = datasets.load_diabetes()
@@ -58,7 +53,7 @@ class TestBaseRegressor(tm.TestCase):
             klass = getattr(sm, model)
 
             estimator = base.StatsModelsRegressor(klass)
-            fitted = estimator.fit(diabetes.data, diabetes.target)
+            estimator.fit(diabetes.data, diabetes.target)
             result = estimator.predict(diabetes.data)
 
             expected = klass(diabetes.target, diabetes.data).fit().predict(diabetes.data)
@@ -67,7 +62,7 @@ class TestBaseRegressor(tm.TestCase):
     def test_GEE(self):
         import statsmodels.genmod.generalized_estimating_equations as geq
         diabetes = datasets.load_diabetes()
-        models = ['GEE'] # 'OrdinalGEE', 'NominalGEE']
+        models = ['GEE']            # 'OrdinalGEE', 'NominalGEE']
         data = diabetes.data[:100, :]
         target = diabetes.target[:100]
         groups = np.array([0] * 50 + [1] * 50)
@@ -116,7 +111,7 @@ class TestBaseRegressor(tm.TestCase):
             estimator = Pipeline([('selector', selector),
                                   ('reg', base.StatsModelsRegressor(klass))])
 
-            fitted = estimator.fit(diabetes.data, diabetes.target)
+            estimator.fit(diabetes.data, diabetes.target)
             result = estimator.predict(diabetes.data)
 
             data = SelectKBest(f_regression, k=5).fit_transform(diabetes.data, diabetes.target)

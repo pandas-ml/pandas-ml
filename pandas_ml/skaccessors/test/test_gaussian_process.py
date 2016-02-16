@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pandas as pd
-import pandas.compat as compat
-
-import sklearn.datasets as datasets
 import sklearn.gaussian_process as gp
 
 import pandas_ml as pdml
@@ -60,7 +56,8 @@ class TestGaussianProcess(tm.TestCase):
         y = np.sin(X).ravel()
         df = pdml.ModelFrame(X, target=y)
 
-        g1 = df.gaussian_process.GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1)
+        g1 = df.gaussian_process.GaussianProcess(theta0=1e-2, thetaL=1e-4,
+                                                 thetaU=1e-1)
         g2 = gp.GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1)
 
         g1.fit(X, y)
@@ -79,7 +76,8 @@ class TestGaussianProcess(tm.TestCase):
         self.assert_index_equal(sigma2_result.index, tdf.index)
 
         self.assert_numpy_array_almost_equal(y_result.values, y_expected)
-        self.assert_numpy_array_almost_equal(sigma2_result.values, sigma2_expected)
+        self.assert_numpy_array_almost_equal(sigma2_result.values,
+                                             sigma2_expected)
 
         y_result = tdf.predict(g1)
         y_expected = g2.predict(x)
@@ -91,15 +89,6 @@ class TestGaussianProcess(tm.TestCase):
 
     def test_Gaussian2D(self):
         # http://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gp_probabilistic_classification_after_regression.html
-        from scipy import stats
-
-        # Standard normal distribution functions
-        phi = stats.distributions.norm().pdf
-        PHI = stats.distributions.norm().cdf
-        PHIinv = stats.distributions.norm().ppf
-
-        # A few constants
-        lim = 8
 
         def g(x):
             """The function to predict (classification will then consist in predicting

@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import pandas.compat as compat
 
 import sklearn.datasets as datasets
 import sklearn.preprocessing as pp
@@ -377,32 +376,7 @@ class TestPreprocessing(tm.TestCase):
         self.assert_numpy_array_almost_equal(inversed.values.flatten(), arr)
         self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
 
-    def test_LabelEncoder(self):
-        arr = np.array(['X', 'Y', 'Z', 'X'])
-        s = pdml.ModelSeries(arr, index=['a', 'b', 'c', 'd'])
-
-        mod1 = s.pp.LabelEncoder()
-        s.fit(mod1)
-        result = s.transform(mod1)
-
-        expected = np.array([0, 1, 2, 0])
-
-        self.assertTrue(isinstance(result, pdml.ModelSeries))
-        self.assert_numpy_array_almost_equal(result.values, expected)
-        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
-
-        mod1 = s.pp.LabelEncoder()
-        result = s.fit_transform(mod1)
-
-        self.assertTrue(isinstance(result, pdml.ModelSeries))
-        self.assert_numpy_array_almost_equal(result.values, expected)
-
-        inversed = result.inverse_transform(mod1)
-        self.assertTrue(isinstance(inversed, pdml.ModelSeries))
-        self.assert_numpy_array_equal(inversed.values.flatten(), arr)
-        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
-
-    def test_LabelBinarizer(self):
+    def test_LabelBinarizer2(self):
         arr = np.array(['X', 'Y', 'Z', 'X'])
         s = pdml.ModelSeries(arr)
 
@@ -429,6 +403,31 @@ class TestPreprocessing(tm.TestCase):
         df.target = df.target.transform(lb)
         self.assertEqual(df.shape, (150, 7))
         self.assert_frame_equal(df.target, expected)
+
+    def test_LabelEncoder(self):
+        arr = np.array(['X', 'Y', 'Z', 'X'])
+        s = pdml.ModelSeries(arr, index=['a', 'b', 'c', 'd'])
+
+        mod1 = s.pp.LabelEncoder()
+        s.fit(mod1)
+        result = s.transform(mod1)
+
+        expected = np.array([0, 1, 2, 0])
+
+        self.assertTrue(isinstance(result, pdml.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
+
+        mod1 = s.pp.LabelEncoder()
+        result = s.fit_transform(mod1)
+
+        self.assertTrue(isinstance(result, pdml.ModelSeries))
+        self.assert_numpy_array_almost_equal(result.values, expected)
+
+        inversed = result.inverse_transform(mod1)
+        self.assertTrue(isinstance(inversed, pdml.ModelSeries))
+        self.assert_numpy_array_equal(inversed.values.flatten(), arr)
+        self.assert_index_equal(result.index, pd.Index(['a', 'b', 'c', 'd']))
 
 
 if __name__ == '__main__':

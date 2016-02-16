@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-from pandas.util.decorators import cache_readonly
-
 from pandas_ml.core.accessor import _AccessorMethods
 
 
@@ -41,5 +37,3 @@ class IsotonicMethods(_AccessorMethods):
         func = self._module.check_increasing
         target = self._target
         return func(target.index, target.values, *args, **kwargs)
-
-

@@ -15,7 +15,6 @@ import pandas_ml.skaccessors as skaccessors
 import pandas_ml.smaccessors as smaccessors
 import pandas_ml.seaborn as seaborn
 import pandas_ml.xgboost as xgboost
-import pandas_ml.misc as misc
 import pandas_ml.util as util
 
 
@@ -96,8 +95,8 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
 
         pd.DataFrame.__init__(self, df)
 
-    def _maybe_convert_data(self, data, target, #target_name,
-        *args, **kwargs):
+    def _maybe_convert_data(self, data, target,
+                            *args, **kwargs):
         """
         Internal function to instanciate data and target
 
@@ -349,7 +348,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                 else:
                     msg = 'target and target_name are unmatched, target_name will be updated'
                     warnings.warn(msg)
-                    data = self.data # hack
+                    data = self.data        # hack
                     self.target_name = target.columns
                     self.data = data
         else:
@@ -446,7 +445,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
                                      index=self.index, columns=columns)
         else:
             return self._constructor(transformed, index=self.index,
-                                    columns=columns)
+                                     columns=columns)
 
     @Appender(_shared_docs['estimator_methods'] %
               dict(funcname='predict_proba', returned='returned : probabilities'))
@@ -532,7 +531,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     def _cross_decomposition(self):
         attrs = ['PLSRegression', 'PLSCanonical', 'CCA', 'PLSSVD']
         return _AccessorMethods(self, module_name='sklearn.cross_decomposition',
-                               attrs=attrs)
+                                attrs=attrs)
 
     @property
     @Appender(_shared_docs['skaccessor'] % dict(module='cross_validation'))
@@ -630,7 +629,7 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     def _kernel_approximation(self):
         attrs = ['AdditiveChi2Sampler', 'Nystroem', 'RBFSampler', 'SkewedChi2Sampler']
         return _AccessorMethods(self, module_name='sklearn.kernel_approximation',
-                               attrs=attrs)
+                                attrs=attrs)
 
     @property
     @Appender(_shared_docs['skaccessor_nolink'] % dict(module='lda'))
@@ -826,7 +825,6 @@ class ModelFrame(pd.DataFrame, ModelPredictor):
     @cache_readonly
     def _xgboost(self):
         return xgboost.XGBoostMethods(self)
-
 
     @Appender(pd.core.generic.NDFrame.groupby.__doc__)
     def groupby(self, by=None, axis=0, level=None, as_index=True, sort=True,

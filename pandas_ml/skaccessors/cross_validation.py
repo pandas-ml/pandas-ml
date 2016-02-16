@@ -2,7 +2,6 @@
 
 import warnings
 
-import numpy as np
 import pandas as pd
 
 from pandas_ml.core.accessor import _AccessorMethods
@@ -132,4 +131,3 @@ class CrossValidationMethods(_AccessorMethods):
         """
         func = self._module.check_cv
         return func(cv, X=self._data, y=self._target, *args, **kwargs)
-

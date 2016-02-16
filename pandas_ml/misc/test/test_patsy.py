@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 
-import datetime
-import warnings
-
 import pandas as pd
-import pandas.compat as compat
-
-import sklearn.datasets as datasets
 
 import pandas_ml as pdml
 import pandas_ml.util.testing as tm
@@ -18,8 +12,8 @@ class TestModelFrame(tm.TestCase):
         df = pd.DataFrame({'A': [1, 2, 3],
                            'B': [4, 5, 6],
                            'C': [7, 8, 9]},
-                           index=['a', 'b', 'c'],
-                           columns=['A', 'B', 'C'])
+                          index=['a', 'b', 'c'],
+                          columns=['A', 'B', 'C'])
         s = pd.Series([10, 11, 12], index=['a', 'b', 'c'])
         mdf = pdml.ModelFrame(df, target=s)
 
@@ -45,8 +39,8 @@ class TestModelFrame(tm.TestCase):
         df = pd.DataFrame({'A': [1, 2, 3],
                            'B': [4, 5, 6],
                            'C': [7, 8, 9]},
-                           index=['a', 'b', 'c'],
-                           columns=['A', 'B', 'C'])
+                          index=['a', 'b', 'c'],
+                          columns=['A', 'B', 'C'])
         s = pd.Series([10, 11, 12], index=['a', 'b', 'c'])
         mdf = pdml.ModelFrame(df, target=s)
 

@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-from pandas.util.decorators import cache_readonly
-
 from pandas_ml.core.accessor import _AccessorMethods
 
 
@@ -33,7 +29,6 @@ class PartialDependenceMethods(_AccessorMethods):
         """
         import sklearn.ensemble.partial_dependence as pdp
         func = pdp.partial_dependence
-        data = self._data
         pdp, axes = func(gbrt, target_variables, X=self._data, **kwargs)
         return pdp, axes
 

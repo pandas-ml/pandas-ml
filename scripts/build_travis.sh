@@ -14,15 +14,10 @@ conda info -a
 
 conda create -n myenv "python=$PYTHON"
 source activate myenv
+conda install openblas
 conda install numpy scipy matplotlib "scikit-learn=$SKLEARN" "pandas=$PANDAS" patsy statsmodels seaborn nose
 
 python -m pip install python-coveralls coverage
 python -m pip install graphviz
-
-# xgboost
-git clone https://github.com/dmlc/xgboost.git
-cd xgboost
-./build.sh
-cd python-package
-python setup.py install
-cd ../..
+python -m pip install flake8
+python -m pip install xgboost

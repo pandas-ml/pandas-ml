@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import numpy as np
-import pandas as pd
-from pandas.util.decorators import cache_readonly
-
 from pandas_ml.core.accessor import _AccessorMethods, _attach_methods, _wrap_data_func
 
 
@@ -59,4 +55,3 @@ class RegressionModelsMethods(_AccessorMethods):
 
 _regression_methods = ['constant', 'linear', 'quadratic']
 _attach_methods(RegressionModelsMethods, _wrap_data_func, _regression_methods)
-

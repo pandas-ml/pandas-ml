@@ -6,7 +6,6 @@ import pandas.compat as compat
 
 import sklearn.datasets as datasets
 import sklearn.metrics as metrics
-import sklearn.multiclass as multiclass
 
 import pandas_ml as pdml
 import pandas_ml.util.testing as tm
@@ -82,7 +81,7 @@ class TestClassificationMetrics(tm.TestCase):
 
     def test_average_precision_score(self):
         with self.assertRaisesRegexp(ValueError, 'multiclass format is not supported'):
-            result = self.df.metrics.average_precision_score()
+            self.df.metrics.average_precision_score()
 
     def test_classification_report(self):
         result = self.df.metrics.classification_report()
@@ -151,11 +150,11 @@ class TestClassificationMetrics(tm.TestCase):
     def test_log_loss(self):
         msg = "class <class 'sklearn.svm.classes.LinearSVC'> doesn't have predict_proba method"
         with self.assertRaisesRegexp(ValueError, msg):
-            result = self.df.metrics.log_loss()
+            self.df.metrics.log_loss()
 
     def test_matthews_corrcoef(self):
         with self.assertRaisesRegexp(ValueError, 'multiclass is not supported'):
-            result = self.df.metrics.matthews_corrcoef()
+            self.df.metrics.matthews_corrcoef()
 
     def test_precision_recall_curve(self):
         results = self.df.metrics.precision_recall_curve()
@@ -199,7 +198,7 @@ class TestClassificationMetrics(tm.TestCase):
 
     def test_roc_auc_score(self):
         with self.assertRaisesRegexp(ValueError, 'multiclass format is not supported'):
-            result = self.df.metrics.roc_auc_score()
+            self.df.metrics.roc_auc_score()
 
     def test_roc_curve(self):
         results = self.df.metrics.roc_curve()
@@ -334,7 +333,7 @@ class TestClassificationMetrics3Classes(TestClassificationMetrics):
 
     def test_average_precision_score(self):
         with self.assertRaisesRegexp(ValueError, 'multiclass format is not supported'):
-            result = self.df.metrics.average_precision_score()
+            self.df.metrics.average_precision_score()
 
 
 class TestAClassificationMetrics3ClassesMultiTargets(TestClassificationMetrics):
@@ -351,14 +350,14 @@ class TestAClassificationMetrics3ClassesMultiTargets(TestClassificationMetrics):
         self.df = pdml.ModelFrame(self.data, target=self.target)
         self.assertEqual(self.df.shape, (150, 7))
 
-        estimator1 = OneVsRestClassifier(svm.SVC(probability=True,
-            random_state=self.random_state))
+        svc1 = svm.SVC(probability=True, random_state=self.random_state)
+        estimator1 = OneVsRestClassifier(svc1)
         self.df.fit(estimator1)
         self.df.predict(estimator1)
         self.assertTrue(isinstance(self.df.predicted, pdml.ModelFrame))
 
-        estimator2 = OneVsRestClassifier(svm.SVC(probability=True,
-            random_state=self.random_state))
+        svc2 = svm.SVC(probability=True, random_state=self.random_state)
+        estimator2 = OneVsRestClassifier(svc2)
         estimator2.fit(self.data, self.target)
         self.pred = estimator2.predict(self.data)
         self.proba = estimator2.predict_proba(self.data)
@@ -383,7 +382,7 @@ class TestAClassificationMetrics3ClassesMultiTargets(TestClassificationMetrics):
 
     def test_confusion_matrix(self):
         with self.assertRaisesRegexp(ValueError, 'multilabel-indicator is not supported'):
-            result = self.df.metrics.confusion_matrix()
+            self.df.metrics.confusion_matrix()
 
     def test_hinge_loss(self):
         return
@@ -394,25 +393,29 @@ class TestAClassificationMetrics3ClassesMultiTargets(TestClassificationMetrics):
         self.assertEqual(result, expected)
 
     def test_matthews_corrcoef(self):
-        with self.assertRaisesRegexp(ValueError, 'multilabel-indicator is not supported'):
-            result = self.df.metrics.matthews_corrcoef()
+        msg = 'multilabel-indicator is not supported'
+        with self.assertRaisesRegexp(ValueError, msg):
+            self.df.metrics.matthews_corrcoef()
 
     def test_precision_recall_curve(self):
         results = self.df.metrics.precision_recall_curve()
         for key, result in compat.iteritems(results):
-            expected = metrics.precision_recall_curve(self.target[:, key], self.decision[:, key],
-                                         pos_label=key)
+            expected = metrics.precision_recall_curve(self.target[:, key],
+                                                      self.decision[:, key],
+                                                      pos_label=key)
             self.assert_numpy_array_almost_equal(result[0], expected[0])
             self.assert_numpy_array_almost_equal(result[1], expected[1])
             self.assert_numpy_array_almost_equal(result[2], expected[2])
 
     def test_roc_auc_score(self):
         result = self.df.metrics.roc_auc_score(average='weighted')
-        expected = metrics.roc_auc_score(self.target, self.decision, average='weighted')
+        expected = metrics.roc_auc_score(self.target, self.decision,
+                                         average='weighted')
         self.assertEqual(result, expected)
 
         result = self.df.metrics.roc_auc_score(average=None)
-        expected = metrics.roc_auc_score(self.target, self.decision, average=None)
+        expected = metrics.roc_auc_score(self.target, self.decision,
+                                         average=None)
         self.assertTrue(isinstance(result, pdml.ModelSeries))
         self.assert_numpy_array_almost_equal(result.values, expected)
 
@@ -461,7 +464,7 @@ class TestRegressionMetrics(tm.TestCase):
         self.pred = estimator2.predict(data)
 
     def test_explained_variance_score(self):
-        result = self.df.explained_variance_score()
+        result = self.df.metrics.explained_variance_score()
         expected = metrics.explained_variance_score(self.target, self.pred)
         self.assertEqual(result, expected)
 
@@ -473,11 +476,6 @@ class TestRegressionMetrics(tm.TestCase):
     def test_mean_squared_error(self):
         result = self.df.metrics.mean_squared_error()
         expected = metrics.mean_squared_error(self.target, self.pred)
-        self.assertEqual(result, expected)
-
-    def test_explained_variance_score(self):
-        result = self.df.metrics.explained_variance_score()
-        expected = metrics.explained_variance_score(self.target, self.pred)
         self.assertEqual(result, expected)
 
     def test_r2_score(self):
