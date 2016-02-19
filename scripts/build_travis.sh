@@ -21,3 +21,4 @@ python -m pip install python-coveralls coverage
 python -m pip install graphviz
 python -m pip install flake8
 python -m pip install xgboost
+python -m pip install enum34
