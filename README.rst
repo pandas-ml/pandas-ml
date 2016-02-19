@@ -6,10 +6,10 @@ pandas-ml
 .. image:: https://readthedocs.org/projects/pandas-ml/badge/?version=latest
     :target: http://pandas-ml.readthedocs.org/en/latest/
     :alt: Latest Docs
-.. image:: https://travis-ci.org/sinhrks/pandas-ml.svg?branch=master
-    :target: https://travis-ci.org/sinhrks/pandas-ml
-.. image:: https://coveralls.io/repos/sinhrks/pandas-ml/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/sinhrks/pandas-ml?branch=master
+.. image:: https://travis-ci.org/pandas-ml/pandas-ml.svg?branch=master
+    :target: https://travis-ci.org/pandas-ml/pandas-ml
+.. image:: https://coveralls.io/repos/pandas-ml/pandas-ml/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/pandas-ml/pandas-ml?branch=master
 
 Overview
 ~~~~~~~~
