@@ -17,6 +17,7 @@ Contents:
    sklearn
    xgboost
    patsy
+   conf_mat
 
 
 API:
