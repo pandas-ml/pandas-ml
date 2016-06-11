@@ -12,7 +12,7 @@ addons:
     packages:
     - graphviz
 
-install: 
+install:
   - bash scripts/build_travis.sh
 
 before_script:
@@ -23,7 +23,7 @@ before_script:
 script:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - source activate myenv
-  - python -m nose --with-coverage
+  - python -m nose --with-coverage --cover-package=pandas_ml
   - flake8 --ignore E501 pandas_ml
 
 after_success:
