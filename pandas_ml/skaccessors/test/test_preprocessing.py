@@ -15,16 +15,29 @@ class TestPreprocessing(tm.TestCase):
     def test_objectmapper(self):
         df = pdml.ModelFrame([])
         self.assertIs(df.preprocessing.Binarizer, pp.Binarizer)
+
+        if pdml.compat._SKLEARN_ge_017():
+            self.assertIs(df.preprocessing.FunctionTransformer,
+                          pp.FunctionTransformer)
+
         self.assertIs(df.preprocessing.Imputer, pp.Imputer)
         self.assertIs(df.preprocessing.KernelCenterer, pp.KernelCenterer)
         self.assertIs(df.preprocessing.LabelBinarizer, pp.LabelBinarizer)
         self.assertIs(df.preprocessing.LabelEncoder, pp.LabelEncoder)
         self.assertIs(df.preprocessing.MultiLabelBinarizer, pp.MultiLabelBinarizer)
+
+        if pdml.compat._SKLEARN_ge_017():
+            self.assertIs(df.preprocessing.MaxAbsScaler, pp.MaxAbsScaler)
+
         self.assertIs(df.preprocessing.MinMaxScaler, pp.MinMaxScaler)
         self.assertIs(df.preprocessing.Normalizer, pp.Normalizer)
         self.assertIs(df.preprocessing.OneHotEncoder, pp.OneHotEncoder)
-        self.assertIs(df.preprocessing.StandardScaler, pp.StandardScaler)
         self.assertIs(df.preprocessing.PolynomialFeatures, pp.PolynomialFeatures)
+
+        if pdml.compat._SKLEARN_ge_017():
+            self.assertIs(df.preprocessing.RobustScaler, pp.RobustScaler)
+
+        self.assertIs(df.preprocessing.StandardScaler, pp.StandardScaler)
 
     def test_add_dummy_feature(self):
         iris = datasets.load_iris()

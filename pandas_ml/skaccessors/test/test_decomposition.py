@@ -12,18 +12,30 @@ class TestDecomposition(tm.TestCase):
     def test_objectmapper(self):
         df = pdml.ModelFrame([])
         self.assertIs(df.decomposition.PCA, decomposition.PCA)
-        self.assertIs(df.decomposition.ProjectedGradientNMF, decomposition.ProjectedGradientNMF)
-        self.assertIs(df.decomposition.RandomizedPCA, decomposition.RandomizedPCA)
+        self.assertIs(df.decomposition.IncrementalPCA,
+                      decomposition.IncrementalPCA)
+        self.assertIs(df.decomposition.ProjectedGradientNMF,
+                      decomposition.ProjectedGradientNMF)
+        self.assertIs(df.decomposition.RandomizedPCA,
+                      decomposition.RandomizedPCA)
         self.assertIs(df.decomposition.KernelPCA, decomposition.KernelPCA)
-        self.assertIs(df.decomposition.FactorAnalysis, decomposition.FactorAnalysis)
+        self.assertIs(df.decomposition.FactorAnalysis,
+                      decomposition.FactorAnalysis)
         self.assertIs(df.decomposition.FastICA, decomposition.FastICA)
         self.assertIs(df.decomposition.TruncatedSVD, decomposition.TruncatedSVD)
         self.assertIs(df.decomposition.NMF, decomposition.NMF)
         self.assertIs(df.decomposition.SparsePCA, decomposition.SparsePCA)
-        self.assertIs(df.decomposition.MiniBatchSparsePCA, decomposition.MiniBatchSparsePCA)
+        self.assertIs(df.decomposition.MiniBatchSparsePCA,
+                      decomposition.MiniBatchSparsePCA)
         self.assertIs(df.decomposition.SparseCoder, decomposition.SparseCoder)
-        self.assertIs(df.decomposition.DictionaryLearning, decomposition.DictionaryLearning)
-        self.assertIs(df.decomposition.MiniBatchDictionaryLearning, decomposition.MiniBatchDictionaryLearning)
+        self.assertIs(df.decomposition.DictionaryLearning,
+                      decomposition.DictionaryLearning)
+        self.assertIs(df.decomposition.MiniBatchDictionaryLearning,
+                      decomposition.MiniBatchDictionaryLearning)
+
+        if pdml.compat._SKLEARN_ge_017():
+            self.assertIs(df.decomposition.LatentDirichletAllocation,
+                          decomposition.LatentDirichletAllocation)
 
     def test_fastica(self):
         iris = datasets.load_iris()
@@ -184,8 +196,8 @@ class TestDecomposition(tm.TestCase):
 
         self.assertTrue(isinstance(result, pdml.ModelFrame))
         self.assert_series_equal(df.target, result.target)
-        self.assert_numpy_array_almost_equal(result.data.values,
-                                             expected)
+        self.assert_numpy_array_almost_equal(result.data.values[:, :40],
+                                             expected[:, :40])
 
     def test_inverse_transform(self):
         iris = datasets.load_iris()
