@@ -5,7 +5,7 @@ Import ``ConfusionMatrix``
 
 .. code-block:: python
 
-    from pandas_ml.confusion_matrix import ConfusionMatrix
+    from pandas_ml import ConfusionMatrix
 
 Define actual values (``y_true``) and predicted values (``y_pred``)
 
@@ -81,7 +81,7 @@ Import ``BinaryConfusionMatrix`` and ``Backend``
 
 .. code-block:: python
 
-    from pandas_ml.confusion_matrix import BinaryConfusionMatrix, Backend
+    from pandas_ml import BinaryConfusionMatrix, Backend
 
 Define actual values (``y_true``) and predicted values (``y_pred``)
 

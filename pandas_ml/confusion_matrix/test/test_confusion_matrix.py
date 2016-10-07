@@ -4,10 +4,9 @@
 import pandas as pd
 import numpy as np
 
-from pandas_ml.confusion_matrix import (
-    LabeledConfusionMatrix, BinaryConfusionMatrix, ConfusionMatrix,
-    TRUE_NAME_DEFAULT, PRED_NAME_DEFAULT
-)
+from pandas_ml import (LabeledConfusionMatrix, BinaryConfusionMatrix,
+                       ConfusionMatrix, TRUE_NAME_DEFAULT, PRED_NAME_DEFAULT)
+from pandas_ml import Backend                                      # noqa
 # from sklearn.metrics import confusion_matrix
 from collections import OrderedDict
 
