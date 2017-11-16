@@ -3,6 +3,7 @@
 from distutils.version import LooseVersion
 
 import pandas as pd
+from pandas.api.types import is_list_like, is_integer_dtype         # noqa
 
 PANDAS_VERSION = LooseVersion(pd.__version__)
 
@@ -12,30 +13,14 @@ if PANDAS_VERSION >= LooseVersion('0.21'):
 else:
     _PANDAS_ge_021 = False
 
-if PANDAS_VERSION >= LooseVersion('0.20'):
-    _PANDAS_ge_020 = True
-else:
-    _PANDAS_ge_020 = False
-
-if PANDAS_VERSION >= LooseVersion('0.19'):
-    _PANDAS_ge_019 = True
-    from pandas.api.types import is_list_like, is_integer_dtype         # noqa
-
-else:
-    _PANDAS_ge_019 = False
-    from pandas.core.common import is_list_like, is_integer_dtype       # noqa
 
 try:
     import sklearn
     _SKLEARN_INSTALLED = True
-    _SKLEARN_ge_017 = sklearn.__version__ >= LooseVersion('0.17')
-    _SKLEARN_ge_018 = sklearn.__version__ >= LooseVersion('0.18')
     _SKLEARN_ge_019 = sklearn.__version__ >= LooseVersion('0.19')
 
 except ImportError:
     _SKLEARN_INSTALLED = False
-    _SKLEARN_ge_017 = False
-    _SKLEARN_ge_018 = False
     _SKLEARN_ge_019 = False
 
 
