@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
-
-from pandas.util.decorators import cache_readonly
-
+from pandas_ml.compat import _PANDAS_ge_021
 from pandas_ml.core.accessor import _AccessorMethods
+
+if not _PANDAS_ge_021:
+    from pandas.util.decorators import cache_readonly
+else:
+    from pandas.util import cache_readonly
 
 
 class ImbalanceMethods(_AccessorMethods):

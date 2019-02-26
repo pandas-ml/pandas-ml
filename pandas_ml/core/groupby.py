@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 
 import pandas as pd
-from pandas.util.decorators import Appender
 import pandas.compat as compat
 
+from pandas_ml.compat import _PANDAS_ge_021
 from pandas_ml.core.base import _BaseEstimator
-from pandas_ml.core.generic import ModelPredictor, _shared_docs
 from pandas_ml.core.frame import ModelFrame
+from pandas_ml.core.generic import ModelPredictor, _shared_docs
 from pandas_ml.core.series import ModelSeries
+
+if not _PANDAS_ge_021:
+    from pandas.util.decorators import Appender
+else:
+    from pandas.util import Appender
 
 
 @Appender(pd.core.groupby.GroupBy.__doc__)
